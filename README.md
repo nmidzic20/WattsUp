@@ -22,6 +22,8 @@ Open the project inside `backend` directory from `dev-backend` branch in Visual 
 
 ## Git workflow
 
+Each team member should have three separate folders (e.g. AIR-Mobile, AIR-Web, AIR-Backend) and clone this repository three times to each of them (`git clone`). Each folder should always be on the `dev` branch for that technology, e.g. AIR-Mobile is always on `dev-android`, AIR-Web on `dev-web` etc. Whenever working on a feature, open the appropriate folder and IDE depending on the technology, e.g. if working on a mobile feature, open the project from AIR-Mobile in Android Studio and whenever committing, all commits will be made in local repository inside AIR-Mobile.
+
 No pull requests or direct commits to `main` branch, all pull requests are made to either `dev-android`, `dev-web` or `dev-backend` branches. These three branches are merged into `main` before the project defenses or at the end of the production cycle. Only `dev` branches may be merged into `main`, all other branches (feature) may only be merged into one of the `dev` branches. Each merged PR to `main` represents a version of production code and has a tag, e.g. `1.0`, `1.0.1`, `1.1.0`.
 
 All feature branches are created from the respective `dev` branch for that technology (mobile, web or backend), never from `main`. E.g. for implementing Login screen on web, create feature branch `dev_web/ANP-7_login` from `dev-web` and when finished make PR to `dev-web`, for implementing login routes in backend, create feature branch `dev_backend/ANP-30_login` from `dev-backend` and when finished make PR to `dev-backend`, etc.
