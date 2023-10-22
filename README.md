@@ -12,7 +12,7 @@ Open the project inside `android` directory from `dev-android` branch in Android
 
 In the `web` directory:
 ```
-npm install // Only after the first fresh pull from the repository, to update node modules
+npm install # Only after the first fresh pull from the repository, to update node modules
 ng serve
 ```
 
