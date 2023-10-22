@@ -36,7 +36,7 @@ Whenever creating a pull request from a feature branch to one of `dev` branches,
 
 ## Naming convention
 
-Each branch, commit and PR should contain reference to Jira issue in order for them to automatically be shown in Jira.
+Each branch, commit and PR should contain reference to Jira issue in order for them to automatically be shown in Jira. Note that Jira issues are case-sensitive, so if the issue is `ANP-1`, then `anp-1` won't work for linking to the issue. More details can be found on https://support.atlassian.com/jira-software-cloud/docs/reference-issues-in-your-development-work/
 
 ### Branches
 
