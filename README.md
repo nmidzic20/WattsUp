@@ -12,7 +12,7 @@ Open the project inside `android` directory from `dev-android` branch in Android
 
 In the `web` directory:
 ```
-npm install # Only after the first fresh pull from the repository, to update node modules
+npm install      # Only after the first fresh pull from the repository, to update node modules
 ng serve
 ```
 
@@ -22,11 +22,12 @@ Open the project inside `backend` directory from `dev-backend` branch in Visual 
 
 ## Git workflow
 
-No pull requests or direct commits to `main` branch, all pull requests are made to either `dev-android`, `dev-web` or `dev-backend` branches. These three branches are merged into `main` before the project defenses or at the end of the production cycle. Only `dev` branches may be merged into `main`, all other branches (feature) may only be merged into one of the `dev` branches. Each merged PR to `main` represents a version of production code and has a tag, e.g. 1.0, 1.0.1, 1.1.0.
+No pull requests or direct commits to `main` branch, all pull requests are made to either `dev-android`, `dev-web` or `dev-backend` branches. These three branches are merged into `main` before the project defenses or at the end of the production cycle. Only `dev` branches may be merged into `main`, all other branches (feature) may only be merged into one of the `dev` branches. Each merged PR to `main` represents a version of production code and has a tag, e.g. `1.0`, `1.0.1`, `1.1.0`.
 
 All feature branches are created from the respective `dev` branch for that technology (mobile, web or backend), never from `main`. E.g. for implementing Login screen on web, create feature branch `dev_web/ANP-7_login` from `dev-web` and when finished make PR to `dev-web`, for implementing login routes in backend, create feature branch `dev_backend/ANP-30_login` from `dev-backend` and when finished make PR to `dev-backend`, etc.
 
 If necessary, `hotfix` branch may be created from `main`. When the issue is patched, `hotfix` must be merged into both `main` and the `dev` branch corresponding to the technology the fix was made in.
+
 Whenever creating a feature branch, always make sure to get the latest version from the respective `dev` branch (`git pull`) before creating the branch from it.
 
 `dev` branches may have direct commits made to them only if it is a very small commit for which creating a new branch doesn't make sense.
