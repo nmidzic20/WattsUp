@@ -58,6 +58,47 @@ Each commit message should start with Jira issue ID, e.g. "ANP-3 Implemented log
 
 Each PR name should start with Jira issue ID, e.g. "ANP-3 ..."
 
+### Git hooks
+
+To enforce standardised naming convention, include files `commit-msg` and `pre-push` inside `.git\hooks` directory in each local repository. `commit-msg` script will block a commit if it doesn't start with Jira issue ID (ANP-). `pre-push` script will block push to remote if the branch name doesn't follow naming convention for a feature branch as specified above.
+
+`commit-msg` script:
+
+```
+#!/bin/sh
+pattern="^ANP-[0-9]+.*"
+while read -r line; do
+  if ! [[ $line =~ $pattern ]]; then
+    echo "Error: Commit message does not begin with 'ANP-'. Commit message was: '$line'"
+    exit 1
+  fi
+done < "$(git rev-parse --git-dir)/COMMIT_EDITMSG"
+```
+
+`pre-push` script:
+
+```
+#!/bin/sh
+
+remote="$1"
+url="$2"
+
+# Define the allowed branch name formats
+allowed_formats="(dev_android/ANP-[number]_[string with any characters], dev_backend/ANP-[number]_[string with any characters], dev_web/ANP-[number]_[string with any characters])"
+
+# Iterate over the branch references being pushed
+while read local_ref local_sha1 remote_ref remote_sha1; do
+    # Extract the branch name from the reference
+    branch_name="${local_ref#refs/heads/}"
+
+    # Check if the branch name matches the allowed formats
+    if ! [[ $branch_name =~ ^(dev_android/ANP-.+|dev_backend/ANP-.+|dev_web/ANP-.+)$ ]]; then
+        echo "Error: Branch name '$branch_name' does not match the allowed formats. Allowed formats: $allowed_formats" >&2
+        exit 1
+    fi
+done
+```
+
 ## Docker Database
 
 In terminal write:
