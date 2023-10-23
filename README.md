@@ -18,7 +18,7 @@ ng serve
 
 ### ASP.NET project
 
-Before running .NET project you have to have Docker installed and you have to run Docker database (see [here](#database-and-docker)).
+Before running .NET project you have to have Docker installed and you have to run Docker database (see [here](#docker-database)).
 
 Open the project inside `backend` directory from `dev-backend` branch in Visual Studio.
 
@@ -70,3 +70,21 @@ This will create Docker container with Postgres database. Now you can run .NET p
 ## Project structures
 
 ### ASP.NET project
+
+The API has 4 layers and every layer can only communicate with layer below or above it, except for Model layer which every layer can use:
+
+1. Data layer
+   
+   It contains Repositories and Migrations that will manage database.
+   
+2. Service layer
+   
+   It contains Services that will have business logic inside.
+   
+3. Controller layer
+
+    It contains endpoints for REST API.
+   
+4. (0) Model layer
+
+    It contains all model classes for database, response and request.
