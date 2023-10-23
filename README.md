@@ -18,6 +18,8 @@ ng serve
 
 ### ASP.NET project
 
+Before running .NET project you have to have Docker installed and you have to run Docker database (see [here](#database-and-docker)).
+
 Open the project inside `backend` directory from `dev-backend` branch in Visual Studio.
 
 ## Git workflow
@@ -56,4 +58,15 @@ Each commit message should start with Jira issue ID, e.g. "ANP-3 Implemented log
 
 Each PR name should start with Jira issue ID, e.g. "ANP-3 ..."
 
-## Database and Docker
+## Docker Database
+
+In terminal write:
+
+```
+docker run --name air-database -e POSTGRES_PASSWORD=Ho1hmRPnKSjTmgS -p 32769:5432 -d postgres:15
+```
+This will create Docker container with Postgres database. Now you can run .NET project that will connect to that database and add tables with mock data.
+
+## Project structures
+
+### ASP.NET project
