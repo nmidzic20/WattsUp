@@ -42,11 +42,11 @@ Each branch, commit and PR should contain reference to Jira issue in order for t
 
 ### Branches
 
-Naming a feature branch created from `dev-android`: `dev_android/[Jira_issue_ID]_feature_name`, e.g. `dev_android/ANP-1_login` 
+Naming a feature branch created from `dev-android`: `dev_android/[Jira_issue_ID]_feature-name`, e.g. `dev_android/ANP-1_login` 
 
-Naming a feature branch created from `dev-web`:  `dev_web/[Jira_issue_ID]_feature_name`, e.g. `dev_web/ANP-2_login`
+Naming a feature branch created from `dev-web`:  `dev_web/[Jira_issue_ID]_feature-name`, e.g. `dev_web/ANP-2_login`
 
-Naming a feature branch created from `dev-backend`:  `dev_backend/[Jira_issue_ID]_feature_name`, e.g. `dev_backend/ANP-3_login` 
+Naming a feature branch created from `dev-backend`:  `dev_backend/[Jira_issue_ID]_feature-name`, e.g. `dev_backend/ANP-3_login` 
 
 ### Commits
 
