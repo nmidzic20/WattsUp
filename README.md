@@ -101,10 +101,10 @@ done
 
 ## Docker Database
 
-In terminal write:
+From `backend` directory, to execute Dockerfile:
 
 ```
 docker run --name air-database -e POSTGRES_PASSWORD=Ho1hmRPnKSjTmgS -p 32769:5432 -d postgres:15
 ```
-This will create Docker container with Postgres database. Now you can run .NET project that will connect to that database and add tables with mock data.
+This will create Docker container with Postgres database. Now you can run .NET project which creates another container in which the backend is executed. The backend will connect to the database and add tables with mock data (via Migrations).
 
