@@ -108,24 +108,3 @@ docker run --name air-database -e POSTGRES_PASSWORD=Ho1hmRPnKSjTmgS -p 32769:543
 ```
 This will create Docker container with Postgres database. Now you can run .NET project that will connect to that database and add tables with mock data.
 
-## Project structures
-
-### ASP.NET project
-
-The API has structure of 4 folders and classes from every folder should only communicate with folder below or above it, except for Model that everyone can use:
-
-1. Data
-   
-   It contains Repositories and Migrations that will manage database.
-   
-2. Service
-   
-   It contains Services that will have business logic inside.
-   
-3. Controller
-
-    It contains endpoints for REST API.
-   
-4. (0) Model
-
-    It contains all model classes for database, response and request.
