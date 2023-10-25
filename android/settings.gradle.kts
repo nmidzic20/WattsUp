@@ -17,3 +17,4 @@ rootProject.name = "WattsUp"
 include(":app")
 include(":core")
 include(":charging")
+include(":user_mode")
