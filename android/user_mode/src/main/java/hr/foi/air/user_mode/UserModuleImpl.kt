@@ -4,8 +4,13 @@ import androidx.compose.runtime.Composable
 import hr.foi.air.core.AppMode
 
 class UserModuleImpl : AppMode {
+
+    override fun getRoute(): String {
+        return "History"
+    }
+
     @Composable
     override fun displayUI() {
-        TODO("Not yet implemented")
+        HistoryScreen()
     }
 }

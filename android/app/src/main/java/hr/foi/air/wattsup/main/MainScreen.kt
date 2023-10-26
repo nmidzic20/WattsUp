@@ -16,7 +16,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -28,11 +27,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import hr.foi.air.charging.ChargingModuleImpl
+import hr.foi.air.core.AppMode
+import hr.foi.air.user_mode.UserModuleImpl
 import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.navigation.NavigationItem
 import hr.foi.air.wattsup.navigation.Screens
-import hr.foi.air.wattsup.screens.ChargerScreen
-import hr.foi.air.wattsup.screens.HistoryScreen
 import hr.foi.air.wattsup.screens.HomeScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -41,6 +41,11 @@ fun MainScreen() {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
+
+    val modules: List<AppMode> = listOf(
+        ChargingModuleImpl(),
+        UserModuleImpl(),
+    )
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -99,7 +104,7 @@ fun MainScreen() {
             startDestination = Screens.Home.route,
             modifier = Modifier.padding(paddingValues = paddingValues),
         ) {
-            composable(Screens.Home.route) {
+            /*composable(Screens.Home.route) {
                 HomeScreen(
                     navController,
                 )
@@ -113,6 +118,16 @@ fun MainScreen() {
                 HistoryScreen(
                     navController,
                 )
+            }*/
+            composable(Screens.Home.route) {
+                HomeScreen(
+                    navController,
+                )
+            }
+            modules.forEach { module ->
+                composable(module.getRoute()) {
+                    module.displayUI()
+                }
             }
         }
     }
