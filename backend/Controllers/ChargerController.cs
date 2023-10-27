@@ -43,6 +43,18 @@ namespace backend.Controllers
             return Ok(chargers);
         }
 
+        [HttpGet("byState/{active}")]
+        public async Task<ActionResult<List<Charger>>> GetChargersByState(bool active)
+        {
+            var chargers = await _dbContext.Charger
+                .Include(c => c.Events)
+                .Include(c => c.CreatedBy)
+                .Where(c => c.Active == active)
+                .ToListAsync();
+
+            return Ok(chargers);
+        }
+
         [HttpPost]
         public async Task<ActionResult<Charger>> AddCharger([FromBody] Charger _charger)
         {
