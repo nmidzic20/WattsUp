@@ -34,13 +34,18 @@ namespace backend.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<List<Charger>>> GetChargerByID(long id)
         {
-            var chargers = await _dbContext.Charger
+            var charger = await _dbContext.Charger
                 .Include(c => c.Events)
                 .Include(c => c.CreatedBy)
                 .Where(c => c.Id == id)
-                .ToListAsync();
-            // return error if not found
-            return Ok(chargers);
+                .FirstOrDefaultAsync();
+            
+            if (charger == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(charger);
         }
 
         [HttpGet("byState/{active}")]
