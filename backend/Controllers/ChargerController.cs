@@ -3,6 +3,7 @@ using backend.Models.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Immutable;
 
 namespace backend.Controllers
 {
@@ -25,6 +26,18 @@ namespace backend.Controllers
             var chargers = await _dbContext.Charger
                 .Include(c => c.Events)
                 .Include(c => c.CreatedBy)
+                .ToListAsync();
+
+            return Ok(chargers);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<List<Charger>>> GetChargerByID(int id)
+        {
+            var chargers = await _dbContext.Charger
+                .Include(c => c.Events)
+                .Include(c => c.CreatedBy)
+                .Where(c => c.Id == id)
                 .ToListAsync();
 
             return Ok(chargers);
