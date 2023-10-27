@@ -23,7 +23,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hr.foi.air.wattsup.R
-import hr.foi.air.wattsup.ui.theme.colorPrimary
 
 @Composable
 fun ModeButton(mode: String, iconId: Int, onChargerModeClick: () -> Unit) {
@@ -35,7 +34,7 @@ fun ModeButton(mode: String, iconId: Int, onChargerModeClick: () -> Unit) {
             .size(220.dp)
             .padding(16.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = colorPrimary,
+            containerColor = MaterialTheme.colorScheme.primary,
             contentColor = Color.White,
         ),
         shape = CircleShape,
@@ -59,7 +58,7 @@ fun ModeButton(mode: String, iconId: Int, onChargerModeClick: () -> Unit) {
 
                 Text(
                     text = mode,
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
                 )
             }
