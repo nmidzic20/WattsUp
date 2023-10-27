@@ -1,4 +1,5 @@
-﻿using backend.Models.Entities;
+﻿using backend.Data;
+using backend.Models.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,10 +9,10 @@ namespace backend.Controllers
     [ApiController]
     public class ChargerController : Controller
     {
-        private readonly WattsUpDbContext _dbContext;
+        private readonly DatabaseContext _dbContext;
         private HttpClient _client;
 
-        public ChargerController(WattsUpDbContext dbContext, HttpClient httpClient)
+        public ChargerController(DatabaseContext dbContext, HttpClient httpClient)
         {
             _dbContext = dbContext;
             _client = httpClient;
@@ -30,8 +31,8 @@ namespace backend.Controllers
                 LastSyncAt = DateTime.Now,
                 Active = false
             };
-
-            _dbContext.Sensors.Add(charger);
+            
+            _dbContext.Charger.Add(charger);
 
             await _dbContext.SaveChangesAsync();
 
