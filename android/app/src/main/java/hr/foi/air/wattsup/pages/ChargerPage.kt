@@ -1,9 +1,20 @@
 package hr.foi.air.wattsup.pages
 
-import androidx.compose.foundation.layout.* // ktlint-disable no-wildcard-imports
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.* // ktlint-disable no-wildcard-imports
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -11,26 +22,25 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import hr.foi.air.wattsup.R
-import hr.foi.air.wattsup.ui.component.ModeButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LandingPage() {
+fun ChargerPage() {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-                    Text(stringResource(R.string.app_name))
+                    Text(stringResource(R.string.charger_mode))
                 },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary,
                 ),
-                /*navigationIcon = {
+                navigationIcon = {
                     IconButton(onClick = { }) {
                         Icon(Icons.Filled.ArrowBack, null, tint = Color.White)
                     }
-                },*/
+                },
 
             )
         },
@@ -44,19 +54,15 @@ fun LandingPage() {
             verticalArrangement = Arrangement.SpaceEvenly,
         ) {
             Text(
-                text = "Select app mode:",
+                text = "Please scan RFID card...",
                 style = MaterialTheme.typography.titleLarge,
             )
-
-            ModeButton(mode = "User mode", iconId = R.drawable.icon_user_mode)
-
-            ModeButton(mode = "Charger mode", iconId = R.drawable.icon_charger_mode)
         }
     }
 }
 
 @Preview
 @Composable
-fun LandingPagePreview() {
-    LandingPage()
+fun ChargerPagePreview() {
+    ChargerPage()
 }
