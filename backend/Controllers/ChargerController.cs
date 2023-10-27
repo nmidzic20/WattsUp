@@ -39,7 +39,7 @@ namespace backend.Controllers
                 .Include(c => c.CreatedBy)
                 .Where(c => c.Id == id)
                 .ToListAsync();
-
+            // return error if not found
             return Ok(chargers);
         }
 
@@ -108,6 +108,27 @@ namespace backend.Controllers
 
             await _dbContext.SaveChangesAsync();
             
+            return Ok(charger);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<Charger>> DeleteChargerByID(long id)
+        {
+            var charger = await _dbContext.Charger
+                .Include(c => c.Events)
+                .Include(c => c.CreatedBy)
+                .Where(c => c.Id == id)
+                .FirstOrDefaultAsync();
+
+            if (charger == null)
+            {
+                return NotFound();
+            }
+
+            _dbContext.Charger.Remove(charger);
+
+            await _dbContext.SaveChangesAsync();
+
             return Ok(charger);
         }
     }
