@@ -24,12 +24,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.ui.theme.colorPrimary
-import hr.foi.air.wattsup.ui.theme.colorPrimaryContainer
 
 @Composable
-fun ModeButton(mode: String, iconId: Int) {
+fun ModeButton(mode: String, iconId: Int, onChargerModeClick: () -> Unit) {
     Button(
         onClick = {
+            onChargerModeClick()
         },
         modifier = Modifier
             .size(220.dp)
@@ -70,5 +70,5 @@ fun ModeButton(mode: String, iconId: Int) {
 @Preview
 @Composable
 fun ModeButtonPreview() {
-    ModeButton("Preview mode", R.drawable.icon_user_mode)
+    ModeButton("Preview mode", R.drawable.icon_user_mode, { })
 }

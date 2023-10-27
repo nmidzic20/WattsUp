@@ -25,7 +25,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
@@ -71,4 +71,7 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.7.2")
     implementation("com.squareup.okhttp3:okhttp:3.6.0")
 
+    val nav_version = "2.7.4"
+
+    implementation("androidx.navigation:navigation-compose:$nav_version")
 }

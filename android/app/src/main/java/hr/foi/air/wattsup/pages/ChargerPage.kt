@@ -25,7 +25,7 @@ import hr.foi.air.wattsup.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChargerPage() {
+fun ChargerPage(onArrowBackClick: () -> Unit) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -37,7 +37,7 @@ fun ChargerPage() {
                     titleContentColor = MaterialTheme.colorScheme.primary,
                 ),
                 navigationIcon = {
-                    IconButton(onClick = { }) {
+                    IconButton(onClick = { onArrowBackClick() }) {
                         Icon(Icons.Filled.ArrowBack, null, tint = Color.White)
                     }
                 },
@@ -64,5 +64,5 @@ fun ChargerPage() {
 @Preview
 @Composable
 fun ChargerPagePreview() {
-    ChargerPage()
+    ChargerPage({})
 }
