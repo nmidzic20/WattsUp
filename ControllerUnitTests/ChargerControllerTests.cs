@@ -157,5 +157,135 @@ namespace ControllerUnitTests
                 Assert.AreEqual(99, (result.Value as Charger).Id);
             }
         }
+
+        [TestMethod]
+        public async Task GetChargersByState_Active_WhenThereAreActiveChargers_ShouldReturnActiveChargers()
+        {
+            // Arrange
+            var options = new DbContextOptionsBuilder<DatabaseContext>()
+                .UseInMemoryDatabase(databaseName: "WattsUpDatabase")
+                .Options;
+
+            using (var context = new DatabaseContext(options))
+            {
+                context.Charger.RemoveRange(context.Charger);
+
+                context.Charger.Add(new Charger
+                {
+                    Id = 1,
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = new User { Email = "test", FirstName = "test", LastName = "test", Password = "test" },
+                    Active = true,
+                    Events = new List<Event> { },
+                    LastSyncAt = DateTime.Now,
+                    Latitude = 1.0,
+                    Longitude = 1.0,
+                    Name = "Test Charger 1"
+                });
+                context.Charger.Add(new Charger
+                {
+                    Id = 2,
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = new User { Email = "test", FirstName = "test", LastName = "test", Password = "test" },
+                    Active = false,
+                    Events = new List<Event> { },
+                    LastSyncAt = DateTime.Now,
+                    Latitude = 1.0,
+                    Longitude = 1.0,
+                    Name = "Test Charger 2"
+                });
+                context.Charger.Add(new Charger
+                {
+                    Id = 3,
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = new User { Email = "test", FirstName = "test", LastName = "test", Password = "test" },
+                    Active = true,
+                    Events = new List<Event> { },
+                    LastSyncAt = DateTime.Now,
+                    Latitude = 1.0,
+                    Longitude = 1.0,
+                    Name = "Test Charger 3"
+                });
+
+                context.SaveChanges();
+            }
+
+            using (var context = new DatabaseContext(options))
+            {
+                ChargerController chargerController = new ChargerController(context, new HttpClient());
+
+                // Act
+                var result = (await chargerController.GetChargersByState(true)).Result as ObjectResult;
+
+                // Assert
+                Assert.AreEqual("Test Charger 1", (result.Value as List<Charger>).FirstOrDefault().Name);
+                Assert.AreEqual("Test Charger 3", (result.Value as List<Charger>).Last().Name);
+            }
+        }
+
+        [TestMethod]
+        public async Task GetChargersByState_NotActive_WhenThereAreNonActiveChargers_ShouldReturnNonActiveChargers()
+        {
+            // Arrange
+            var options = new DbContextOptionsBuilder<DatabaseContext>()
+                .UseInMemoryDatabase(databaseName: "WattsUpDatabase")
+                .Options;
+
+            using (var context = new DatabaseContext(options))
+            {
+                context.Charger.RemoveRange(context.Charger);
+
+                context.Charger.Add(new Charger
+                {
+                    Id = 1,
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = new User { Email = "test", FirstName = "test", LastName = "test", Password = "test" },
+                    Active = false,
+                    Events = new List<Event> { },
+                    LastSyncAt = DateTime.Now,
+                    Latitude = 1.0,
+                    Longitude = 1.0,
+                    Name = "Test Charger 1"
+                });
+                context.Charger.Add(new Charger
+                {
+                    Id = 2,
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = new User { Email = "test", FirstName = "test", LastName = "test", Password = "test" },
+                    Active = true,
+                    Events = new List<Event> { },
+                    LastSyncAt = DateTime.Now,
+                    Latitude = 1.0,
+                    Longitude = 1.0,
+                    Name = "Test Charger 2"
+                });
+                context.Charger.Add(new Charger
+                {
+                    Id = 3,
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = new User { Email = "test", FirstName = "test", LastName = "test", Password = "test" },
+                    Active = false,
+                    Events = new List<Event> { },
+                    LastSyncAt = DateTime.Now,
+                    Latitude = 1.0,
+                    Longitude = 1.0,
+                    Name = "Test Charger 3"
+                });
+
+                context.SaveChanges();
+            }
+
+            using (var context = new DatabaseContext(options))
+            {
+                ChargerController chargerController = new ChargerController(context, new HttpClient());
+
+                // Act
+                var result = (await chargerController.GetChargersByState(false)).Result as ObjectResult;
+
+                // Assert
+                Assert.AreEqual("Test Charger 1", (result.Value as List<Charger>).FirstOrDefault().Name);
+                Assert.AreEqual("Test Charger 3", (result.Value as List<Charger>).Last().Name);
+            }
+        }
     }
 }
