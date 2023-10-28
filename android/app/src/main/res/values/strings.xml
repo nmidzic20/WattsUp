@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">WattsUp</string>
+    <string name="charger_mode">Charger mode</string>
 </resources>
