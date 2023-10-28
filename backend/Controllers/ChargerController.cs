@@ -32,7 +32,7 @@ namespace backend.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<List<Charger>>> GetChargerByID(long id)
+        public async Task<ActionResult<Charger>> GetChargerByID(long id)
         {
             var charger = await _dbContext.Charger
                 .Include(c => c.Events)
@@ -78,32 +78,13 @@ namespace backend.Controllers
 
             await _dbContext.SaveChangesAsync();
 
-            return Ok(new Charger
-            {
-                Id = charger.Id,
-                Name = charger.Name,
-                Latitude = charger.Latitude,
-                Longitude = charger.Longitude,
-                CreatedAt = charger.CreatedAt,
-                CreatedBy = charger.CreatedBy,
-                LastSyncAt = charger.LastSyncAt,
-                Active = charger.Active
-            });
+            return Ok(charger);
         }
 
         [HttpPut("{id}")]
         public async Task<ActionResult<Charger>> UpdateChargerByID(long id, [FromBody] Charger _charger)
         {
-            var charger = await _dbContext.Charger
-                .Include(c => c.Events)
-                .Include(c => c.CreatedBy)
-                .Where(c => c.Id == id)
-                .FirstOrDefaultAsync();
-
-            if (charger == null)
-            {
-                return NotFound();
-            }
+            var charger = (await GetChargerByID(id)).Value;
 
             charger.Name = _charger.Name;
             charger.Latitude = _charger.Latitude;
