@@ -7,6 +7,7 @@
         public double Latitude { get; set; }
         public double Longitude { get; set; }
         public DateTime CreatedAt { get; set; }
+        public int CreatedById { get; set; }
         public virtual User CreatedBy { get; set; }
         public DateTime LastSyncAt { get; set; }
         public bool Active { get; set; }

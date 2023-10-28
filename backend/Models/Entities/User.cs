@@ -9,6 +9,7 @@
         public string Password { get; set; }
         public bool Active { get; set; }
         public DateTime CreatedAt { get; set; }
+        public int RoleId { get; set; }
         public virtual Role Role { get; set; }
     }
 }
