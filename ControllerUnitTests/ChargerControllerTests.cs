@@ -3,6 +3,9 @@ using backend.Data;
 using backend.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System;
 
 namespace ControllerUnitTests
 {
@@ -10,15 +13,43 @@ namespace ControllerUnitTests
     public class ChargerControllerTests
     {
         [TestMethod]
-        public async Task Get_WhenThereAreChargers_ShouldReturnAllChargers()
+        public async Task GetChargers_WhenThereAreNoChargers_ShouldReturnEmptyList()
         {
             // Arrange
             var options = new DbContextOptionsBuilder<DatabaseContext>()
-                .UseInMemoryDatabase(databaseName: "MovieListDatabase")
+                .UseInMemoryDatabase(databaseName: "WattsUpDatabase")
                 .Options;
 
             using (var context = new DatabaseContext(options))
             {
+                context.Charger.RemoveRange(context.Charger);
+                context.SaveChanges();
+            }
+
+            using (var context = new DatabaseContext(options))
+            {
+                ChargerController chargerController = new ChargerController(context, new HttpClient());
+
+                // Act
+                var result = (await chargerController.GetChargers()).Result as ObjectResult;
+
+                // Assert
+                Assert.IsFalse((result.Value as List<Charger>).Any());
+            }
+        }
+
+        [TestMethod]
+        public async Task GetChargers_WhenThereAreChargers_ShouldReturnAllChargers()
+        {
+            // Arrange
+            var options = new DbContextOptionsBuilder<DatabaseContext>()
+                .UseInMemoryDatabase(databaseName: "WattsUpDatabase")
+                .Options;
+
+            using (var context = new DatabaseContext(options))
+            {
+                context.Charger.RemoveRange(context.Charger);
+                
                 context.Charger.Add(new Charger 
                 { 
                     Id = 1,
@@ -31,6 +62,7 @@ namespace ControllerUnitTests
                     Longitude = 1.0,
                     Name = "Test Charger 1"
                 });
+
                 context.Charger.Add(new Charger
                 {
                     Id = 2,
@@ -43,6 +75,7 @@ namespace ControllerUnitTests
                     Longitude = 1.0,
                     Name = "Test Charger 2"
                 });
+
                 context.SaveChanges();
             }
 
@@ -51,10 +84,77 @@ namespace ControllerUnitTests
                 ChargerController chargerController = new ChargerController(context, new HttpClient());
             
                 // Act
-                var chargers = (await chargerController.GetChargers()).Result as OkObjectResult;
+                var result = (await chargerController.GetChargers()).Result as ObjectResult;
 
                 // Assert
-                Assert.AreEqual(2, (chargers.Value as List<Charger>).Count);
+                Assert.AreEqual(2, (result.Value as List<Charger>).Count);
+            }
+        }
+
+        [TestMethod]
+        public async Task GetChargerByID_WhenThereIsNoChargerWithGivenID_ShouldReturnError404()
+        {
+            // Arrange
+            var options = new DbContextOptionsBuilder<DatabaseContext>()
+                .UseInMemoryDatabase(databaseName: "WattsUpDatabase")
+                .Options;
+
+            using (var context = new DatabaseContext(options))
+            {
+                context.Charger.RemoveRange(context.Charger);
+                context.SaveChanges();
+            }
+
+            using (var context = new DatabaseContext(options))
+            {
+                ChargerController chargerController = new ChargerController(context, new HttpClient());
+
+                // Act
+                var chargers = await chargerController.GetChargerByID(9999);
+                var result = chargers.Result as StatusCodeResult;
+
+                // Assert
+                Assert.AreEqual(404, result.StatusCode);
+            }
+        }
+
+        [TestMethod]
+        public async Task GetChargerByID_WhenThereIsChargerWithGivenID_ShouldReturnThatCharger()
+        {
+            // Arrange
+            var options = new DbContextOptionsBuilder<DatabaseContext>()
+                .UseInMemoryDatabase(databaseName: "WattsUpDatabase")
+                .Options;
+
+            using (var context = new DatabaseContext(options))
+            {
+                context.Charger.RemoveRange(context.Charger);
+
+                context.Charger.Add(new Charger
+                {
+                    Id = 99,
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = new User { Email = "test", FirstName = "test", LastName = "test", Password = "test" },
+                    Active = true,
+                    Events = new List<Event> { },
+                    LastSyncAt = DateTime.Now,
+                    Latitude = 1.0,
+                    Longitude = 1.0,
+                    Name = "Test Charger 2"
+                });
+
+                context.SaveChanges();
+            }
+
+            using (var context = new DatabaseContext(options))
+            {
+                ChargerController chargerController = new ChargerController(context, new HttpClient());
+
+                // Act
+                var result = (await chargerController.GetChargerByID(99)).Result as ObjectResult;
+
+                // Assert
+                Assert.AreEqual(99, (result.Value as Charger).Id);
             }
         }
     }

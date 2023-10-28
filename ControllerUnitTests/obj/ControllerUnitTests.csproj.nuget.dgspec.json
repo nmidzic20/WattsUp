@@ -1,7 +1,7 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Hrvoje\\source\\repos\\WattsUp\\ControllerUnitTests\\ControllerUnitTests.csproj": {}
+    "C:\\Users\\Hrvoje\\Source\\Repos\\WattsUp\\ControllerUnitTests\\ControllerUnitTests.csproj": {}
   },
   "projects": {
     "C:\\Users\\Hrvoje\\Source\\Repos\\WattsUp\\backend\\backend.csproj": {
@@ -91,14 +91,14 @@
         }
       }
     },
-    "C:\\Users\\Hrvoje\\source\\repos\\WattsUp\\ControllerUnitTests\\ControllerUnitTests.csproj": {
+    "C:\\Users\\Hrvoje\\Source\\Repos\\WattsUp\\ControllerUnitTests\\ControllerUnitTests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Hrvoje\\source\\repos\\WattsUp\\ControllerUnitTests\\ControllerUnitTests.csproj",
+        "projectUniqueName": "C:\\Users\\Hrvoje\\Source\\Repos\\WattsUp\\ControllerUnitTests\\ControllerUnitTests.csproj",
         "projectName": "ControllerUnitTests",
-        "projectPath": "C:\\Users\\Hrvoje\\source\\repos\\WattsUp\\ControllerUnitTests\\ControllerUnitTests.csproj",
+        "projectPath": "C:\\Users\\Hrvoje\\Source\\Repos\\WattsUp\\ControllerUnitTests\\ControllerUnitTests.csproj",
         "packagesPath": "C:\\Users\\Hrvoje\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Hrvoje\\source\\repos\\WattsUp\\ControllerUnitTests\\obj\\",
+        "outputPath": "C:\\Users\\Hrvoje\\Source\\Repos\\WattsUp\\ControllerUnitTests\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Hrvoje\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -115,8 +115,8 @@
           "net7.0": {
             "targetAlias": "net7.0",
             "projectReferences": {
-              "C:\\Users\\Hrvoje\\source\\repos\\WattsUp\\backend\\backend.csproj": {
-                "projectPath": "C:\\Users\\Hrvoje\\source\\repos\\WattsUp\\backend\\backend.csproj"
+              "C:\\Users\\Hrvoje\\Source\\Repos\\WattsUp\\backend\\backend.csproj": {
+                "projectPath": "C:\\Users\\Hrvoje\\Source\\Repos\\WattsUp\\backend\\backend.csproj"
               }
             }
           }

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "jg7AUY3b1TB+1wqvCfd7yTIOsnocEHIOSmnl8qAkfaB34atT6QTWQN9cxep7hWMVnDGzfkiq5aC6+hPXffN13g==",
+  "dgSpecHash": "UgX73917JgxpTXsUqrUrhNd8R2dm2g63HxWvVVpwrgIXhURReM177BDpMeZEEu1xnAMqedG10WaIcqlnbzbZ3Q==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Hrvoje\\source\\repos\\WattsUp\\ControllerUnitTests\\ControllerUnitTests.csproj",
+  "projectFilePath": "C:\\Users\\Hrvoje\\Source\\Repos\\WattsUp\\ControllerUnitTests\\ControllerUnitTests.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Hrvoje\\.nuget\\packages\\azure.core\\1.25.0\\azure.core.1.25.0.nupkg.sha512",
     "C:\\Users\\Hrvoje\\.nuget\\packages\\azure.identity\\1.7.0\\azure.identity.1.7.0.nupkg.sha512",
