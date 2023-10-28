@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE coverage SYSTEM "http://cobertura.sourceforge.net/xml/coverage-04.dtd">
-<coverage line-rate="0.954293628808864" branch-rate="0.75" lines-covered="689" lines-valid="722" branches-covered="6" branches-valid="8" complexity="66" version="0" timestamp="1698522487">
+<coverage line-rate="0.954293628808864" branch-rate="0.75" lines-covered="689" lines-valid="722" branches-covered="6" branches-valid="8" complexity="66" version="0" timestamp="1698522992">
   <sources>
     <source>C:\Users\Hrvoje\</source>
   </sources>

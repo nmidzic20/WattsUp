@@ -9,7 +9,7 @@ namespace backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ChargerController : Controller
+    public class ChargerController : ControllerBase
     {
         private readonly DatabaseContext _dbContext;
         private HttpClient _client;
