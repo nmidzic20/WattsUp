@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<coverage line-rate="0.9215000000000001" branch-rate="0.375" version="1.9" timestamp="1698514753" lines-covered="564" lines-valid="612" branches-covered="3" branches-valid="8">
+<coverage line-rate="0.9542" branch-rate="0.75" version="1.9" timestamp="1698515286" lines-covered="689" lines-valid="722" branches-covered="6" branches-valid="8">
   <sources>
     <source>C:\Users\Hrvoje\</source>
   </sources>
   <packages>
-    <package name="backend" line-rate="0.8558" branch-rate="0.375" complexity="54">
+    <package name="backend" line-rate="0.9018" branch-rate="0.75" complexity="54">
       <classes>
         <class name="Program/&lt;&lt;Main&gt;$&gt;d__0" filename="Source\Repos\WattsUp\backend\Program.cs" line-rate="0" branch-rate="0" complexity="2">
           <methods>
@@ -124,27 +124,27 @@
           <methods>
             <method name="get_Id" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="5" hits="17" branch="False" />
+                <line number="5" hits="23" branch="False" />
               </lines>
             </method>
             <method name="get_Name" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="6" hits="25" branch="False" />
+                <line number="6" hits="30" branch="False" />
               </lines>
             </method>
             <method name="get_Latitude" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="7" hits="20" branch="False" />
+                <line number="7" hits="25" branch="False" />
               </lines>
             </method>
             <method name="get_Longitude" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="8" hits="20" branch="False" />
+                <line number="8" hits="25" branch="False" />
               </lines>
             </method>
             <method name="get_CreatedAt" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="9" hits="17" branch="False" />
+                <line number="9" hits="22" branch="False" />
               </lines>
             </method>
             <method name="get_CreatedById" signature="()" line-rate="1" branch-rate="1" complexity="1">
@@ -154,36 +154,36 @@
             </method>
             <method name="get_CreatedBy" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="11" hits="15" branch="False" />
+                <line number="11" hits="20" branch="False" />
               </lines>
             </method>
             <method name="get_LastSyncAt" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="12" hits="18" branch="False" />
+                <line number="12" hits="23" branch="False" />
               </lines>
             </method>
             <method name="get_Active" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="13" hits="19" branch="False" />
+                <line number="13" hits="24" branch="False" />
               </lines>
             </method>
             <method name="get_Events" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="15" hits="13" branch="False" />
+                <line number="15" hits="18" branch="False" />
               </lines>
             </method>
           </methods>
           <lines>
-            <line number="5" hits="17" branch="False" />
-            <line number="6" hits="25" branch="False" />
-            <line number="7" hits="20" branch="False" />
-            <line number="8" hits="20" branch="False" />
-            <line number="9" hits="17" branch="False" />
+            <line number="5" hits="23" branch="False" />
+            <line number="6" hits="30" branch="False" />
+            <line number="7" hits="25" branch="False" />
+            <line number="8" hits="25" branch="False" />
+            <line number="9" hits="22" branch="False" />
             <line number="10" hits="3" branch="False" />
-            <line number="11" hits="15" branch="False" />
-            <line number="12" hits="18" branch="False" />
-            <line number="13" hits="19" branch="False" />
-            <line number="15" hits="13" branch="False" />
+            <line number="11" hits="20" branch="False" />
+            <line number="12" hits="23" branch="False" />
+            <line number="13" hits="24" branch="False" />
+            <line number="15" hits="18" branch="False" />
           </lines>
         </class>
         <class name="backend.Models.Entities.Event" filename="Source\Repos\WattsUp\backend\Models\Entities\Event.cs" line-rate="0.75" branch-rate="1" complexity="8">
@@ -267,22 +267,22 @@
             </method>
             <method name="get_FirstName" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="6" hits="16" branch="False" />
+                <line number="6" hits="21" branch="False" />
               </lines>
             </method>
             <method name="get_LastName" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="7" hits="16" branch="False" />
+                <line number="7" hits="21" branch="False" />
               </lines>
             </method>
             <method name="get_Email" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="8" hits="16" branch="False" />
+                <line number="8" hits="21" branch="False" />
               </lines>
             </method>
             <method name="get_Password" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="9" hits="16" branch="False" />
+                <line number="9" hits="21" branch="False" />
               </lines>
             </method>
             <method name="get_Active" signature="()" line-rate="1" branch-rate="1" complexity="1">
@@ -308,10 +308,10 @@
           </methods>
           <lines>
             <line number="5" hits="3" branch="False" />
-            <line number="6" hits="16" branch="False" />
-            <line number="7" hits="16" branch="False" />
-            <line number="8" hits="16" branch="False" />
-            <line number="9" hits="16" branch="False" />
+            <line number="6" hits="21" branch="False" />
+            <line number="7" hits="21" branch="False" />
+            <line number="8" hits="21" branch="False" />
+            <line number="9" hits="21" branch="False" />
             <line number="10" hits="3" branch="False" />
             <line number="11" hits="3" branch="False" />
             <line number="12" hits="3" branch="False" />
@@ -322,27 +322,27 @@
           <methods>
             <method name="get_User" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="12" hits="16" branch="False" />
+                <line number="12" hits="22" branch="False" />
               </lines>
             </method>
             <method name="get_Event" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="13" hits="16" branch="False" />
+                <line number="13" hits="22" branch="False" />
               </lines>
             </method>
             <method name="get_Charger" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="14" hits="53" branch="False" />
+                <line number="14" hits="75" branch="False" />
               </lines>
             </method>
             <method name="get_Card" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="15" hits="16" branch="False" />
+                <line number="15" hits="22" branch="False" />
               </lines>
             </method>
             <method name="get_Role" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="16" hits="16" branch="False" />
+                <line number="16" hits="22" branch="False" />
               </lines>
             </method>
             <method name="OnModelCreating" signature="(Microsoft.EntityFrameworkCore.ModelBuilder)" line-rate="1" branch-rate="1" complexity="1">
@@ -531,18 +531,18 @@
             </method>
             <method name=".ctor" signature="(Microsoft.EntityFrameworkCore.DbContextOptions`1&lt;backend.Data.DatabaseContext&gt;)" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="8" hits="16" branch="False" />
-                <line number="9" hits="16" branch="False" />
-                <line number="10" hits="16" branch="False" />
+                <line number="8" hits="22" branch="False" />
+                <line number="9" hits="22" branch="False" />
+                <line number="10" hits="22" branch="False" />
               </lines>
             </method>
           </methods>
           <lines>
-            <line number="12" hits="16" branch="False" />
-            <line number="13" hits="16" branch="False" />
-            <line number="14" hits="53" branch="False" />
-            <line number="15" hits="16" branch="False" />
-            <line number="16" hits="16" branch="False" />
+            <line number="12" hits="22" branch="False" />
+            <line number="13" hits="22" branch="False" />
+            <line number="14" hits="75" branch="False" />
+            <line number="15" hits="22" branch="False" />
+            <line number="16" hits="22" branch="False" />
             <line number="19" hits="1" branch="False" />
             <line number="20" hits="1" branch="False" />
             <line number="21" hits="1" branch="False" />
@@ -723,29 +723,29 @@
             <line number="200" hits="1" branch="False" />
             <line number="201" hits="1" branch="False" />
             <line number="202" hits="1" branch="False" />
-            <line number="8" hits="16" branch="False" />
-            <line number="9" hits="16" branch="False" />
-            <line number="10" hits="16" branch="False" />
+            <line number="8" hits="22" branch="False" />
+            <line number="9" hits="22" branch="False" />
+            <line number="10" hits="22" branch="False" />
           </lines>
         </class>
         <class name="backend.Controllers.ChargerController" filename="Source\Repos\WattsUp\backend\Controllers\ChargerController.cs" line-rate="1" branch-rate="1" complexity="1">
           <methods>
             <method name=".ctor" signature="(backend.Data.DatabaseContext,System.Net.Http.HttpClient)" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="17" hits="8" branch="False" />
-                <line number="18" hits="8" branch="False" />
-                <line number="19" hits="8" branch="False" />
-                <line number="20" hits="8" branch="False" />
-                <line number="21" hits="8" branch="False" />
+                <line number="17" hits="11" branch="False" />
+                <line number="18" hits="11" branch="False" />
+                <line number="19" hits="11" branch="False" />
+                <line number="20" hits="11" branch="False" />
+                <line number="21" hits="11" branch="False" />
               </lines>
             </method>
           </methods>
           <lines>
-            <line number="17" hits="8" branch="False" />
-            <line number="18" hits="8" branch="False" />
-            <line number="19" hits="8" branch="False" />
-            <line number="20" hits="8" branch="False" />
-            <line number="21" hits="8" branch="False" />
+            <line number="17" hits="11" branch="False" />
+            <line number="18" hits="11" branch="False" />
+            <line number="19" hits="11" branch="False" />
+            <line number="20" hits="11" branch="False" />
+            <line number="21" hits="11" branch="False" />
           </lines>
         </class>
         <class name="backend.Controllers.ChargerController/&lt;AddCharger&gt;d__6" filename="Source\Repos\WattsUp\backend\Controllers\ChargerController.cs" line-rate="1" branch-rate="1" complexity="1">
@@ -788,48 +788,48 @@
             <line number="82" hits="1" branch="False" />
           </lines>
         </class>
-        <class name="backend.Controllers.ChargerController/&lt;DeleteChargerByID&gt;d__8" filename="Source\Repos\WattsUp\backend\Controllers\ChargerController.cs" line-rate="0" branch-rate="0" complexity="2">
+        <class name="backend.Controllers.ChargerController/&lt;DeleteChargerByID&gt;d__8" filename="Source\Repos\WattsUp\backend\Controllers\ChargerController.cs" line-rate="1" branch-rate="1" complexity="2">
           <methods>
-            <method name="MoveNext" signature="()" line-rate="0" branch-rate="0" complexity="2">
+            <method name="MoveNext" signature="()" line-rate="1" branch-rate="1" complexity="2">
               <lines>
-                <line number="111" hits="0" branch="False" />
-                <line number="112" hits="0" branch="False" />
-                <line number="113" hits="0" branch="False" />
-                <line number="114" hits="0" branch="False" />
-                <line number="115" hits="0" branch="False" />
-                <line number="116" hits="0" branch="False" />
-                <line number="118" hits="0" branch="True" condition-coverage="0% (0/2)">
+                <line number="111" hits="2" branch="False" />
+                <line number="112" hits="2" branch="False" />
+                <line number="113" hits="2" branch="False" />
+                <line number="114" hits="2" branch="False" />
+                <line number="115" hits="2" branch="False" />
+                <line number="116" hits="2" branch="False" />
+                <line number="118" hits="2" branch="True" condition-coverage="100% (2/2)">
                   <conditions>
-                    <condition number="458" type="jump" coverage="0%" />
+                    <condition number="458" type="jump" coverage="100%" />
                   </conditions>
                 </line>
-                <line number="119" hits="0" branch="False" />
-                <line number="120" hits="0" branch="False" />
-                <line number="123" hits="0" branch="False" />
-                <line number="125" hits="0" branch="False" />
-                <line number="127" hits="0" branch="False" />
-                <line number="128" hits="0" branch="False" />
+                <line number="119" hits="1" branch="False" />
+                <line number="120" hits="1" branch="False" />
+                <line number="123" hits="1" branch="False" />
+                <line number="125" hits="1" branch="False" />
+                <line number="127" hits="1" branch="False" />
+                <line number="128" hits="2" branch="False" />
               </lines>
             </method>
           </methods>
           <lines>
-            <line number="111" hits="0" branch="False" />
-            <line number="112" hits="0" branch="False" />
-            <line number="113" hits="0" branch="False" />
-            <line number="114" hits="0" branch="False" />
-            <line number="115" hits="0" branch="False" />
-            <line number="116" hits="0" branch="False" />
-            <line number="118" hits="0" branch="True" condition-coverage="0% (0/2)">
+            <line number="111" hits="2" branch="False" />
+            <line number="112" hits="2" branch="False" />
+            <line number="113" hits="2" branch="False" />
+            <line number="114" hits="2" branch="False" />
+            <line number="115" hits="2" branch="False" />
+            <line number="116" hits="2" branch="False" />
+            <line number="118" hits="2" branch="True" condition-coverage="100% (2/2)">
               <conditions>
-                <condition number="458" type="jump" coverage="0%" />
+                <condition number="458" type="jump" coverage="100%" />
               </conditions>
             </line>
-            <line number="119" hits="0" branch="False" />
-            <line number="120" hits="0" branch="False" />
-            <line number="123" hits="0" branch="False" />
-            <line number="125" hits="0" branch="False" />
-            <line number="127" hits="0" branch="False" />
-            <line number="128" hits="0" branch="False" />
+            <line number="119" hits="1" branch="False" />
+            <line number="120" hits="1" branch="False" />
+            <line number="123" hits="1" branch="False" />
+            <line number="125" hits="1" branch="False" />
+            <line number="127" hits="1" branch="False" />
+            <line number="128" hits="2" branch="False" />
           </lines>
         </class>
         <class name="backend.Controllers.ChargerController/&lt;GetChargerByID&gt;d__4" filename="Source\Repos\WattsUp\backend\Controllers\ChargerController.cs" line-rate="1" branch-rate="1" complexity="2">
@@ -922,23 +922,23 @@
             <line number="61" hits="2" branch="False" />
           </lines>
         </class>
-        <class name="backend.Controllers.ChargerController/&lt;UpdateChargerByID&gt;d__7" filename="Source\Repos\WattsUp\backend\Controllers\ChargerController.cs" line-rate="0.8823000000000001" branch-rate="0.5" complexity="2">
+        <class name="backend.Controllers.ChargerController/&lt;UpdateChargerByID&gt;d__7" filename="Source\Repos\WattsUp\backend\Controllers\ChargerController.cs" line-rate="1" branch-rate="1" complexity="2">
           <methods>
-            <method name="MoveNext" signature="()" line-rate="0.8823000000000001" branch-rate="0.5" complexity="2">
+            <method name="MoveNext" signature="()" line-rate="1" branch-rate="1" complexity="2">
               <lines>
-                <line number="86" hits="1" branch="False" />
-                <line number="87" hits="1" branch="False" />
-                <line number="88" hits="1" branch="False" />
-                <line number="89" hits="1" branch="False" />
-                <line number="90" hits="1" branch="False" />
-                <line number="91" hits="1" branch="False" />
-                <line number="93" hits="1" branch="True" condition-coverage="50% (1/2)">
+                <line number="86" hits="2" branch="False" />
+                <line number="87" hits="2" branch="False" />
+                <line number="88" hits="2" branch="False" />
+                <line number="89" hits="2" branch="False" />
+                <line number="90" hits="2" branch="False" />
+                <line number="91" hits="2" branch="False" />
+                <line number="93" hits="2" branch="True" condition-coverage="100% (2/2)">
                   <conditions>
-                    <condition number="458" type="jump" coverage="50%" />
+                    <condition number="458" type="jump" coverage="100%" />
                   </conditions>
                 </line>
-                <line number="94" hits="0" branch="False" />
-                <line number="95" hits="0" branch="False" />
+                <line number="94" hits="1" branch="False" />
+                <line number="95" hits="1" branch="False" />
                 <line number="98" hits="1" branch="False" />
                 <line number="99" hits="1" branch="False" />
                 <line number="100" hits="1" branch="False" />
@@ -946,24 +946,24 @@
                 <line number="102" hits="1" branch="False" />
                 <line number="104" hits="1" branch="False" />
                 <line number="106" hits="1" branch="False" />
-                <line number="107" hits="1" branch="False" />
+                <line number="107" hits="2" branch="False" />
               </lines>
             </method>
           </methods>
           <lines>
-            <line number="86" hits="1" branch="False" />
-            <line number="87" hits="1" branch="False" />
-            <line number="88" hits="1" branch="False" />
-            <line number="89" hits="1" branch="False" />
-            <line number="90" hits="1" branch="False" />
-            <line number="91" hits="1" branch="False" />
-            <line number="93" hits="1" branch="True" condition-coverage="50% (1/2)">
+            <line number="86" hits="2" branch="False" />
+            <line number="87" hits="2" branch="False" />
+            <line number="88" hits="2" branch="False" />
+            <line number="89" hits="2" branch="False" />
+            <line number="90" hits="2" branch="False" />
+            <line number="91" hits="2" branch="False" />
+            <line number="93" hits="2" branch="True" condition-coverage="100% (2/2)">
               <conditions>
-                <condition number="458" type="jump" coverage="50%" />
+                <condition number="458" type="jump" coverage="100%" />
               </conditions>
             </line>
-            <line number="94" hits="0" branch="False" />
-            <line number="95" hits="0" branch="False" />
+            <line number="94" hits="1" branch="False" />
+            <line number="95" hits="1" branch="False" />
             <line number="98" hits="1" branch="False" />
             <line number="99" hits="1" branch="False" />
             <line number="100" hits="1" branch="False" />
@@ -971,12 +971,12 @@
             <line number="102" hits="1" branch="False" />
             <line number="104" hits="1" branch="False" />
             <line number="106" hits="1" branch="False" />
-            <line number="107" hits="1" branch="False" />
+            <line number="107" hits="2" branch="False" />
           </lines>
         </class>
       </classes>
     </package>
-    <package name="ControllerUnitTests" line-rate="0.9965" branch-rate="1" complexity="9">
+    <package name="ControllerUnitTests" line-rate="0.9974" branch-rate="1" complexity="12">
       <classes>
         <class name="AutoGeneratedProgram" filename=".nuget\packages\microsoft.net.test.sdk\17.5.0\build\netcoreapp3.1\Microsoft.NET.Test.Sdk.Program.cs" line-rate="0" branch-rate="1" complexity="1">
           <methods>
@@ -1052,6 +1052,166 @@
             <line number="338" hits="1" branch="False" />
             <line number="339" hits="1" branch="False" />
             <line number="340" hits="1" branch="False" />
+          </lines>
+        </class>
+        <class name="ControllerUnitTests.ChargerControllerTests/&lt;DeleteCharger_GivenChargerDoesntExist_ShouldReturnError404&gt;d__9" filename="Source\Repos\WattsUp\ControllerUnitTests\ChargerControllerTests.cs" line-rate="1" branch-rate="1" complexity="1">
+          <methods>
+            <method name="MoveNext" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="448" hits="1" branch="False" />
+                <line number="450" hits="1" branch="False" />
+                <line number="451" hits="1" branch="False" />
+                <line number="452" hits="1" branch="False" />
+                <line number="454" hits="1" branch="False" />
+                <line number="455" hits="1" branch="False" />
+                <line number="456" hits="1" branch="False" />
+                <line number="458" hits="1" branch="False" />
+                <line number="459" hits="1" branch="False" />
+                <line number="460" hits="1" branch="False" />
+                <line number="461" hits="1" branch="False" />
+                <line number="462" hits="1" branch="False" />
+                <line number="463" hits="1" branch="False" />
+                <line number="464" hits="1" branch="False" />
+                <line number="465" hits="1" branch="False" />
+                <line number="466" hits="1" branch="False" />
+                <line number="467" hits="1" branch="False" />
+                <line number="468" hits="1" branch="False" />
+                <line number="469" hits="1" branch="False" />
+                <line number="471" hits="1" branch="False" />
+                <line number="472" hits="1" branch="False" />
+                <line number="474" hits="1" branch="False" />
+                <line number="475" hits="1" branch="False" />
+                <line number="476" hits="1" branch="False" />
+                <line number="479" hits="1" branch="False" />
+                <line number="480" hits="1" branch="False" />
+                <line number="483" hits="1" branch="False" />
+                <line number="484" hits="1" branch="False" />
+                <line number="485" hits="1" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="448" hits="1" branch="False" />
+            <line number="450" hits="1" branch="False" />
+            <line number="451" hits="1" branch="False" />
+            <line number="452" hits="1" branch="False" />
+            <line number="454" hits="1" branch="False" />
+            <line number="455" hits="1" branch="False" />
+            <line number="456" hits="1" branch="False" />
+            <line number="458" hits="1" branch="False" />
+            <line number="459" hits="1" branch="False" />
+            <line number="460" hits="1" branch="False" />
+            <line number="461" hits="1" branch="False" />
+            <line number="462" hits="1" branch="False" />
+            <line number="463" hits="1" branch="False" />
+            <line number="464" hits="1" branch="False" />
+            <line number="465" hits="1" branch="False" />
+            <line number="466" hits="1" branch="False" />
+            <line number="467" hits="1" branch="False" />
+            <line number="468" hits="1" branch="False" />
+            <line number="469" hits="1" branch="False" />
+            <line number="471" hits="1" branch="False" />
+            <line number="472" hits="1" branch="False" />
+            <line number="474" hits="1" branch="False" />
+            <line number="475" hits="1" branch="False" />
+            <line number="476" hits="1" branch="False" />
+            <line number="479" hits="1" branch="False" />
+            <line number="480" hits="1" branch="False" />
+            <line number="483" hits="1" branch="False" />
+            <line number="484" hits="1" branch="False" />
+            <line number="485" hits="1" branch="False" />
+          </lines>
+        </class>
+        <class name="ControllerUnitTests.ChargerControllerTests/&lt;DeleteCharger_GivenChargerExists_ShouldReturnDeletedCharger&gt;d__10" filename="Source\Repos\WattsUp\ControllerUnitTests\ChargerControllerTests.cs" line-rate="1" branch-rate="1" complexity="1">
+          <methods>
+            <method name="MoveNext" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="489" hits="1" branch="False" />
+                <line number="491" hits="1" branch="False" />
+                <line number="492" hits="1" branch="False" />
+                <line number="493" hits="1" branch="False" />
+                <line number="495" hits="1" branch="False" />
+                <line number="496" hits="1" branch="False" />
+                <line number="497" hits="1" branch="False" />
+                <line number="499" hits="1" branch="False" />
+                <line number="500" hits="1" branch="False" />
+                <line number="501" hits="1" branch="False" />
+                <line number="502" hits="1" branch="False" />
+                <line number="503" hits="1" branch="False" />
+                <line number="504" hits="1" branch="False" />
+                <line number="505" hits="1" branch="False" />
+                <line number="506" hits="1" branch="False" />
+                <line number="507" hits="1" branch="False" />
+                <line number="508" hits="1" branch="False" />
+                <line number="509" hits="1" branch="False" />
+                <line number="510" hits="1" branch="False" />
+                <line number="511" hits="1" branch="False" />
+                <line number="512" hits="1" branch="False" />
+                <line number="513" hits="1" branch="False" />
+                <line number="514" hits="1" branch="False" />
+                <line number="515" hits="1" branch="False" />
+                <line number="516" hits="1" branch="False" />
+                <line number="517" hits="1" branch="False" />
+                <line number="518" hits="1" branch="False" />
+                <line number="519" hits="1" branch="False" />
+                <line number="520" hits="1" branch="False" />
+                <line number="521" hits="1" branch="False" />
+                <line number="522" hits="1" branch="False" />
+                <line number="524" hits="1" branch="False" />
+                <line number="525" hits="1" branch="False" />
+                <line number="527" hits="1" branch="False" />
+                <line number="528" hits="1" branch="False" />
+                <line number="529" hits="1" branch="False" />
+                <line number="532" hits="1" branch="False" />
+                <line number="535" hits="1" branch="False" />
+                <line number="536" hits="1" branch="False" />
+                <line number="537" hits="1" branch="False" />
+                <line number="538" hits="1" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="489" hits="1" branch="False" />
+            <line number="491" hits="1" branch="False" />
+            <line number="492" hits="1" branch="False" />
+            <line number="493" hits="1" branch="False" />
+            <line number="495" hits="1" branch="False" />
+            <line number="496" hits="1" branch="False" />
+            <line number="497" hits="1" branch="False" />
+            <line number="499" hits="1" branch="False" />
+            <line number="500" hits="1" branch="False" />
+            <line number="501" hits="1" branch="False" />
+            <line number="502" hits="1" branch="False" />
+            <line number="503" hits="1" branch="False" />
+            <line number="504" hits="1" branch="False" />
+            <line number="505" hits="1" branch="False" />
+            <line number="506" hits="1" branch="False" />
+            <line number="507" hits="1" branch="False" />
+            <line number="508" hits="1" branch="False" />
+            <line number="509" hits="1" branch="False" />
+            <line number="510" hits="1" branch="False" />
+            <line number="511" hits="1" branch="False" />
+            <line number="512" hits="1" branch="False" />
+            <line number="513" hits="1" branch="False" />
+            <line number="514" hits="1" branch="False" />
+            <line number="515" hits="1" branch="False" />
+            <line number="516" hits="1" branch="False" />
+            <line number="517" hits="1" branch="False" />
+            <line number="518" hits="1" branch="False" />
+            <line number="519" hits="1" branch="False" />
+            <line number="520" hits="1" branch="False" />
+            <line number="521" hits="1" branch="False" />
+            <line number="522" hits="1" branch="False" />
+            <line number="524" hits="1" branch="False" />
+            <line number="525" hits="1" branch="False" />
+            <line number="527" hits="1" branch="False" />
+            <line number="528" hits="1" branch="False" />
+            <line number="529" hits="1" branch="False" />
+            <line number="532" hits="1" branch="False" />
+            <line number="535" hits="1" branch="False" />
+            <line number="536" hits="1" branch="False" />
+            <line number="537" hits="1" branch="False" />
+            <line number="538" hits="1" branch="False" />
           </lines>
         </class>
         <class name="ControllerUnitTests.ChargerControllerTests/&lt;GetChargerByID_WhenThereIsChargerWithGivenID_ShouldReturnThatCharger&gt;d__3" filename="Source\Repos\WattsUp\ControllerUnitTests\ChargerControllerTests.cs" line-rate="1" branch-rate="1" complexity="1">
@@ -1552,7 +1712,7 @@
             <line number="39" hits="1" branch="False" />
           </lines>
         </class>
-        <class name="ControllerUnitTests.ChargerControllerTests/&lt;UpdateCharger_GivenChargerExists_ShouldReturnUpdatedCharger&gt;d__7" filename="Source\Repos\WattsUp\ControllerUnitTests\ChargerControllerTests.cs" line-rate="1" branch-rate="1" complexity="1">
+        <class name="ControllerUnitTests.ChargerControllerTests/&lt;UpdateCharger_GivenChargerDoesntExist_ShouldReturnError404&gt;d__7" filename="Source\Repos\WattsUp\ControllerUnitTests\ChargerControllerTests.cs" line-rate="1" branch-rate="1" complexity="1">
           <methods>
             <method name="MoveNext" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
@@ -1592,9 +1752,10 @@
                 <line number="384" hits="1" branch="False" />
                 <line number="385" hits="1" branch="False" />
                 <line number="386" hits="1" branch="False" />
-                <line number="389" hits="1" branch="False" />
-                <line number="390" hits="1" branch="False" />
+                <line number="388" hits="1" branch="False" />
                 <line number="391" hits="1" branch="False" />
+                <line number="392" hits="1" branch="False" />
+                <line number="393" hits="1" branch="False" />
               </lines>
             </method>
           </methods>
@@ -1635,9 +1796,98 @@
             <line number="384" hits="1" branch="False" />
             <line number="385" hits="1" branch="False" />
             <line number="386" hits="1" branch="False" />
-            <line number="389" hits="1" branch="False" />
-            <line number="390" hits="1" branch="False" />
+            <line number="388" hits="1" branch="False" />
             <line number="391" hits="1" branch="False" />
+            <line number="392" hits="1" branch="False" />
+            <line number="393" hits="1" branch="False" />
+          </lines>
+        </class>
+        <class name="ControllerUnitTests.ChargerControllerTests/&lt;UpdateCharger_GivenChargerExists_ShouldReturnUpdatedCharger&gt;d__8" filename="Source\Repos\WattsUp\ControllerUnitTests\ChargerControllerTests.cs" line-rate="1" branch-rate="1" complexity="1">
+          <methods>
+            <method name="MoveNext" signature="()" line-rate="1" branch-rate="1" complexity="1">
+              <lines>
+                <line number="397" hits="1" branch="False" />
+                <line number="399" hits="1" branch="False" />
+                <line number="400" hits="1" branch="False" />
+                <line number="401" hits="1" branch="False" />
+                <line number="403" hits="1" branch="False" />
+                <line number="404" hits="1" branch="False" />
+                <line number="405" hits="1" branch="False" />
+                <line number="407" hits="1" branch="False" />
+                <line number="408" hits="1" branch="False" />
+                <line number="409" hits="1" branch="False" />
+                <line number="410" hits="1" branch="False" />
+                <line number="411" hits="1" branch="False" />
+                <line number="412" hits="1" branch="False" />
+                <line number="413" hits="1" branch="False" />
+                <line number="414" hits="1" branch="False" />
+                <line number="415" hits="1" branch="False" />
+                <line number="416" hits="1" branch="False" />
+                <line number="417" hits="1" branch="False" />
+                <line number="418" hits="1" branch="False" />
+                <line number="420" hits="1" branch="False" />
+                <line number="421" hits="1" branch="False" />
+                <line number="423" hits="1" branch="False" />
+                <line number="424" hits="1" branch="False" />
+                <line number="425" hits="1" branch="False" />
+                <line number="428" hits="1" branch="False" />
+                <line number="429" hits="1" branch="False" />
+                <line number="430" hits="1" branch="False" />
+                <line number="431" hits="1" branch="False" />
+                <line number="432" hits="1" branch="False" />
+                <line number="433" hits="1" branch="False" />
+                <line number="434" hits="1" branch="False" />
+                <line number="435" hits="1" branch="False" />
+                <line number="436" hits="1" branch="False" />
+                <line number="437" hits="1" branch="False" />
+                <line number="438" hits="1" branch="False" />
+                <line number="439" hits="1" branch="False" />
+                <line number="442" hits="1" branch="False" />
+                <line number="443" hits="1" branch="False" />
+                <line number="444" hits="1" branch="False" />
+              </lines>
+            </method>
+          </methods>
+          <lines>
+            <line number="397" hits="1" branch="False" />
+            <line number="399" hits="1" branch="False" />
+            <line number="400" hits="1" branch="False" />
+            <line number="401" hits="1" branch="False" />
+            <line number="403" hits="1" branch="False" />
+            <line number="404" hits="1" branch="False" />
+            <line number="405" hits="1" branch="False" />
+            <line number="407" hits="1" branch="False" />
+            <line number="408" hits="1" branch="False" />
+            <line number="409" hits="1" branch="False" />
+            <line number="410" hits="1" branch="False" />
+            <line number="411" hits="1" branch="False" />
+            <line number="412" hits="1" branch="False" />
+            <line number="413" hits="1" branch="False" />
+            <line number="414" hits="1" branch="False" />
+            <line number="415" hits="1" branch="False" />
+            <line number="416" hits="1" branch="False" />
+            <line number="417" hits="1" branch="False" />
+            <line number="418" hits="1" branch="False" />
+            <line number="420" hits="1" branch="False" />
+            <line number="421" hits="1" branch="False" />
+            <line number="423" hits="1" branch="False" />
+            <line number="424" hits="1" branch="False" />
+            <line number="425" hits="1" branch="False" />
+            <line number="428" hits="1" branch="False" />
+            <line number="429" hits="1" branch="False" />
+            <line number="430" hits="1" branch="False" />
+            <line number="431" hits="1" branch="False" />
+            <line number="432" hits="1" branch="False" />
+            <line number="433" hits="1" branch="False" />
+            <line number="434" hits="1" branch="False" />
+            <line number="435" hits="1" branch="False" />
+            <line number="436" hits="1" branch="False" />
+            <line number="437" hits="1" branch="False" />
+            <line number="438" hits="1" branch="False" />
+            <line number="439" hits="1" branch="False" />
+            <line number="442" hits="1" branch="False" />
+            <line number="443" hits="1" branch="False" />
+            <line number="444" hits="1" branch="False" />
           </lines>
         </class>
       </classes>

@@ -340,6 +340,59 @@ namespace ControllerUnitTests
         }
 
         [TestMethod]
+        public async Task UpdateCharger_GivenChargerDoesntExist_ShouldReturnError404()
+        {
+            // Arrange
+            var options = new DbContextOptionsBuilder<DatabaseContext>()
+                .UseInMemoryDatabase(databaseName: "WattsUpDatabase")
+                .Options;
+
+            using (var context = new DatabaseContext(options))
+            {
+                context.Charger.RemoveRange(context.Charger);
+
+                context.Charger.Add(new Charger
+                {
+                    Id = 1,
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = new User { Email = "test", FirstName = "test", LastName = "test", Password = "test" },
+                    Active = false,
+                    Events = new List<Event> { },
+                    LastSyncAt = DateTime.Now,
+                    Latitude = 1.0,
+                    Longitude = 1.0,
+                    Name = "Test Charger 1"
+                });
+
+                context.SaveChanges();
+            }
+
+            using (var context = new DatabaseContext(options))
+            {
+                ChargerController chargerController = new ChargerController(context, new HttpClient());
+
+                // Act
+                var chargers = await chargerController.UpdateChargerByID(9999, new Charger
+                {
+                    Id = 1,
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = new User { Email = "test", FirstName = "test", LastName = "test", Password = "test" },
+                    Active = false,
+                    Events = new List<Event> { },
+                    LastSyncAt = DateTime.Now,
+                    Latitude = 1.0,
+                    Longitude = 1.0,
+                    Name = "Test Charger 1"
+                });
+
+                var result = chargers.Result as StatusCodeResult;
+
+                // Assert
+                Assert.AreEqual(404, result.StatusCode);
+            }
+        }
+
+        [TestMethod]
         public async Task UpdateCharger_GivenChargerExists_ShouldReturnUpdatedCharger()
         {
             // Arrange
@@ -387,6 +440,100 @@ namespace ControllerUnitTests
 
                 // Assert
                 Assert.AreEqual("TESTNOW", context.Charger.FirstOrDefault().Name);
+            }
+        }
+
+        [TestMethod]
+        public async Task DeleteCharger_GivenChargerDoesntExist_ShouldReturnError404()
+        {
+            // Arrange
+            var options = new DbContextOptionsBuilder<DatabaseContext>()
+                .UseInMemoryDatabase(databaseName: "WattsUpDatabase")
+                .Options;
+
+            using (var context = new DatabaseContext(options))
+            {
+                context.Charger.RemoveRange(context.Charger);
+
+                context.Charger.Add(new Charger
+                {
+                    Id = 1,
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = new User { Email = "test", FirstName = "test", LastName = "test", Password = "test" },
+                    Active = false,
+                    Events = new List<Event> { },
+                    LastSyncAt = DateTime.Now,
+                    Latitude = 1.0,
+                    Longitude = 1.0,
+                    Name = "Test Charger 1"
+                });
+
+                context.SaveChanges();
+            }
+
+            using (var context = new DatabaseContext(options))
+            {
+                ChargerController chargerController = new ChargerController(context, new HttpClient());
+
+                // Act
+                var chargers = await chargerController.DeleteChargerByID(9999);
+                var result = chargers.Result as StatusCodeResult;
+
+                // Assert
+                Assert.AreEqual(404, result.StatusCode);
+            }
+        }
+
+        [TestMethod]
+        public async Task DeleteCharger_GivenChargerExists_ShouldReturnDeletedCharger()
+        {
+            // Arrange
+            var options = new DbContextOptionsBuilder<DatabaseContext>()
+                .UseInMemoryDatabase(databaseName: "WattsUpDatabase")
+                .Options;
+
+            using (var context = new DatabaseContext(options))
+            {
+                context.Charger.RemoveRange(context.Charger);
+
+                context.Charger.Add(new Charger
+                {
+                    Id = 1,
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = new User { Email = "test", FirstName = "test", LastName = "test", Password = "test" },
+                    Active = false,
+                    Events = new List<Event> { },
+                    LastSyncAt = DateTime.Now,
+                    Latitude = 1.0,
+                    Longitude = 1.0,
+                    Name = "Test Charger 1"
+                });
+                context.Charger.Add(new Charger
+                {
+                    Id = 2,
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = new User { Email = "test", FirstName = "test", LastName = "test", Password = "test" },
+                    Active = false,
+                    Events = new List<Event> { },
+                    LastSyncAt = DateTime.Now,
+                    Latitude = 1.0,
+                    Longitude = 1.0,
+                    Name = "Test Charger 2"
+                });
+
+                context.SaveChanges();
+            }
+
+            using (var context = new DatabaseContext(options))
+            {
+                ChargerController chargerController = new ChargerController(context, new HttpClient());
+
+                // Act
+                await chargerController.DeleteChargerByID(1);
+
+                // Assert
+                Assert.AreEqual(1, context.Charger.Count());
+                Assert.AreEqual(2, context.Charger.FirstOrDefault().Id);
             }
         }
     }
