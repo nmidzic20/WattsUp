@@ -372,13 +372,13 @@ namespace ControllerUnitTests
                 ChargerController chargerController = new ChargerController(context, new HttpClient());
 
                 // Act
-                var response = await chargerController.UpdateChargerByID(1, new Charger
+                await chargerController.UpdateChargerByID(1, new Charger
                 {
                     Id = 1,
                     CreatedAt = DateTime.Now,
                     CreatedBy = new User { Email = "test", FirstName = "test", LastName = "test", Password = "test" },
-                    Events = new List<Event> { },
                     Active = false,
+                    Events = new List<Event> { },
                     LastSyncAt = DateTime.Now,
                     Latitude = 1.0,
                     Longitude = 1.0,
