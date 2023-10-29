@@ -7,6 +7,42 @@ form, #formContainer {
     align-items: center;
     font-family: $defaultFont;
     label{
+        align-self:flex-start;
         font-weight: bold;
+    }
+}
+
+input[type="text"], input[type="email"], input[type="password"]{
+    background-color: #C9FFDC;
+    width: 240px;
+    height: 30px;
+    border-radius: 6px;
+    box-shadow: 2px 2px 4px #000000;
+    border: none;
+}
+
+input[type="button"]{
+    background-color: #11CB54;
+    color: white;
+    width: 130px;
+    height: 30px;
+    border-radius: 6px;
+    box-shadow: 2px 2px 4px #000000;
+}
+
+#loginInstead{
+    margin-top: 30px;
+    display: flex;
+    align-items: center;
+}
+
+#loginLink {
+    margin-left: 5px;
+    color: #11CB54;
+    font-weight: bold;
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
     }
 }
