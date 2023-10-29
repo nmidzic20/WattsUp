@@ -9,6 +9,7 @@ using backend.Data;
 using backend.Models.Entities;
 using backend.Models.Requests;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity;
 
 namespace backend.Controllers
 {
@@ -49,10 +50,17 @@ namespace backend.Controllers
                 RoleId = 2
             };
 
+            var passwordHasher = new PasswordHasher<User>();
+            string hashedPassword = passwordHasher.HashPassword(newUser, userRequest.Password);
+            newUser.Password = hashedPassword;
+
             _context.User.Add(newUser);
             await _context.SaveChangesAsync();
 
             return Ok(new { message = $"User {newUser.FirstName} is added to database!" });
         }
+
+        //login:
+        //PasswordVerificationResult passwordVerification = passwordHasher.VerifyHashedPassword(newUser, newUser.Password, userRequest.Password);
     }
 }
