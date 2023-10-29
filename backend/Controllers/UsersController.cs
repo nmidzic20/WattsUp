@@ -10,6 +10,7 @@ using backend.Models.Entities;
 using backend.Models.Requests;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
+using backend.Services;
 
 namespace backend.Controllers
 {
@@ -18,10 +19,12 @@ namespace backend.Controllers
     public class UsersController : ControllerBase
     {
         private readonly DatabaseContext _context;
+        private readonly UserService _userService;
 
-        public UsersController(DatabaseContext context)
+        public UsersController(DatabaseContext context, UserService userService)
         {
             _context = context;
+            _userService = userService;
         }
 
         // POST: api/Users
@@ -33,34 +36,14 @@ namespace backend.Controllers
                 return BadRequest(ModelState);
             }
 
-            var existingUser = await _context.User.FirstOrDefaultAsync(u => u.Email == userRequest.Email);
-            if (existingUser != null)
+            User newUser = await _userService.CreateUserAsync(userRequest);
+
+            if (newUser == null)
             {
                 return Conflict(new { message = "A user with this email already exists." });
             }
 
-            User newUser = new User
-            {
-                FirstName = userRequest.FirstName,
-                LastName = userRequest.LastName,
-                Email = userRequest.Email,
-                Password = userRequest.Password,
-                Active = true,
-                CreatedAt = DateTime.UtcNow,
-                RoleId = 2
-            };
-
-            var passwordHasher = new PasswordHasher<User>();
-            string hashedPassword = passwordHasher.HashPassword(newUser, userRequest.Password);
-            newUser.Password = hashedPassword;
-
-            _context.User.Add(newUser);
-            await _context.SaveChangesAsync();
-
             return Ok(new { message = $"User {newUser.FirstName} is added to database!" });
         }
-
-        //login:
-        //PasswordVerificationResult passwordVerification = passwordHasher.VerifyHashedPassword(newUser, newUser.Password, userRequest.Password);
     }
 }

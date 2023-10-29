@@ -27,7 +27,6 @@
     <Folder Include="Data\Migrations\" />
     <Folder Include="Data\Repositories\" />
     <Folder Include="Models\Responses\" />
-    <Folder Include="Services\" />
   </ItemGroup>
 
 </Project>
