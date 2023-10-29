@@ -1,0 +1,12 @@
+$defaultFont: 'Arial', 'Helvetica', 'sans-serif';
+
+form, #formContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: $defaultFont;
+    label{
+        font-weight: bold;
+    }
+}

@@ -1,10 +1,12 @@
+$defaultFont: 'Arial', 'Helvetica', 'sans-serif';
+
 nav {
     background-color: #11CB54;
     padding: 0px;
     display: flex;
     width: 100%;
     align-items: center;
-    font-family:Arial, Helvetica, sans-serif;
+    font-family: $defaultFont;
 
     h1 {
         margin-right: auto;
