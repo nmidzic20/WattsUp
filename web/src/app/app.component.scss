@@ -1,0 +1,27 @@
+$defaultFont: 'Arial', 'Helvetica', 'sans-serif';
+
+nav {
+    background-color: #11CB54;
+    padding: 0px;
+    display: flex;
+    width: 100%;
+    align-items: center;
+    font-family: $defaultFont;
+
+    h1 {
+        margin-right: auto;
+        text-align: left;
+        font-size: 40px;
+        padding-left: 10px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    a {
+        margin-left: 30px;
+        text-decoration: none;
+        text-align: right;
+        margin-right: 20px;
+        font-weight: bold;
+    }
+}
