@@ -1,4 +1,7 @@
+$defaultFont: 'Arial', 'Helvetica', 'sans-serif';
+
 body{
     margin: 0px;
     background-color: #F5FFF6;
+    font-family: $defaultFont;
 }

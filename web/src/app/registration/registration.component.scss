@@ -1,33 +1,41 @@
-$defaultFont: 'Arial', 'Helvetica', 'sans-serif';
-
-form, #formContainer {
+#formContainer{
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    font-family: $defaultFont;
     label{
         align-self:flex-start;
         font-weight: bold;
     }
+    input{
+        background-color: #C9FFDC;
+        width: 240px;
+        height: 30px;
+        border-radius: 6px;
+        box-shadow: 2px 2px 4px #000000;
+        border: none;
+    }
+    
+    button{
+        background-color: #11CB54;
+        color: white;
+        width: 130px;
+        height: 30px;
+        border-radius: 6px;
+        box-shadow: 2px 2px 4px #000000;
+        align-self: center;
+    }
 }
 
-input[type="text"], input[type="email"], input[type="password"]{
-    background-color: #C9FFDC;
-    width: 240px;
-    height: 30px;
-    border-radius: 6px;
-    box-shadow: 2px 2px 4px #000000;
-    border: none;
-}
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
 
-input[type="button"]{
-    background-color: #11CB54;
-    color: white;
-    width: 130px;
-    height: 30px;
-    border-radius: 6px;
-    box-shadow: 2px 2px 4px #000000;
+    label {
+      margin-bottom: 10px;
+
+    }
 }
 
 #loginInstead{

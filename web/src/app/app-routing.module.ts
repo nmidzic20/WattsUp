@@ -1,10 +1,11 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { RegistrationComponent } from './registration/registration.component';
+import { NotFoundComponent } from './not-found/not-found.component';
 
 const routes: Routes = [
-  {path: '', redirectTo: '/login', pathMatch: 'full'},
-  {path: 'registration', component: RegistrationComponent}
+  {path: 'registration', component: RegistrationComponent},
+  { path: '**', component: NotFoundComponent}
 ];
 
 @NgModule({
