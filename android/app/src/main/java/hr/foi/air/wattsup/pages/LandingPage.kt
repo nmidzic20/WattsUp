@@ -7,7 +7,6 @@ import androidx.compose.material3.* // ktlint-disable no-wildcard-imports
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -59,7 +58,7 @@ fun LandingPage(onChargerModeClick: () -> Unit) {
                                     text = stringResource(R.string.app_name),
                                     modifier = Modifier.padding(start = 8.dp), // Add padding to the text
                                     style = MaterialTheme.typography.titleLarge,
-                                    color = Color(0xffffd700), // MaterialTheme.colorScheme.onPrimary,
+                                    color = MaterialTheme.colorScheme.onPrimary,
                                 )
                             }
                         }
