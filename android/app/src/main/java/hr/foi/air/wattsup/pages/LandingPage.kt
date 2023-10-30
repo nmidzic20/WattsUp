@@ -7,8 +7,9 @@ import androidx.compose.material3.* // ktlint-disable no-wildcard-imports
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
@@ -32,14 +33,12 @@ fun LandingPage(onChargerModeClick: () -> Unit) {
                         contentAlignment = Alignment.CenterStart,
                         modifier = Modifier
                             .width(200.dp),
-                        // .background(color = Color.Blue),
                     ) {
                         val boxWidth = this.maxWidth
 
                         Box(
                             modifier = Modifier
                                 .width(boxWidth - 150.dp)
-                                // .background(Color.Red)
                                 .align(Alignment.CenterStart),
                         ) {
                             SpinningLogo()
@@ -54,11 +53,19 @@ fun LandingPage(onChargerModeClick: () -> Unit) {
                                 // .zIndex(-2f)
                                 // .background(Color.Yellow),
                             ) {
-                                Text(
+                                /*Text(
                                     text = stringResource(R.string.app_name),
-                                    modifier = Modifier.padding(start = 8.dp), // Add padding to the text
+                                    modifier = Modifier.padding(start = 8.dp),
                                     style = MaterialTheme.typography.titleLarge,
                                     color = MaterialTheme.colorScheme.onPrimary,
+                                )*/
+                                Image(
+                                    painter = painterResource(id = R.drawable.logo_text_white),
+                                    contentDescription = null,
+                                    contentScale = ContentScale.Fit,
+                                    modifier = Modifier
+                                        .height(30.dp)
+                                        .padding(start = 40.dp),
                                 )
                             }
                         }
@@ -113,7 +120,7 @@ fun SpinningLogo() {
         .build()
     Image(
         painter = rememberAsyncImagePainter(
-            ImageRequest.Builder(context).data(data = R.drawable.icon_yellow).apply(block = {
+            ImageRequest.Builder(context).data(data = R.drawable.icon_white).apply(block = {
                 size(150, 150)
             }).build(),
             imageLoader = imageLoader,
