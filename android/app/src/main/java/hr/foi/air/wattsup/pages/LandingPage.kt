@@ -7,6 +7,7 @@ import androidx.compose.material3.* // ktlint-disable no-wildcard-imports
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,32 +27,19 @@ fun LandingPage(onChargerModeClick: () -> Unit) {
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-                    /*Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier.fillMaxSize(),
-                    ) {
-                        // Spacer(Modifier.width(8.dp))
-                        Text(
-                            text = stringResource(R.string.app_name),
-                            modifier = Modifier.padding(start = 8.dp), // Add padding to the text
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.onPrimary,
-                        )
+                    // SpinningLogo()
 
-                        // Spacer(modifier = Modifier.width(8.dp))
-                        SpinningLogo()
-                    }*/
                     BoxWithConstraints(
                         contentAlignment = Alignment.CenterStart,
                         modifier = Modifier
-                            .width(170.dp),
+                            .width(200.dp),
                         // .background(color = Color.Blue),
                     ) {
                         val boxWidth = this.maxWidth
 
                         Box(
                             modifier = Modifier
-                                .width(boxWidth - 120.dp)
+                                .width(boxWidth - 150.dp)
                                 // .background(Color.Red)
                                 .align(Alignment.CenterStart),
                         ) {
@@ -71,7 +59,7 @@ fun LandingPage(onChargerModeClick: () -> Unit) {
                                     text = stringResource(R.string.app_name),
                                     modifier = Modifier.padding(start = 8.dp), // Add padding to the text
                                     style = MaterialTheme.typography.titleLarge,
-                                    color = MaterialTheme.colorScheme.onPrimary,
+                                    color = Color(0xffffd700), // MaterialTheme.colorScheme.onPrimary,
                                 )
                             }
                         }
@@ -127,7 +115,7 @@ fun SpinningLogo() {
     Image(
         painter = rememberAsyncImagePainter(
             ImageRequest.Builder(context).data(data = R.drawable.icon_yellow).apply(block = {
-                size(100, 100)
+                size(150, 150)
             }).build(),
             imageLoader = imageLoader,
         ),
