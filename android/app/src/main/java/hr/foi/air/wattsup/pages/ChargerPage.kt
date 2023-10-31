@@ -16,7 +16,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -32,6 +34,11 @@ import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.ui.component.CircleButton
 import hr.foi.air.wattsup.ui.component.TopAppBar
 import hr.foi.air.wattsup.ui.theme.colorBtnRed
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -64,6 +71,32 @@ fun ChargerPage(onArrowBackClick: () -> Unit) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceEvenly,
             ) {
+                var charging by remember { mutableStateOf(false) }
+                var startTime by remember { mutableLongStateOf(0L) }
+                var endTime by remember { mutableLongStateOf(0L) }
+                var timeElapsed by remember { mutableLongStateOf(0L) }
+                var timeTrackingJob: Job? by remember { mutableStateOf(null) }
+
+                LaunchedEffect(charging) {
+                    // Started charging
+                    if (charging) {
+                        timeElapsed = 0L
+                        startTime = System.currentTimeMillis()
+                        timeTrackingJob = CoroutineScope(Dispatchers.Default).launch {
+                            while (charging) {
+                                // Update time every second
+                                delay(1000)
+                                timeElapsed = System.currentTimeMillis() - startTime
+                            }
+                        }
+                    }
+                    // Stopped charging
+                    else {
+                        endTime = System.currentTimeMillis()
+                        timeTrackingJob?.cancel()
+                    }
+                }
+
                 Image(
                     painter = painterResource(id = R.drawable.icon_electric_car),
                     contentDescription = null,
@@ -73,16 +106,25 @@ fun ChargerPage(onArrowBackClick: () -> Unit) {
                         .height(150.dp),
                 )
 
-                Text(
-                    text = "Time spent charging:",
-                    style = MaterialTheme.typography.titleLarge,
-                )
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(
+                        text = "Time spent charging:",
+                        style = MaterialTheme.typography.titleMedium,
+                    )
 
-                var charging by remember { mutableStateOf(false) }
+                    Text(
+                        text = "${timeElapsed / 1000} seconds",
+                        style = MaterialTheme.typography.titleLarge,
+                    )
+                }
 
                 CircleButton(
                     mode = if (!charging) "Start charging" else "Stop charging",
-                    onClick = { charging = !charging },
+                    onClick = {
+                        charging = !charging
+                    },
                     color = if (!charging) MaterialTheme.colorScheme.primary else colorBtnRed,
                     iconId = null,
                 )
