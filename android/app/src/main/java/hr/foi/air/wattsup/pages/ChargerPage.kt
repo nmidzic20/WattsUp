@@ -29,6 +29,10 @@ import androidx.compose.ui.unit.dp
 import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.ui.component.ModeButton
 import hr.foi.air.wattsup.ui.component.TopAppBar
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,11 +69,19 @@ fun ChargerPage(onArrowBackClick: () -> Unit) {
                 verticalArrangement = Arrangement.Center,
             ) {
                 if (!scanning) {
-                    ModeButton("Scan RFID card", { scanning = true }, null)
-                    Spacer(modifier = Modifier.height(30.dp))
+                    ModeButton("Scan RFID card", {
+                        scanning = true
+                        CoroutineScope(Dispatchers.Default).launch {
+                            delay(10000)
+                            scanning = false
+                        }
+                    }, null)
+                    Spacer(
+                        modifier = Modifier.height(30.dp),
+                    )
                 }
                 Text(
-                    text = if (!scanning) "Please scan RFID card..." else "Scanning...",
+                    text = if (!scanning) "Please scan RFID card..." else "Scanning for RFID card...",
                     style = MaterialTheme.typography.titleLarge,
                 )
             }
@@ -80,5 +92,5 @@ fun ChargerPage(onArrowBackClick: () -> Unit) {
 @Preview
 @Composable
 fun ChargerPagePreview() {
-    ChargerPage {}
+    ChargerPage({})
 }
