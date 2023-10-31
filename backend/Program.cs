@@ -12,6 +12,7 @@ builder.Services.AddDbContext<DatabaseContext>(options =>
 builder.Services.AddControllers();
 
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<CardService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

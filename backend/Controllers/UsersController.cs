@@ -20,11 +20,13 @@ namespace backend.Controllers
     {
         private readonly DatabaseContext _context;
         private readonly UserService _userService;
+        private readonly CardService _cardService;
 
-        public UsersController(DatabaseContext context, UserService userService)
+        public UsersController(DatabaseContext context, UserService userService, CardService cardService)
         {
             _context = context;
             _userService = userService;
+            _cardService = cardService;
         }
 
         // POST: api/Users
@@ -37,11 +39,27 @@ namespace backend.Controllers
             }
 
             User newUser = await _userService.CreateUserAsync(userRequest);
-
             if (newUser == null)
             {
                 return Conflict(new { message = "A user with this email already exists." });
             }
+
+            Card newCard = null;
+            if(userRequest.Card != null)
+            {
+                newCard = await _cardService.CreateCardAsync(userRequest.Card, newUser);
+                if (newCard == null)
+                {
+                    return Conflict(new { message = "This card already exists." });
+                }
+            }
+
+            _context.User.Add(newUser);
+            if(newCard != null)
+            {
+                _context.Card.Add(newCard);
+            }
+            await _context.SaveChangesAsync();
 
             return Ok(new { message = $"User {newUser.FirstName} is added to database!" });
         }
