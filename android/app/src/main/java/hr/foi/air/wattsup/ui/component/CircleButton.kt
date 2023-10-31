@@ -60,7 +60,7 @@ fun CircleButton(mode: String, onClick: () -> Unit, color: Color?, iconId: Int?)
 
                 Text(
                     text = mode,
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = if (iconId != null) MaterialTheme.typography.bodyLarge else MaterialTheme.typography.titleLarge,
                     textAlign = TextAlign.Center,
                 )
             }

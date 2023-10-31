@@ -81,7 +81,7 @@ fun ChargerPage(onArrowBackClick: () -> Unit) {
                 LaunchedEffect(charging) {
                     // Started charging
                     if (charging) {
-                        timeElapsed = 0L
+                        if (timeElapsed != 0L) timeElapsed = 0L
                         startTime = System.currentTimeMillis()
                         timeTrackingJob = CoroutineScope(Dispatchers.Default).launch {
                             while (charging) {
