@@ -14,7 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import hr.foi.air.wattsup.R
-import hr.foi.air.wattsup.ui.component.ModeButton
+import hr.foi.air.wattsup.ui.component.CircleButton
 import hr.foi.air.wattsup.ui.component.TopAppBar
 import hr.foi.air.wattsup.ui.component.TopAppBarLogoTitle
 
@@ -39,16 +39,18 @@ fun LandingPage(onChargerModeClick: () -> Unit) {
                 style = MaterialTheme.typography.titleLarge,
             )
 
-            ModeButton(
+            CircleButton(
                 mode = "User mode",
                 iconId = R.drawable.icon_user_mode,
                 onClick = { },
+                color = null,
             )
 
-            ModeButton(
+            CircleButton(
                 mode = "Charger mode",
                 iconId = R.drawable.icon_charger_mode,
                 onClick = onChargerModeClick,
+                color = null,
             )
         }
     }
