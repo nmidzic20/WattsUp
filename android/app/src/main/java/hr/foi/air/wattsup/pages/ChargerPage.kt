@@ -2,8 +2,10 @@ package hr.foi.air.wattsup.pages
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -14,12 +16,18 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import hr.foi.air.wattsup.R
+import hr.foi.air.wattsup.ui.component.ModeButton
 import hr.foi.air.wattsup.ui.component.TopAppBar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,10 +53,26 @@ fun ChargerPage(onArrowBackClick: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceEvenly,
         ) {
-            Text(
-                text = "Please scan RFID card...",
-                style = MaterialTheme.typography.titleLarge,
-            )
+            var scanning by remember { mutableStateOf(false) }
+            var scanSuccess by remember { mutableStateOf(false) }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .padding(10.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ) {
+                if (!scanning) {
+                    ModeButton("Scan RFID card", { scanning = true }, null)
+                    Spacer(modifier = Modifier.height(30.dp))
+                }
+                Text(
+                    text = if (!scanning) "Please scan RFID card..." else "Scanning...",
+                    style = MaterialTheme.typography.titleLarge,
+                )
+            }
         }
     }
 }
