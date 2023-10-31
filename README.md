@@ -56,7 +56,7 @@ Each commit message should start with Jira issue ID, e.g. "ANP-3 Implemented log
 
 ### Pull Requests
 
-Each PR name should start with Jira issue ID, e.g. "ANP-3 ..."
+Each PR name should include Jira issue ID.
 
 ### Git hooks
 
