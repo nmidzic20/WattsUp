@@ -25,10 +25,10 @@ import androidx.compose.ui.unit.dp
 import hr.foi.air.wattsup.R
 
 @Composable
-fun ModeButton(mode: String, iconId: Int, onChargerModeClick: () -> Unit) {
+fun ModeButton(mode: String, onClick: () -> Unit, iconId: Int?) {
     Button(
         onClick = {
-            onChargerModeClick()
+            onClick()
         },
         modifier = Modifier
             .size(220.dp)
@@ -47,14 +47,16 @@ fun ModeButton(mode: String, iconId: Int, onChargerModeClick: () -> Unit) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceEvenly,
             ) {
-                Image(
-                    painter = painterResource(id = iconId),
-                    contentDescription = null,
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(80.dp),
-                )
+                if (iconId != null) {
+                    Image(
+                        painter = painterResource(id = iconId),
+                        contentDescription = null,
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(80.dp),
+                    )
+                }
 
                 Text(
                     text = mode,
@@ -69,5 +71,5 @@ fun ModeButton(mode: String, iconId: Int, onChargerModeClick: () -> Unit) {
 @Preview
 @Composable
 fun ModeButtonPreview() {
-    ModeButton("Preview mode", R.drawable.icon_user_mode, { })
+    ModeButton("Preview mode", { }, R.drawable.icon_user_mode)
 }

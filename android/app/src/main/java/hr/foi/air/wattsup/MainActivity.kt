@@ -19,7 +19,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             WattsUpTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background,
@@ -32,7 +31,14 @@ class MainActivity : ComponentActivity() {
 
                             LandingPage(onChargerModeClick)
                         }
-                        composable("chargerMode") { ChargerPage { navController.popBackStack() } }
+                        composable("chargerMode") {
+                            val onArrowBackClick = {
+                                navController.popBackStack()
+                                Unit
+                            }
+
+                            ChargerPage(onArrowBackClick)
+                        }
                     }
                 }
             }
