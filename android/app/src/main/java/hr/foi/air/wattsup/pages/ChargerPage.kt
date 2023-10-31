@@ -39,6 +39,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -115,7 +116,7 @@ fun ChargerPage(onArrowBackClick: () -> Unit) {
                     )
 
                     Text(
-                        text = "${timeElapsed / 1000} seconds",
+                        text = "${formatTime(timeElapsed)}",
                         style = MaterialTheme.typography.titleLarge,
                     )
                 }
@@ -131,6 +132,14 @@ fun ChargerPage(onArrowBackClick: () -> Unit) {
             }
         }
     }
+}
+
+fun formatTime(milliseconds: Long): String {
+    val hours = TimeUnit.MILLISECONDS.toHours(milliseconds)
+    val minutes = TimeUnit.MILLISECONDS.toMinutes(milliseconds) % 60
+    val seconds = TimeUnit.MILLISECONDS.toSeconds(milliseconds) % 60
+
+    return String.format("%02d:%02d:%02d", hours, minutes, seconds)
 }
 
 @Preview
