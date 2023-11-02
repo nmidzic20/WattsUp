@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ControllerUnitTests
+namespace ControllerUnitTests.ServicesTests
 {
     [TestClass]
     public class UserServiceTests
@@ -116,7 +116,7 @@ namespace ControllerUnitTests
                 // Assert
                 Assert.IsNotNull(result);
                 var passwordHasher = new PasswordHasher<User>();
-                var isPasswordValid = passwordHasher.VerifyHashedPassword(result,result.Password,userRequest.Password);
+                var isPasswordValid = passwordHasher.VerifyHashedPassword(result, result.Password, userRequest.Password);
                 Assert.AreEqual(PasswordVerificationResult.Success, isPasswordValid);
             }
         }
