@@ -19,22 +19,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hr.foi.air.wattsup.R
 
 @Composable
-fun ModeButton(mode: String, iconId: Int, onChargerModeClick: () -> Unit) {
+fun CircleButton(mode: String, onClick: () -> Unit, color: Color?, iconId: Int?) {
     Button(
         onClick = {
-            onChargerModeClick()
+            onClick()
         },
         modifier = Modifier
             .size(220.dp)
             .padding(16.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.primary,
+            containerColor = color ?: MaterialTheme.colorScheme.primary,
             contentColor = Color.White,
         ),
         shape = CircleShape,
@@ -47,18 +48,21 @@ fun ModeButton(mode: String, iconId: Int, onChargerModeClick: () -> Unit) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceEvenly,
             ) {
-                Image(
-                    painter = painterResource(id = iconId),
-                    contentDescription = null,
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(80.dp),
-                )
+                if (iconId != null) {
+                    Image(
+                        painter = painterResource(id = iconId),
+                        contentDescription = null,
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(80.dp),
+                    )
+                }
 
                 Text(
                     text = mode,
-                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold,
+                    style = if (iconId != null) MaterialTheme.typography.bodyLarge else MaterialTheme.typography.titleLarge,
                     textAlign = TextAlign.Center,
                 )
             }
@@ -69,5 +73,5 @@ fun ModeButton(mode: String, iconId: Int, onChargerModeClick: () -> Unit) {
 @Preview
 @Composable
 fun ModeButtonPreview() {
-    ModeButton("Preview mode", R.drawable.icon_user_mode, { })
+    CircleButton("Preview mode", { }, null, R.drawable.icon_user_mode)
 }

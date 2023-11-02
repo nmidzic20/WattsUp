@@ -12,6 +12,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import hr.foi.air.wattsup.pages.ChargerPage
 import hr.foi.air.wattsup.pages.LandingPage
+import hr.foi.air.wattsup.pages.ScanRFIDPage
 import hr.foi.air.wattsup.ui.theme.WattsUpTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,20 +20,30 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             WattsUpTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background,
                 ) {
                     val navController = rememberNavController()
+                    val onArrowBackClick = {
+                        navController.popBackStack()
+                        Unit
+                    }
 
                     NavHost(navController = navController, startDestination = "landing") {
                         composable("landing") {
-                            val onChargerModeClick = { navController.navigate("chargerMode") }
+                            val onChargerModeClick = { navController.navigate("scanRFID") }
 
                             LandingPage(onChargerModeClick)
                         }
-                        composable("chargerMode") { ChargerPage { navController.popBackStack() } }
+                        composable("scanRFID") {
+                            val onScanRFID = { navController.navigate("chargerMode") }
+
+                            ScanRFIDPage(onArrowBackClick, onScanRFID)
+                        }
+                        composable("chargerMode") {
+                            ChargerPage(onArrowBackClick)
+                        }
                     }
                 }
             }

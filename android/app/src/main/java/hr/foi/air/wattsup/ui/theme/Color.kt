@@ -2,10 +2,11 @@ package hr.foi.air.wattsup.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+val colorPrimary = Color(0xff11CB54) // green
+val colorSecondary = Color(0xffe43d) // yellow
+val colorBackground = Color(0xf0f8ff) // alice blue
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+val colorBackgroundDark = Color(0xff303030) // almost black
+val colorPrimaryDark = colorPrimary
+
+val colorBtnRed = Color(0xffFF6262)

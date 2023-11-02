@@ -12,17 +12,9 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-val colorPrimary = Color(0xff11CB54) // green
-val colorSecondary = Color(0xffe43d) // yellow
-val colorBackground = Color(0xf0f8ff) // alice blue
-
-val colorBackgroundDark = Color(0xff303030) // almost black
-val colorPrimaryDark = colorPrimary
-
 private val DarkColorScheme = darkColorScheme(
     primary = colorPrimaryDark,
     secondary = colorSecondary,
-    tertiary = Pink80,
     background = colorBackgroundDark,
     primaryContainer = colorPrimaryDark,
     surface = colorPrimaryDark,
@@ -37,7 +29,6 @@ private val DarkColorScheme = darkColorScheme(
 private val LightColorScheme = lightColorScheme(
     primary = colorPrimary,
     secondary = colorSecondary,
-    tertiary = Pink40,
     background = colorBackground,
     primaryContainer = colorPrimary,
     surface = colorPrimary,
@@ -64,6 +55,7 @@ fun WattsUpTheme(
     content: @Composable () -> Unit,
 ) {
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
+    // enable this only if you want dynamic color scheme
     /* when {
     dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
         val context = LocalContext.current
