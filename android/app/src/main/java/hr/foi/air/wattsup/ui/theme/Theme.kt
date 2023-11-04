@@ -13,8 +13,9 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 val colorPrimary = Color(0xff11CB54) // green
-val colorSecondary = Color(0xffe43d) // yellow
-val colorBackground = Color(0xf0f8ff) // alice blue
+val colorIterativeView = Color(0xff26D465) //lighter green
+val colorSecondary = Color(0xffFFFFFF) // White
+val colorBackground = Color(0xffF5FFF6) // light green
 
 val colorBackgroundDark = Color(0xff303030) // almost black
 val colorPrimaryDark = colorPrimary
@@ -22,7 +23,7 @@ val colorPrimaryDark = colorPrimary
 private val DarkColorScheme = darkColorScheme(
     primary = colorPrimaryDark,
     secondary = colorSecondary,
-    tertiary = Pink80,
+    tertiary = colorIterativeView,
     background = colorBackgroundDark,
     primaryContainer = colorPrimaryDark,
     surface = colorPrimaryDark,
@@ -37,7 +38,7 @@ private val DarkColorScheme = darkColorScheme(
 private val LightColorScheme = lightColorScheme(
     primary = colorPrimary,
     secondary = colorSecondary,
-    tertiary = Pink40,
+    tertiary = colorIterativeView,
     background = colorBackground,
     primaryContainer = colorPrimary,
     surface = colorPrimary,
@@ -69,7 +70,6 @@ fun WattsUpTheme(
         val context = LocalContext.current
         if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
     }
-
     darkTheme -> DarkColorScheme
     else -> LightColorScheme
 }*/

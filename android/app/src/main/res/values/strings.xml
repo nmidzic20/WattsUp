@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">WattsUp</string>
     <string name="charger_mode">Charger mode</string>
+    <string name="login">Login</string>
+    <string name="emailLabel">Email</string>
+    <string name="passwordLabel">Password</string>
+    <string name="LoginDontHaveAccountLabel">Don\'t have an account?</string>
+    <string name="registerLabel">Register</string>
 </resources>
