@@ -1,25 +1,25 @@
 <div id="formContainer">
     <h1>Register</h1>
-    <div id="message"></div>
-    <form action="">
+    <div id="message">{{ message }}</div>
+    <form #registrationForm="ngForm" (ngSubmit)="submitRegistration(registrationForm)" novalidate>
         <div class="form-group">
             <label for="firstname">First name:</label>
-            <input type="text" name="firstname" id="firstname">
+            <input type="text" name="firstname" ngModel required>
         </div>
         <div class="form-group">
             <label for="lastname">Last name:</label>
-            <input type="text" name="lastname" id="lastname">
+            <input type="text" name="lastname" ngModel required>
         </div>
         <div class="form-group">
             <label for="email">Email:</label>
-            <input type="email" name="email" id="email">
+            <input type="email" name="email" ngModel required>
         </div>
         <div class="form-group">
             <label for="password">Password:</label>
-            <input type="password" name="password" id="password">
+            <input type="password" name="password" ngModel required minlength="6">
         </div>
         <div class="form-group">
-            <button id="register">Register</button>
+            <button id="register" type="submit">Register</button>
         </div>
     </form>
     <div id="loginInstead">Already have an account? <a href="" id="loginLink">Log in</a></div>
