@@ -11,6 +11,7 @@ export class RegistrationComponent implements OnInit{
   lastNameInput?: HTMLInputElement;
   emailInput?: HTMLInputElement;
   passwordInput?: HTMLInputElement;
+  messageBox?: HTMLElement;
 
   constructor(private router: Router){
 
@@ -21,5 +22,39 @@ export class RegistrationComponent implements OnInit{
       this.lastNameInput = document.getElementById("lastname") as HTMLInputElement;
       this.emailInput = document.getElementById("email") as HTMLInputElement;
       this.passwordInput = document.getElementById("password") as HTMLInputElement;
+      this.messageBox = document.getElementById("message") as HTMLElement;
+  }
+
+  validateInput(){
+    let isValid = true;
+    let firstname = this.firstNameInput?.value;
+    let lastname = this.lastNameInput?.value;
+    let email = this.emailInput?.value;
+    let password = this.passwordInput?.value;
+    let errorMessage = "";
+
+    if (firstname == ""){
+      isValid = false;
+      errorMessage += "First name field is empty!";
+    } 
+    if (lastname == ""){
+      isValid = false;
+      errorMessage += "Last name field is empty!";
+    } 
+    if (email == ""){
+      isValid = false;
+      errorMessage += "Email field is empty!";
+    } 
+    if (password == ""){
+      isValid = false;
+      errorMessage += "Password field is empty!";
+    }
+    if (password!!.length < 6){
+      isValid = false;
+      errorMessage += "Password must be at least 6 characters long!";
+    }
+    this.messageBox!!.innerHTML = errorMessage;
+    
+    return isValid;
   }
 }
