@@ -21,7 +21,7 @@ namespace ControllerUnitTests.ServicesTests
         public void TestInitialize()
         {
             _options = new DbContextOptionsBuilder<DatabaseContext>()
-                .UseInMemoryDatabase(databaseName: "UserServiceTestsDatabase")
+                .UseInMemoryDatabase(databaseName: "WattsUpDatabase")
                 .Options;
         }
 
