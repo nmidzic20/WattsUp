@@ -38,10 +38,21 @@ namespace backend.Controllers
         }
 
         [HttpGet("forCharger/{chargerId}")]
-        public async Task<ActionResult<List<Event>>> GetEventsForCCharger(long chargerId)
+        public async Task<ActionResult<List<Event>>> GetEventsForCharger(long chargerId)
         {
             var res = await _dbContext.Event
                 .Where(e => e.ChargerId == chargerId)
+                .ToListAsync();
+
+            return Ok(res);
+        }
+
+        [HttpGet("current")]
+        public async Task<ActionResult<List<Event>>> GetCurrentEvents()
+        {
+            // ongoing events have an EndedAt max value placeholder
+            var res = await _dbContext.Event
+                .Where(e => e.EndedAt == DateTime.MaxValue)
                 .ToListAsync();
 
             return Ok(res);
