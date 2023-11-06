@@ -1,5 +1,7 @@
 ﻿using backend.Data;
+using backend.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend.Controllers
 {
@@ -14,6 +16,15 @@ namespace backend.Controllers
         {
             _dbContext = dbContext;
             _client = httpClient;
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<List<Event>>> GetEvents()
+        {
+            var res = await _dbContext.Event
+                .ToListAsync();
+
+            return Ok(res);
         }
     }
 }
