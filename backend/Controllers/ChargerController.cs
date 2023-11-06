@@ -1,9 +1,7 @@
 ﻿using backend.Data;
 using backend.Models.Entities;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Immutable;
 
 namespace backend.Controllers
 {
@@ -12,7 +10,7 @@ namespace backend.Controllers
     public class ChargerController : ControllerBase
     {
         private readonly DatabaseContext _dbContext;
-        private HttpClient _client;
+        private readonly HttpClient _client;
 
         public ChargerController(DatabaseContext dbContext, HttpClient httpClient)
         {
