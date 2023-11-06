@@ -26,5 +26,15 @@ namespace backend.Controllers
 
             return Ok(res);
         }
+
+        [HttpGet("{cardId}")]
+        public async Task<ActionResult<List<Event>>> GetEventsForCard(long cardId)
+        {
+            var res = await _dbContext.Event
+                .Where(e => e.CardId == cardId)
+                .ToListAsync();
+
+            return Ok(res);
+        }
     }
 }
