@@ -3,6 +3,8 @@ using backend.Models.Entities;
 using backend.Models.Requests;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
+using System.Runtime.InteropServices;
 using System.Runtime.Loader;
 
 namespace backend.Controllers
@@ -95,24 +97,53 @@ namespace backend.Controllers
                 EndedAt = DateTime.MaxValue
             };
 
-            // call charging station update
-            charger = new Charger
-            {
-                Active = true,
-                LastSyncAt = DateTime.Now
-            };
+            var chargerUpdate = await UpdateChargerState(true, eventRequest.ChargerId);
 
-            var chargerUpdateResponse = await _client.PutAsJsonAsync("api/Charger/" + newEvent.ChargerId.ToString(), charger);
-            
-            if (chargerUpdateResponse != null)
+            if (chargerUpdate.Value.StatusCode != HttpStatusCode.OK)
             {
-                return Conflict("Failed to update charger.");
+                return Conflict("Failed to update charger state.");
             }
 
             _dbContext.Event.Add(newEvent);
             await _dbContext.SaveChangesAsync();
-
             return Ok(newEvent);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<Event>> EndEvent(long id)
+        {
+            var eventToUpdate = await _dbContext.Event
+                .Where(e => e.Id == id)
+                .FirstOrDefaultAsync();
+
+            if (eventToUpdate == null)
+            {
+                return NotFound();
+            }
+
+            eventToUpdate.EndedAt = DateTime.Now;
+
+            var chargerUpdate = await UpdateChargerState(true, eventToUpdate.ChargerId);
+
+            if (chargerUpdate.Value.StatusCode != HttpStatusCode.OK)
+            {
+                return Conflict("Failed to update charger state.");
+            }
+
+            await _dbContext.SaveChangesAsync();
+            return Ok(eventToUpdate);
+        }
+
+        private async Task<ActionResult<HttpResponseMessage>> UpdateChargerState(bool state, long id)
+        {
+            // call charging station update
+            var charger = new Charger
+            {
+                Active = state,
+                LastSyncAt = DateTime.Now
+            };
+
+            return await _client.PutAsJsonAsync("api/Charger/" + id.ToString(), charger);
         }
     }
 }
