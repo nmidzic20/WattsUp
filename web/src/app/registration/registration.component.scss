@@ -3,10 +3,21 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+
+    #message{
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        color: #8a0101;
+    }
+
     label{
         align-self:flex-start;
         font-weight: bold;
     }
+
     input{
         background-color: #C9FFDC;
         width: 240px;
