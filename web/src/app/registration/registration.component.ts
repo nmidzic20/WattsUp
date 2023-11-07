@@ -31,10 +31,19 @@ export class RegistrationComponent implements OnInit{
       let body = {firstName: firstName, lastName: lastName, email: email, password: password}
       let parameters = {method: 'POST', headers: header, body: JSON.stringify(body)};
 
-      let response = await fetch("https://localhost:32770/api/Users", parameters);
-      if(response.status == 200){
-        this.errorMessageBox!!.innerHTML = "successfully";
-      } 
+      try{
+        let response = await fetch("https://localhost:32770/api/Users", parameters);
+
+        if(response.status == 200){
+          this.router.navigate(['/login']);
+        }else{
+          let errorMessage = JSON.parse(await response.text()).message;
+          this.errorMessageBox!!.innerHTML = response.status.toString() + ": " + errorMessage;
+        }
+      }catch (error){
+        this.errorMessageBox!!.innerHTML = (error as Error).message
+      }
+      
     }else{
       this.errorMessageBox!!.innerHTML = this.showErrorMessage(form);
     }
