@@ -52,5 +52,10 @@ namespace backend.Services
             var passwordHasher = new PasswordHasher<User>();
             return passwordHasher.VerifyHashedPassword(user, user.Password, password);
         }
+
+        public async Task<User> LoginAsync(UserLoginRequest userRequest)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

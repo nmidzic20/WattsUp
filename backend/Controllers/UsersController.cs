@@ -29,6 +29,24 @@ namespace backend.Controllers
             _cardService = cardService;
         }
 
+        // POST: api/Users/login
+        [HttpPost("login")]
+        public async Task<ActionResult<User>> Login(UserLoginRequest userRequest)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            User user = await _userService.LoginAsync(userRequest);
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found." });
+            }
+
+            return Ok(user);
+        }
+
         // POST: api/Users
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(UserCreateRequest userRequest)
