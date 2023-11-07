@@ -31,7 +31,7 @@ export class RegistrationComponent implements OnInit{
       let body = {firstName: firstName, lastName: lastName, email: email, password: password}
       let parameters = {method: 'POST', headers: header, body: JSON.stringify(body)};
 
-      let response = await fetch("https://localhost:32776/api/Users", parameters);
+      let response = await fetch("https://localhost:32770/api/Users", parameters);
       if(response.status == 200){
         this.errorMessageBox!!.innerHTML = "successfully";
       } 
