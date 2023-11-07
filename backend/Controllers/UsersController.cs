@@ -38,13 +38,21 @@ namespace backend.Controllers
                 return BadRequest(ModelState);
             }
 
-            User user = await _userService.LoginAsync(userRequest);
-            if (user == null)
+            try
             {
-                return NotFound(new { message = "User not found." });
+                User user = await _userService.LoginAsync(userRequest);
+
+                return Ok(user);
+            }
+            catch (InvalidDataException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { message = ex.Message });
             }
 
-            return Ok(user);
         }
 
         // POST: api/Users

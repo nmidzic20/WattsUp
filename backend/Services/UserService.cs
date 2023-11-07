@@ -55,7 +55,19 @@ namespace backend.Services
 
         public async Task<User> LoginAsync(UserLoginRequest userRequest)
         {
-            throw new NotImplementedException();
+            var user = await _context.User.FirstOrDefaultAsync(u => u.Email == userRequest.Email);
+            if (user == null)
+            {
+                throw new Exception("User not found.");
+            }
+
+            var passwordVerification = VerifyHashedPassword(user, userRequest.Password);
+            if(passwordVerification == PasswordVerificationResult.Failed)
+            {
+                throw new InvalidDataException("Incorrect password.");
+            }
+
+            return user;
         }
     }
 }
