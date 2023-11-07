@@ -1,7 +1,9 @@
 ﻿using backend.Data;
 using backend.Models.Entities;
+using backend.Models.Requests;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.Loader;
 
 namespace backend.Controllers
 {
@@ -56,6 +58,61 @@ namespace backend.Controllers
                 .ToListAsync();
 
             return Ok(res);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<Event>> CreateEvent(EventCreateRequest eventRequest)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var charger = await _dbContext.Charger
+                .Where(c => c.Id == eventRequest.ChargerId)
+                .FirstOrDefaultAsync();
+
+            if (charger == null)
+            {
+                return Conflict("The specified charger doesn't exist.");
+            }
+
+            var card = await _dbContext.Card
+                .Where(c => c.Id == eventRequest.CardId)
+                .FirstOrDefaultAsync();
+
+            if (card == null)
+            {
+                return Conflict("The specified card doesn't exist.");
+            }
+
+            var newEvent = new Event
+            {
+                ChargerId = eventRequest.ChargerId,
+                CardId = eventRequest.CardId,
+                VolumeKwh = eventRequest.VolumeKwh,
+                StartedAt = DateTime.Now,
+                EndedAt = DateTime.MaxValue
+            };
+
+            // call charging station update
+            charger = new Charger
+            {
+                Active = true,
+                LastSyncAt = DateTime.Now
+            };
+
+            var chargerUpdateResponse = await _client.PutAsJsonAsync("api/Charger/" + newEvent.ChargerId.ToString(), charger);
+            
+            if (chargerUpdateResponse != null)
+            {
+                return Conflict("Failed to update charger.");
+            }
+
+            _dbContext.Event.Add(newEvent);
+            await _dbContext.SaveChangesAsync();
+
+            return Ok(newEvent);
         }
     }
 }
