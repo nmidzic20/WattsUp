@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
 
-namespace ControllerUnitTests
+namespace ControllerUnitTests.ControllersTests
 {
     [TestClass]
     public class ChargerControllerTests
@@ -49,9 +49,9 @@ namespace ControllerUnitTests
             using (var context = new DatabaseContext(options))
             {
                 context.Charger.RemoveRange(context.Charger);
-                
-                context.Charger.Add(new Charger 
-                { 
+
+                context.Charger.Add(new Charger
+                {
                     Id = 1,
                     CreatedAt = DateTime.Now,
                     CreatedBy = new User { Email = "test", FirstName = "test", LastName = "test", Password = "test" },
@@ -82,7 +82,7 @@ namespace ControllerUnitTests
             using (var context = new DatabaseContext(options))
             {
                 ChargerController chargerController = new ChargerController(context, new HttpClient());
-            
+
                 // Act
                 var result = (await chargerController.GetChargers()).Result as ObjectResult;
 
