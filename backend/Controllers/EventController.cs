@@ -4,8 +4,6 @@ using backend.Models.Requests;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
-using System.Runtime.InteropServices;
-using System.Runtime.Loader;
 
 namespace backend.Controllers
 {
