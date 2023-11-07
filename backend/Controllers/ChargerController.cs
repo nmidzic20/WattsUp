@@ -9,8 +9,10 @@ namespace backend.Controllers
     [ApiController]
     public class ChargerController : ControllerBase
     {
+        // TODO: add charger create request
+
         private readonly DatabaseContext _dbContext;
-        private readonly HttpClient _client;
+        private readonly HttpClient _client; // TODO: remove this
 
         public ChargerController(DatabaseContext dbContext, HttpClient httpClient)
         {
@@ -71,7 +73,7 @@ namespace backend.Controllers
                 LastSyncAt = DateTime.Now,
                 Active = false
             };
-            
+            // TODO: add valid check
             _dbContext.Charger.Add(charger);
 
             await _dbContext.SaveChangesAsync();

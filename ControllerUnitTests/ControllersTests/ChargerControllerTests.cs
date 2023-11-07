@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ControllerUnitTests.ControllersTests
 {
+    // TODO: add initialize and cleanup
+
     [TestClass]
     public class ChargerControllerTests
     {
