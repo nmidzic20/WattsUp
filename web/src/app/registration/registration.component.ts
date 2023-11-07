@@ -21,9 +21,9 @@ export class RegistrationComponent implements OnInit{
   async submitRegistration(form: NgForm){
     if(form.valid){
       let firstName = form.controls['firstname'].value;
-      let lastName = form.controls['firstname'].value;
-      let email = form.controls['firstname'].value;
-      let password = form.controls['firstname'].value;
+      let lastName = form.controls['lastname'].value;
+      let email = form.controls['email'].value;
+      let password = form.controls['password'].value;
       let header = new Headers();
 
       header.set("Content-Type", "application/json");
