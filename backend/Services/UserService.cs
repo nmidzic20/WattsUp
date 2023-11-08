@@ -1,6 +1,7 @@
 ﻿using backend.Data;
 using backend.Models.Entities;
 using backend.Models.Requests;
+using backend.Models.Responses;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -59,9 +60,9 @@ namespace backend.Services
             return passwordHasher.VerifyHashedPassword(user, user.Password, password);
         }
 
-        public async Task<string> LoginAsync(UserLoginRequest userRequest)
+        public async Task<LoginResponse> LoginAsync(UserLoginRequest userRequest)
         {
-            var user = await _context.User.Include(r => r.Role).FirstOrDefaultAsync(u => u.Email == userRequest.Email);
+            var user = await _context.User.Include(r => r.Role).Include(t => t.RefreshToken).FirstOrDefaultAsync(u => u.Email == userRequest.Email);
             if (user == null)
             {
                 throw new Exception("User not found.");
@@ -73,7 +74,38 @@ namespace backend.Services
                 throw new InvalidDataException("Incorrect password.");
             }
 
-            return GenerateJwtToken(user);
+            string jwt = GenerateJwtToken(user);
+            RefreshToken refreshToken = await GenerateRefreshToken(user);
+
+            LoginResponse loginResponse = new LoginResponse
+            {
+                JWT = jwt,
+                RefreshToken = refreshToken.Token,
+                RefreshTokenExpiresAt = refreshToken.ExpiresAt
+            };
+
+            return loginResponse;
+        }
+
+        private async Task<RefreshToken> GenerateRefreshToken(User user)
+        {
+            var refreshToken = await _context.RefreshToken.FindAsync(user.RefreshTokenId);
+            if(refreshToken != null)
+            {
+                _context.RefreshToken.Remove(refreshToken);
+            }
+
+            var newRefreshToken = new RefreshToken
+            {
+                Token = Guid.NewGuid().ToString(),
+                ExpiresAt = DateTime.UtcNow.AddHours(5)
+            };
+
+            user.RefreshToken = newRefreshToken;
+            _context.User.Update(user);
+            _context.SaveChanges();
+            
+            return newRefreshToken;
         }
 
         private string GenerateJwtToken(User user)

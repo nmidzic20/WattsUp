@@ -28,7 +28,6 @@
     <Folder Include="Auth\" />
     <Folder Include="Data\Migrations\" />
     <Folder Include="Data\Repositories\" />
-    <Folder Include="Models\Responses\" />
   </ItemGroup>
 
 </Project>

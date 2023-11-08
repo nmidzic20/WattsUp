@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using backend.Services;
 using Microsoft.AspNetCore.Authorization;
+using backend.Models.Responses;
 
 namespace backend.Controllers
 {
@@ -41,9 +42,9 @@ namespace backend.Controllers
 
             try
             {
-                string jwt = await _userService.LoginAsync(userRequest);
+                LoginResponse response = await _userService.LoginAsync(userRequest);
 
-                return Ok(jwt);
+                return Ok(response);
             }
             catch (InvalidDataException ex)
             {
