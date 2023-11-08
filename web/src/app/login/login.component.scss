@@ -1,0 +1,66 @@
+#formContainer{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    #message{
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        color: #8a0101;
+    }
+
+    label{
+        align-self:flex-start;
+        font-weight: bold;
+    }
+
+    input{
+        background-color: #C9FFDC;
+        width: 240px;
+        height: 30px;
+        border-radius: 6px;
+        box-shadow: 2px 2px 4px #000000;
+        border: none;
+    }
+    
+    button{
+        background-color: #11CB54;
+        color: white;
+        width: 130px;
+        height: 30px;
+        border-radius: 6px;
+        box-shadow: 2px 2px 4px #000000;
+        align-self: center;
+    }
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+
+    label {
+      margin-bottom: 10px;
+    }
+}
+
+#registerInstead{
+    margin-top: 30px;
+    display: flex;
+    align-items: center;
+}
+
+#registrationLink {
+    margin-left: 5px;
+    color: #11CB54;
+    font-weight: bold;
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
