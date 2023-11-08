@@ -75,5 +75,37 @@ namespace ControllerUnitTests.ControllersTests
             // Assert
             Assert.IsInstanceOfType(result.Result, typeof(NotFoundObjectResult));
         }
+
+        [TestMethod]
+        public async Task GetEventsForCard_WhenCardExists_ShouldReturnEventsForCard()
+        {
+            // Arrange
+            using var context = new DatabaseContext(_options);
+            EventController eventController = new(context, new HttpClient());
+            context.Card.Add(new Card
+            {
+                Id = 1,
+                Active = true,
+                Events = new List<Event> { },
+                OwnedBy = new User 
+                { 
+                    Email = "test",
+                    FirstName = "test",
+                    LastName = "test",
+                    Password = "test"
+                },
+                OwnedById = 1,
+                Value = "1"
+            });
+            context.Event.Add(new Event { Id = 1, CardId = 1, ChargerId = 1, StartedAt = DateTime.Now, EndedAt = DateTime.MaxValue });
+            context.Event.Add(new Event { Id = 2, CardId = 2, ChargerId = 2, StartedAt = DateTime.Now, EndedAt = DateTime.MaxValue });
+            context.SaveChanges();
+
+            // Act
+            var result = await eventController.GetEventsForCard(1);
+
+            // Assert
+            Assert.AreEqual(1, ((result.Result as ObjectResult).Value as List<Event>).Count);
+        }
     }
 }
