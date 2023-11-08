@@ -157,5 +157,22 @@ namespace ControllerUnitTests.ControllersTests
             // Assert
             Assert.AreEqual(1, ((result.Result as ObjectResult).Value as List<Event>).Count);
         }
+
+        [TestMethod]
+        public async Task GetCurrentEvents_WhenThereAreOngoingEvents_ShouldReturnOngoingEvents()
+        {
+            // Arrange
+            using var context = new DatabaseContext(_options);
+            EventController eventController = new(context, new HttpClient());
+            context.Event.Add(new Event { Id = 1, CardId = 1, ChargerId = 1, StartedAt = DateTime.Today, EndedAt = DateTime.Now });
+            context.Event.Add(new Event { Id = 2, CardId = 2, ChargerId = 2, StartedAt = DateTime.Now, EndedAt = DateTime.MaxValue });
+            context.SaveChanges();
+
+            // Act
+            var result = await eventController.GetCurrentEvents();
+
+            // Assert
+            Assert.AreEqual(1, ((result.Result as ObjectResult).Value as List<Event>).Count);
+        }
     }
 }
