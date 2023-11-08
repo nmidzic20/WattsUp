@@ -32,6 +32,11 @@ namespace backend.Controllers
         [HttpGet("forCard/{cardId}")]
         public async Task<ActionResult<List<Event>>> GetEventsForCard(long cardId)
         {
+            if (!await CheckCard(cardId))
+            {
+                return NotFound("Specified card doesn't exist.");
+            }
+
             var res = await _dbContext.Event
                 .Where(e => e.CardId == cardId)
                 .ToListAsync();
@@ -42,6 +47,11 @@ namespace backend.Controllers
         [HttpGet("forCharger/{chargerId}")]
         public async Task<ActionResult<List<Event>>> GetEventsForCharger(long chargerId)
         {
+            if (!await CheckCharger(chargerId))
+            {
+                return NotFound("Specified charger doesn't exist.");
+            }
+
             var res = await _dbContext.Event
                 .Where(e => e.ChargerId == chargerId)
                 .ToListAsync();
@@ -68,22 +78,14 @@ namespace backend.Controllers
                 return BadRequest(ModelState);
             }
 
-            var charger = await _dbContext.Charger
-                .Where(c => c.Id == eventRequest.ChargerId)
-                .FirstOrDefaultAsync();
-
-            if (charger == null)
+            if (!await CheckCard(eventRequest.CardId))
             {
-                return Conflict("The specified charger doesn't exist.");
+                return NotFound("Specified card doesn't exist.");
             }
 
-            var card = await _dbContext.Card
-                .Where(c => c.Id == eventRequest.CardId)
-                .FirstOrDefaultAsync();
-
-            if (card == null)
+            if (!await CheckCharger(eventRequest.ChargerId))
             {
-                return Conflict("The specified card doesn't exist.");
+                return NotFound("Specified charger doesn't exist.");
             }
 
             var newEvent = new Event
@@ -95,9 +97,7 @@ namespace backend.Controllers
                 EndedAt = DateTime.MaxValue
             };
 
-            var chargerUpdate = await UpdateChargerState(true, eventRequest.ChargerId);
-
-            if (chargerUpdate.Value.StatusCode != HttpStatusCode.OK)
+            if (!await UpdateChargerState(true, eventRequest.ChargerId))
             {
                 return Conflict("Failed to update charger state.");
             }
@@ -121,9 +121,7 @@ namespace backend.Controllers
 
             eventToUpdate.EndedAt = DateTime.Now;
 
-            var chargerUpdate = await UpdateChargerState(true, eventToUpdate.ChargerId);
-
-            if (chargerUpdate.Value.StatusCode != HttpStatusCode.OK)
+            if (!await UpdateChargerState(false, eventToUpdate.ChargerId))
             {
                 return Conflict("Failed to update charger state.");
             }
@@ -132,7 +130,7 @@ namespace backend.Controllers
             return Ok(eventToUpdate);
         }
 
-        private async Task<ActionResult<HttpResponseMessage>> UpdateChargerState(bool state, long id)
+        private async Task<bool> UpdateChargerState(bool state, long id)
         {
             // call charging station update
             var charger = new Charger
@@ -141,7 +139,21 @@ namespace backend.Controllers
                 LastSyncAt = DateTime.Now
             };
 
-            return await _client.PutAsJsonAsync("api/Charger/" + id.ToString(), charger);
+            var chargerController = new ChargerController(_dbContext, _client);
+            var chargerUpdate = await chargerController.UpdateChargerByID(id, charger);
+
+            // check response
+            return chargerUpdate.Value != null;
+        }
+
+        private Task<bool> CheckCard(long cardId)
+        {
+            return _dbContext.Card.AnyAsync(c => c.Id == cardId);
+        }
+
+        private Task<bool> CheckCharger(long chargerId)
+        {
+            return _dbContext.Charger.AnyAsync(c => c.Id == chargerId);
         }
     }
 }

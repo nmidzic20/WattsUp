@@ -58,5 +58,22 @@ namespace ControllerUnitTests.ControllersTests
             // Assert
             Assert.AreEqual(2, (result.Value as List<Event>).Count);
         }
+
+        [TestMethod]
+        public async Task GetEventsForCard_WhenCardDoesNotExist_ShouldReturnNotFoundException()
+        {
+            // Arrange
+            using var context = new DatabaseContext(_options);
+            EventController eventController = new(context, new HttpClient());
+            context.Event.Add(new Event { Id = 1, CardId = 1, ChargerId = 1, StartedAt = DateTime.Now, EndedAt = DateTime.MaxValue });
+            context.Event.Add(new Event { Id = 2, CardId = 2, ChargerId = 2, StartedAt = DateTime.Now, EndedAt = DateTime.MaxValue });
+            context.SaveChanges();
+
+            // Act
+            var result = await eventController.GetEventsForCard(1);
+
+            // Assert
+            Assert.IsInstanceOfType(result.Result, typeof(NotFoundObjectResult));
+        }
     }
 }
