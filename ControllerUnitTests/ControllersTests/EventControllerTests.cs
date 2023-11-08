@@ -107,5 +107,55 @@ namespace ControllerUnitTests.ControllersTests
             // Assert
             Assert.AreEqual(1, ((result.Result as ObjectResult).Value as List<Event>).Count);
         }
+
+        [TestMethod]
+        public async Task GetEventsForCharger_WhenChargerDoesNotExist_ShouldReturnNotFoundException()
+        {
+            // Arrange
+            using var context = new DatabaseContext(_options);
+            EventController eventController = new(context, new HttpClient());
+            context.Event.Add(new Event { Id = 1, CardId = 1, ChargerId = 1, StartedAt = DateTime.Now, EndedAt = DateTime.MaxValue });
+            context.Event.Add(new Event { Id = 2, CardId = 2, ChargerId = 2, StartedAt = DateTime.Now, EndedAt = DateTime.MaxValue });
+            context.SaveChanges();
+
+            // Act
+            var result = await eventController.GetEventsForCharger(1);
+
+            // Assert
+            Assert.IsInstanceOfType(result.Result, typeof(NotFoundObjectResult));
+        }
+
+        [TestMethod]
+        public async Task GetEventsForCharger_WhenChargerExists_ShouldReturnEventsForCard()
+        {
+            // Arrange
+            using var context = new DatabaseContext(_options);
+            EventController eventController = new(context, new HttpClient());
+            context.Charger.Add(new Charger
+            {
+                Active = true,
+                Events = new List<Event> { },
+                Id = 1,
+                Name = "test",
+                CreatedAt = DateTime.Now,
+                CreatedBy = new User
+                {
+                    Email = "test",
+                    FirstName = "test",
+                    LastName = "test",
+                    Password = "test"
+                },
+                CreatedById = 1
+            });
+            context.Event.Add(new Event { Id = 1, CardId = 1, ChargerId = 1, StartedAt = DateTime.Now, EndedAt = DateTime.MaxValue });
+            context.Event.Add(new Event { Id = 2, CardId = 2, ChargerId = 2, StartedAt = DateTime.Now, EndedAt = DateTime.MaxValue });
+            context.SaveChanges();
+
+            // Act
+            var result = await eventController.GetEventsForCharger(1);
+
+            // Assert
+            Assert.AreEqual(1, ((result.Result as ObjectResult).Value as List<Event>).Count);
+        }
     }
 }
