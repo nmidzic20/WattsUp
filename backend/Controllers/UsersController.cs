@@ -11,6 +11,7 @@ using backend.Models.Requests;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using backend.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace backend.Controllers
 {
@@ -40,9 +41,9 @@ namespace backend.Controllers
 
             try
             {
-                User user = await _userService.LoginAsync(userRequest);
+                string jwt = await _userService.LoginAsync(userRequest);
 
-                return Ok(user);
+                return Ok(jwt);
             }
             catch (InvalidDataException ex)
             {
