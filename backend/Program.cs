@@ -12,6 +12,26 @@ builder.Services.AddDbContext<DatabaseContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+var ProductionPolicy = "ProductionPolicy";
+var DevelopmentPolicy = "DevelopmentPolicy";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: ProductionPolicy,
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:4200")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+    options.AddPolicy(name: DevelopmentPolicy,
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:4200")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
+
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
@@ -30,10 +50,15 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseCors(DevelopmentPolicy);
 
     using var scope = app.Services.CreateScope();
     await using var dbContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
     await dbContext.Database.MigrateAsync();
+}
+else
+{
+    app.UseCors(ProductionPolicy);
 }
 
 app.UseHttpsRedirection();
