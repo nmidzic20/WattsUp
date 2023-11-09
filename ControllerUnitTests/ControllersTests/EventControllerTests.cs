@@ -1,6 +1,7 @@
 ﻿using backend.Controllers;
 using backend.Data;
 using backend.Models.Entities;
+using backend.Models.Requests;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -173,6 +174,58 @@ namespace ControllerUnitTests.ControllersTests
 
             // Assert
             Assert.AreEqual(1, ((result.Result as ObjectResult).Value as List<Event>).Count);
+        }
+
+        // TODO: figure out why this fails even though it works fine in Swagger
+        [TestMethod]
+        public async Task CreateEvent_GivenValidData_ShouldReturnSuccess()
+        {
+            // Arrange
+            using var context = new DatabaseContext(_options);
+            EventController eventController = new(context, new HttpClient());
+            context.Charger.Add(new Charger
+            {
+                Active = true,
+                Events = new List<Event> { },
+                Id = 1,
+                Name = "test",
+                CreatedAt = DateTime.Now,
+                CreatedBy = new User
+                {
+                    Email = "test",
+                    FirstName = "test",
+                    LastName = "test",
+                    Password = "test"
+                },
+                CreatedById = 1
+            });
+            context.Card.Add(new Card
+            {
+                Id = 1,
+                Active = true,
+                Events = new List<Event> { },
+                OwnedBy = new User
+                {
+                    Email = "test",
+                    FirstName = "test",
+                    LastName = "test",
+                    Password = "test"
+                },
+                OwnedById = 1,
+                Value = "1"
+            });
+
+            var newEvent = new EventCreateRequest
+            {
+                CardId = 1,
+                ChargerId = 1,
+            };
+
+            // Act
+            var result = await eventController.CreateEvent(newEvent);
+            
+            // Assert
+            Assert.AreEqual(1, context.Event.Count());
         }
     }
 }

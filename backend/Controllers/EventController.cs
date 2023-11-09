@@ -132,18 +132,20 @@ namespace backend.Controllers
 
         private async Task<bool> UpdateChargerState(bool state, long id)
         {
-            // call charging station update
-            var charger = new Charger
-            {
-                Active = state,
-                LastSyncAt = DateTime.Now
-            };
-
             var chargerController = new ChargerController(_dbContext, _client);
-            var chargerUpdate = await chargerController.UpdateChargerByID(id, charger);
+            var result = (await chargerController.GetChargerByID(id)).Result as ObjectResult;
+            var charger = result.Value as Charger;
+            
+            if (charger == null)
+            {
+                return false;
+            }
 
-            // check response
-            return chargerUpdate.Value != null;
+            charger.Active = state;
+            charger.LastSyncAt = DateTime.Now;
+            var response = await chargerController.UpdateChargerByID(id, charger);
+
+            return response.Result is OkObjectResult;
         }
 
         private Task<bool> CheckCard(long cardId)
