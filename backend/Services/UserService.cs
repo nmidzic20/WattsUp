@@ -132,5 +132,30 @@ namespace backend.Services
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
+
+        public async Task<LoginResponse> TokenRefreshAsync(TokenRefreshRequest tokenRefreshRequest)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(tokenRefreshRequest.JWT);
+            var userId = token.Claims.First(claim => claim.Type == "id").Value;
+            var user = _context.User.Include(r => r.Role).Include(t => t.RefreshToken).FirstOrDefault(u => u.Id == int.Parse(userId));
+            
+            if(tokenRefreshRequest.RefreshToken != user.RefreshToken.Token || user.RefreshToken.ExpiresAt < DateTime.Now)
+            {
+                throw new Exception("Invalid refresh token.");
+            }
+
+            string jwt = GenerateJwtToken(user);
+            RefreshToken refreshToken = await GenerateRefreshToken(user);
+
+            LoginResponse loginResponse = new LoginResponse
+            {
+                JWT = jwt,
+                RefreshToken = refreshToken.Token,
+                RefreshTokenExpiresAt = refreshToken.ExpiresAt
+            };
+
+            return loginResponse;
+        }
     }
 }

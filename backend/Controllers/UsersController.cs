@@ -31,8 +31,8 @@ namespace backend.Controllers
             _cardService = cardService;
         }
 
-        // POST: api/Users/login
-        [HttpPost("login")]
+        // POST: api/Users/Login
+        [HttpPost("Login")]
         public async Task<ActionResult<User>> Login(UserLoginRequest userRequest)
         {
             if (!ModelState.IsValid)
@@ -53,6 +53,28 @@ namespace backend.Controllers
             catch (Exception ex)
             {
                 return NotFound(new { message = ex.Message });
+            }
+
+        }
+
+        // POST: api/Users/TokenRefresh
+        [HttpPost("TokenRefresh")]
+        public async Task<ActionResult<User>> TokenRefresh(TokenRefreshRequest tokenRefreshRequest)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                LoginResponse response = await _userService.TokenRefreshAsync(tokenRefreshRequest);
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return Unauthorized(new { message = ex.Message });
             }
 
         }
