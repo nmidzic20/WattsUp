@@ -104,7 +104,7 @@ namespace backend.Controllers
 
             _dbContext.Event.Add(newEvent);
             await _dbContext.SaveChangesAsync();
-            return Ok(newEvent);
+            return Ok($"Created event {newEvent.Id}");
         }
 
         [HttpPut("{id}")]
@@ -127,7 +127,7 @@ namespace backend.Controllers
             }
 
             await _dbContext.SaveChangesAsync();
-            return Ok(eventToUpdate);
+            return Ok($"Ended event {eventToUpdate.Id}");
         }
 
         private async Task<bool> UpdateChargerState(bool state, long id)
