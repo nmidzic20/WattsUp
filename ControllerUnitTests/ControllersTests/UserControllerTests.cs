@@ -5,6 +5,7 @@ using backend.Models.Requests;
 using backend.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,7 @@ namespace ControllerUnitTests.ControllersTests
     public class UserControllerTests
     {
         private DbContextOptions<DatabaseContext> _options;
+        private IConfiguration _configuration;
 
         [TestInitialize]
         public void TestInitialize()
@@ -24,6 +26,8 @@ namespace ControllerUnitTests.ControllersTests
             _options = new DbContextOptionsBuilder<DatabaseContext>()
                 .UseInMemoryDatabase(databaseName: "WattsUpDatabase")
                 .Options;
+
+            _configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string>()).Build();
         }
 
         [TestCleanup]
@@ -51,7 +55,7 @@ namespace ControllerUnitTests.ControllersTests
                     Card = new CardCreateRequest { Value = "123456" }
                 };
                 
-                var userService = new UserService(dbContext);
+                var userService = new UserService(dbContext, _configuration);
                 var cardService = new CardService(dbContext);
 
                 // Act
@@ -77,7 +81,7 @@ namespace ControllerUnitTests.ControllersTests
                     Password = "123456"
                 };
 
-                var userService = new UserService(dbContext);
+                var userService = new UserService(dbContext, _configuration);
                 var cardService = new CardService(dbContext);
 
                 // Act
@@ -110,7 +114,7 @@ namespace ControllerUnitTests.ControllersTests
                     Email = "john.doe@example.com"
                 };
 
-                var userService = new UserService(dbContext);
+                var userService = new UserService(dbContext, _configuration);
                 var cardService = new CardService(dbContext);
 
                 // Act
@@ -141,7 +145,7 @@ namespace ControllerUnitTests.ControllersTests
                     Card = new CardCreateRequest { Value = "123456" }
                 };
 
-                var userService = new UserService(dbContext);
+                var userService = new UserService(dbContext, _configuration);
                 var cardService = new CardService(dbContext);
 
                 // Act

@@ -4,6 +4,7 @@ using backend.Models.Requests;
 using backend.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace ControllerUnitTests.ServicesTests
     public class UserServiceTests
     {
         private DbContextOptions<DatabaseContext> _options;
+        private IConfiguration _configuration;
 
         [TestInitialize]
         public void TestInitialize()
@@ -23,6 +25,8 @@ namespace ControllerUnitTests.ServicesTests
             _options = new DbContextOptionsBuilder<DatabaseContext>()
                 .UseInMemoryDatabase(databaseName: "WattsUpDatabase")
                 .Options;
+
+            _configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string>()).Build();
         }
 
         [TestCleanup]
@@ -50,7 +54,7 @@ namespace ControllerUnitTests.ServicesTests
                 };
 
                 // Act
-                var userService = new UserService(dbContext);
+                var userService = new UserService(dbContext, _configuration);
                 var result = await userService.CreateUserAsync(userRequest);
 
                 // Assert
@@ -87,7 +91,7 @@ namespace ControllerUnitTests.ServicesTests
                 };
 
                 // Act
-                var userService = new UserService(dbContext);
+                var userService = new UserService(dbContext, _configuration);
                 var result = await userService.CreateUserAsync(userRequest);
 
                 // Assert
@@ -110,7 +114,7 @@ namespace ControllerUnitTests.ServicesTests
                 };
 
                 // Act
-                var userService = new UserService(dbContext);
+                var userService = new UserService(dbContext, _configuration);
                 var result = await userService.CreateUserAsync(userRequest);
 
                 // Assert
@@ -143,7 +147,7 @@ namespace ControllerUnitTests.ServicesTests
                 };
 
                 // Act
-                var userService = new UserService(dbContext);
+                var userService = new UserService(dbContext, _configuration);
                 var result1 = await userService.CreateUserAsync(userRequest1);
                 var result2 = await userService.CreateUserAsync(userRequest2);
 
