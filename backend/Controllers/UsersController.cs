@@ -58,6 +58,7 @@ namespace backend.Controllers
         }
 
         // POST: api/Users/TokenRefresh
+        [Authorize(AuthenticationSchemes = "NoExpiryCheck")]
         [HttpPost("TokenRefresh")]
         public async Task<ActionResult<User>> TokenRefresh(TokenRefreshRequest tokenRefreshRequest)
         {
