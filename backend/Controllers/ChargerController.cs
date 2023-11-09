@@ -1,9 +1,7 @@
 ﻿using backend.Data;
 using backend.Models.Entities;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Immutable;
 
 namespace backend.Controllers
 {
@@ -12,20 +10,16 @@ namespace backend.Controllers
     public class ChargerController : ControllerBase
     {
         private readonly DatabaseContext _dbContext;
-        private HttpClient _client;
 
         public ChargerController(DatabaseContext dbContext, HttpClient httpClient)
         {
             _dbContext = dbContext;
-            _client = httpClient;
         }
 
         [HttpGet]
         public async Task<ActionResult<List<Charger>>> GetChargers()
         {
             var chargers = await _dbContext.Charger
-                .Include(c => c.Events)
-                .Include(c => c.CreatedBy)
                 .ToListAsync();
 
             return Ok(chargers);
@@ -35,8 +29,6 @@ namespace backend.Controllers
         public async Task<ActionResult<Charger>> GetChargerByID(long id)
         {
             var charger = await _dbContext.Charger
-                .Include(c => c.Events)
-                .Include(c => c.CreatedBy)
                 .Where(c => c.Id == id)
                 .FirstOrDefaultAsync();
             
@@ -52,8 +44,6 @@ namespace backend.Controllers
         public async Task<ActionResult<List<Charger>>> GetChargersByState(bool active)
         {
             var chargers = await _dbContext.Charger
-                .Include(c => c.Events)
-                .Include(c => c.CreatedBy)
                 .Where(c => c.Active == active)
                 .ToListAsync();
 
@@ -75,7 +65,6 @@ namespace backend.Controllers
             };
             
             _dbContext.Charger.Add(charger);
-
             await _dbContext.SaveChangesAsync();
 
             return Ok(charger);
@@ -85,8 +74,6 @@ namespace backend.Controllers
         public async Task<ActionResult<Charger>> UpdateChargerByID(long id, [FromBody] Charger _charger)
         {
             var charger = await _dbContext.Charger
-                .Include(c => c.Events)
-                .Include(c => c.CreatedBy)
                 .Where(c => c.Id == id)
                 .FirstOrDefaultAsync();
 
@@ -103,15 +90,13 @@ namespace backend.Controllers
 
             await _dbContext.SaveChangesAsync();
             
-            return Ok(charger);
+            return Ok($"Updated charger {charger.Id}");
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult<Charger>> DeleteChargerByID(long id)
         {
             var charger = await _dbContext.Charger
-                .Include(c => c.Events)
-                .Include(c => c.CreatedBy)
                 .Where(c => c.Id == id)
                 .FirstOrDefaultAsync();
 
@@ -121,10 +106,9 @@ namespace backend.Controllers
             }
 
             _dbContext.Charger.Remove(charger);
-
             await _dbContext.SaveChangesAsync();
 
-            return Ok(charger);
+            return Ok($"Deleted charger {charger.Id}");
         }
     }
 }
