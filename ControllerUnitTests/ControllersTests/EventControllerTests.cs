@@ -227,5 +227,61 @@ namespace ControllerUnitTests.ControllersTests
             // Assert
             Assert.AreEqual(1, context.Event.Count());
         }
+
+        // TODO: figure out why this fails even though it works fine in Swagger
+        [TestMethod]
+        public async Task EndEvent_GivenValidData_ShouldReturnSuccess()
+        {
+            // Arrange
+            using var context = new DatabaseContext(_options);
+            EventController eventController = new(context, new HttpClient());
+            
+            context.Charger.Add(new Charger
+            {
+                Active = true,
+                Events = new List<Event> { },
+                Id = 1,
+                Name = "test",
+                CreatedAt = DateTime.Now,
+                CreatedBy = new User
+                {
+                    Email = "test",
+                    FirstName = "test",
+                    LastName = "test",
+                    Password = "test"
+                },
+                CreatedById = 1
+            });
+            context.Card.Add(new Card
+            {
+                Id = 1,
+                Active = true,
+                Events = new List<Event> { },
+                OwnedBy = new User
+                {
+                    Email = "test",
+                    FirstName = "test",
+                    LastName = "test",
+                    Password = "test"
+                },
+                OwnedById = 1,
+                Value = "1"
+            });
+            context.Event.Add(new Event
+            {
+                Id = 1,
+                CardId = 1,
+                ChargerId = 1,
+                StartedAt = DateTime.Now,
+                EndedAt = DateTime.MaxValue
+            });
+
+            // Act
+            var result = await eventController.EndEvent(1);
+
+            // Assert
+            Assert.IsFalse(context.Charger.Find(1).Active);
+            Assert.AreNotEqual(DateTime.MaxValue, context.Event.Find(1).EndedAt);
+        }
     }
 }
