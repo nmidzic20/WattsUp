@@ -176,7 +176,6 @@ namespace ControllerUnitTests.ControllersTests
             Assert.AreEqual(1, ((result.Result as ObjectResult).Value as List<Event>).Count);
         }
 
-        // TODO: figure out why this fails even though it works fine in Swagger
         [TestMethod]
         public async Task CreateEvent_GivenValidData_ShouldReturnSuccess()
         {
@@ -214,6 +213,7 @@ namespace ControllerUnitTests.ControllersTests
                 OwnedById = 1,
                 Value = "1"
             });
+            context.SaveChanges();
 
             var newEvent = new EventCreateRequest
             {
@@ -228,7 +228,6 @@ namespace ControllerUnitTests.ControllersTests
             Assert.AreEqual(1, context.Event.Count());
         }
 
-        // TODO: figure out why this fails even though it works fine in Swagger
         [TestMethod]
         public async Task EndEvent_GivenValidData_ShouldReturnSuccess()
         {
@@ -275,6 +274,7 @@ namespace ControllerUnitTests.ControllersTests
                 StartedAt = DateTime.Now,
                 EndedAt = DateTime.MaxValue
             });
+            context.SaveChanges();
 
             // Act
             var result = await eventController.EndEvent(1);
