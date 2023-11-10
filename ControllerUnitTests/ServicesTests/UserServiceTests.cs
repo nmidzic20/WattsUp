@@ -399,7 +399,7 @@ namespace ControllerUnitTests.ServicesTests
                     RefreshToken = new RefreshToken
                     {
                         Id = 1,
-                        Token = "valid_token",
+                        Token = "invalid_token",
                         ExpiresAt = DateTime.UtcNow
                     }
                 };

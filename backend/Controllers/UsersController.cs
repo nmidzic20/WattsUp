@@ -54,7 +54,6 @@ namespace backend.Controllers
             {
                 return NotFound(new { message = ex.Message });
             }
-
         }
 
         // POST: api/Users/TokenRefresh
