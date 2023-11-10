@@ -9,10 +9,8 @@ namespace backend.Controllers
     [ApiController]
     public class ChargerController : ControllerBase
     {
-        // TODO: add charger create request
-
         private readonly DatabaseContext _dbContext;
-        private readonly HttpClient _client; // TODO: remove this
+        private readonly HttpClient _client;
 
         public ChargerController(DatabaseContext dbContext, HttpClient httpClient)
         {
