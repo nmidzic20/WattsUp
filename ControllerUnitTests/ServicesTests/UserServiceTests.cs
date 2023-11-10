@@ -307,5 +307,116 @@ namespace ControllerUnitTests.ServicesTests
             Assert.IsTrue(response.RefreshTokenExpiresAt > DateTime.UtcNow.AddHours(4).AddMinutes(59));
             Assert.IsTrue(response.RefreshTokenExpiresAt < DateTime.UtcNow.AddHours(5).AddMinutes(1));
         }
+
+        [TestMethod]
+        public async Task TokenRefreshAsync_ValidRefresh_ReturnsValidTokens()
+        {
+            // Arrange
+            using (var dbContext = new DatabaseContext(_options))
+            {
+                var user = new User
+                {
+                    Id = 1,
+                    FirstName = "John",
+                    LastName = "Doe",
+                    Email = "john.doe@gmail.com",
+                    Password = "123456",
+                    Active = true,
+                    CreatedAt = DateTime.UtcNow,
+                    Role = new Role
+                    {
+                        Id = 2,
+                        Name = "User"
+                    },
+                    RefreshToken = new RefreshToken
+                    {
+                        Id = 1,
+                        Token = "valid_token",
+                        ExpiresAt = DateTime.UtcNow.AddMinutes(1)
+                    }
+                };
+
+                dbContext.User.Add(user);
+                dbContext.SaveChanges();
+
+                var userService = new UserService(dbContext, _configuration);
+                var tokenRefreshRequest = new TokenRefreshRequest
+                {
+                    JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJmaXJzdE5hbWUiOiJKb2huIiwiZW1haWwiOiJqb2huLmRvZUBnbWFpbC5jb20iLCJyb2xlSWQiOiIyIiwicm9sZSI6IlVzZXIiLCJuYmYiOjE2OTk2MjI4NTksImV4cCI6MTY5OTYyMzE1OCwiaWF0IjoxNjk5NjIyODU5LCJpc3MiOiJOdWxsUG9pbnRlci5jb20iLCJhdWQiOiJOdWxsUG9pbnRlci5jb20ifQ._-RPcRIfh0XeUzpEIqm0Vgl-_yrjhqFSD-9aRfmm4KE",
+                    RefreshToken = "valid_token"
+                };
+
+                // Act
+                var response = await userService.TokenRefreshAsync(tokenRefreshRequest);
+
+                // Assert
+                Assert.IsNotNull(response);
+
+                Assert.IsNotNull(response.JWT);
+                var handler = new JwtSecurityTokenHandler();
+                var token = handler.ReadJwtToken(response.JWT);
+                var id = token.Claims.First(claim => claim.Type == "id").Value;
+                var name = token.Claims.First(claim => claim.Type == "firstName").Value;
+                var email = token.Claims.First(claim => claim.Type == "email").Value;
+                var roleId = token.Claims.First(claim => claim.Type == "roleId").Value;
+                var roleName = token.Claims.First(claim => claim.Type == "role").Value;
+                Assert.AreEqual(user.Id.ToString(), id);
+                Assert.AreEqual(user.FirstName, name);
+                Assert.AreEqual(user.Email, email);
+                Assert.AreEqual(user.RoleId.ToString(), roleId);
+                Assert.AreEqual(user.Role.Name, roleName);
+                Assert.IsTrue(token.ValidTo < DateTime.UtcNow.AddMinutes(5));
+                Assert.IsTrue(token.ValidTo > DateTime.UtcNow.AddMinutes(4));
+
+                Assert.IsNotNull(response.RefreshToken);
+                Assert.AreNotEqual("valid_token", response.RefreshToken);
+                Assert.IsTrue(response.RefreshTokenExpiresAt > DateTime.UtcNow.AddHours(4).AddMinutes(59));
+                Assert.IsTrue(response.RefreshTokenExpiresAt < DateTime.UtcNow.AddHours(5).AddMinutes(1));
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(Exception), "Invalid refresh token.")]
+        public async Task TokenRefreshAsync_InvalidRefreshToken_ThrowsException()
+        {
+            // Arrange
+            using (var dbContext = new DatabaseContext(_options))
+            {
+                var user = new User
+                {
+                    Id = 1,
+                    FirstName = "John",
+                    LastName = "Doe",
+                    Email = "john.doe@gmail.com",
+                    Password = "123456",
+                    Active = true,
+                    CreatedAt = DateTime.UtcNow,
+                    Role = new Role
+                    {
+                        Id = 2,
+                        Name = "User"
+                    },
+                    RefreshToken = new RefreshToken
+                    {
+                        Id = 1,
+                        Token = "valid_token",
+                        ExpiresAt = DateTime.UtcNow
+                    }
+                };
+
+                dbContext.User.Add(user);
+                dbContext.SaveChanges();
+
+                var userService = new UserService(dbContext, _configuration);
+                var tokenRefreshRequest = new TokenRefreshRequest
+                {
+                    JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJmaXJzdE5hbWUiOiJKb2huIiwiZW1haWwiOiJqb2huLmRvZUBnbWFpbC5jb20iLCJyb2xlSWQiOiIyIiwicm9sZSI6IlVzZXIiLCJuYmYiOjE2OTk2MjI4NTksImV4cCI6MTY5OTYyMzE1OCwiaWF0IjoxNjk5NjIyODU5LCJpc3MiOiJOdWxsUG9pbnRlci5jb20iLCJhdWQiOiJOdWxsUG9pbnRlci5jb20ifQ._-RPcRIfh0XeUzpEIqm0Vgl-_yrjhqFSD-9aRfmm4KE",
+                    RefreshToken = "valid_token"
+                };
+
+                // Act
+                var response = await userService.TokenRefreshAsync(tokenRefreshRequest);
+            }
+        }
     }
 }
