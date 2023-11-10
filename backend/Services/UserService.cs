@@ -140,7 +140,7 @@ namespace backend.Services
             var userId = token.Claims.First(claim => claim.Type == "id").Value;
             var user = _context.User.Include(r => r.Role).Include(t => t.RefreshToken).FirstOrDefault(u => u.Id == int.Parse(userId));
             
-            if(tokenRefreshRequest.RefreshToken != user.RefreshToken.Token || user.RefreshToken.ExpiresAt < DateTime.Now)
+            if(tokenRefreshRequest.RefreshToken != user.RefreshToken.Token || user.RefreshToken.ExpiresAt < DateTime.UtcNow)
             {
                 throw new Exception("Invalid refresh token.");
             }
