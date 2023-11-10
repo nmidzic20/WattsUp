@@ -1,5 +1,6 @@
 ﻿using backend.Data;
 using backend.Models.Entities;
+using backend.Models.Requests;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -51,15 +52,25 @@ namespace backend.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Charger>> AddCharger([FromBody] Charger _charger)
+        public async Task<ActionResult<Charger>> AddCharger(ChargerCreateRequest _charger)
         {
+            var user = await _dbContext.User
+                .Where(u => u.Id == _charger.CreatedById)
+                .FirstOrDefaultAsync();
+
+            if (user == null)
+            {
+                return NotFound("Specified user doesn't exist.");
+            }
+
             var charger = new Charger
             {
                 Name = _charger.Name,
                 Latitude = _charger.Latitude,
                 Longitude = _charger.Longitude,
                 CreatedAt = DateTime.Now,
-                CreatedBy = _charger.CreatedBy,
+                CreatedById = _charger.CreatedById,
+                CreatedBy = user,
                 LastSyncAt = DateTime.Now,
                 Active = false
             };
@@ -71,7 +82,7 @@ namespace backend.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<Charger>> UpdateChargerByID(long id, [FromBody] Charger _charger)
+        public async Task<ActionResult<Charger>> UpdateChargerByID(long id, ChargerCreateRequest _charger)
         {
             var charger = await _dbContext.Charger
                 .Where(c => c.Id == id)

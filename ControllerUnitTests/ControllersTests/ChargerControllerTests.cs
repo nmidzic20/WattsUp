@@ -1,6 +1,7 @@
 using backend.Controllers;
 using backend.Data;
 using backend.Models.Entities;
+using backend.Models.Requests;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -214,19 +215,23 @@ namespace ControllerUnitTests.ControllersTests
             // Arrange
             using var context = new DatabaseContext(_options);
             ChargerController chargerController = new(context, new HttpClient());
-
-            // Act
-            await chargerController.AddCharger(new Charger
+            context.User.Add(new User
             {
                 Id = 1,
-                CreatedAt = DateTime.Now,
-                CreatedBy = new User { Email = "test", FirstName = "test", LastName = "test", Password = "test" },
-                Active = false,
-                Events = new List<Event> { },
-                LastSyncAt = DateTime.Now,
+                Email = "test",
+                FirstName = "test",
+                LastName = "test",
+                Password = "test"
+            });
+            context.SaveChanges();
+
+            // Act
+            await chargerController.AddCharger(new ChargerCreateRequest
+            {
                 Latitude = 1.0,
                 Longitude = 1.0,
-                Name = "Test Charger 1"
+                Name = "Test Charger 1",
+                CreatedById = 1
             });
 
             // Assert
@@ -241,17 +246,13 @@ namespace ControllerUnitTests.ControllersTests
             ChargerController chargerController = new(context, new HttpClient());
 
             // Act
-            var chargers = await chargerController.UpdateChargerByID(9999, new Charger
+            var chargers = await chargerController.UpdateChargerByID(9999, new ChargerCreateRequest
             {
-                Id = 1,
-                CreatedAt = DateTime.Now,
-                CreatedBy = new User { Email = "test", FirstName = "test", LastName = "test", Password = "test" },
                 Active = false,
-                Events = new List<Event> { },
-                LastSyncAt = DateTime.Now,
                 Latitude = 1.0,
                 Longitude = 1.0,
-                Name = "Test Charger 1"
+                Name = "Test Charger 1",
+                CreatedById = 1
             });
 
             var result = chargers.Result as StatusCodeResult;
@@ -278,17 +279,13 @@ namespace ControllerUnitTests.ControllersTests
             context.SaveChanges();
 
             // Act
-            await chargerController.UpdateChargerByID(1, new Charger
+            await chargerController.UpdateChargerByID(1, new ChargerCreateRequest
             {
-                Id = 1,
-                CreatedAt = DateTime.Now,
-                CreatedBy = new User { Email = "test", FirstName = "test", LastName = "test", Password = "test" },
                 Active = false,
-                Events = new List<Event> { },
-                LastSyncAt = DateTime.Now,
                 Latitude = 1.0,
                 Longitude = 1.0,
-                Name = "TESTNOW"
+                Name = "TESTNOW",
+                CreatedById = 1
             });
 
             // Assert
