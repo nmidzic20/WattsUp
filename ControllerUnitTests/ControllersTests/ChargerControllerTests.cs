@@ -3,9 +3,6 @@ using backend.Data;
 using backend.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System;
 
 namespace ControllerUnitTests.ControllersTests
 {
