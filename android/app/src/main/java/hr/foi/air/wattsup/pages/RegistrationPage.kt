@@ -45,7 +45,7 @@ fun RegistrationPage() {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.charger_mode)) },
+                title = { Text(stringResource(R.string.app_name)) },
                 navigationIcon = {
                 },
             )
@@ -120,7 +120,9 @@ fun PasswordAndEmailOutlinedTextField(modifier: Modifier){
     var RFIDcard: String by remember { mutableStateOf("") }
     Row (verticalAlignment = Alignment.CenterVertically){
         OutlinedTextField(
-            modifier = Modifier.padding(0.dp,15.dp).width(200.dp),
+            modifier = Modifier
+                .padding(0.dp, 15.dp)
+                .width(200.dp),
             value = RFIDcard,
             onValueChange = { RFIDcard = it },
             label = { Text(stringResource(R.string.rfid_card_label)) }
@@ -128,7 +130,9 @@ fun PasswordAndEmailOutlinedTextField(modifier: Modifier){
         Spacer(modifier = Modifier.width(4.dp))
         ElevatedButton(
             onClick = { /* do something */ },
-            modifier = Modifier.padding(10.dp).clip(MaterialTheme.shapes.medium),
+            modifier = Modifier
+                .padding(10.dp)
+                .clip(MaterialTheme.shapes.medium),
             contentPadding = PaddingValues(10.dp,0.dp),
             interactionSource = interactionSource) {
             Icon(
