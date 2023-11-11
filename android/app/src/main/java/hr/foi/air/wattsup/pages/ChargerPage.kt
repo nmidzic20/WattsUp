@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -31,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.ui.component.CircleButton
+import hr.foi.air.wattsup.ui.component.CustomAlertDialog
 import hr.foi.air.wattsup.ui.component.GradientImage
 import hr.foi.air.wattsup.ui.component.ProgressBarCircle
 import hr.foi.air.wattsup.ui.component.ProgressBarFill
@@ -47,6 +49,23 @@ import java.util.concurrent.TimeUnit
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChargerPage(onArrowBackClick: () -> Unit) {
+    var openFullChargeAlertDialog by remember { mutableStateOf(false) }
+
+    when {
+        openFullChargeAlertDialog -> {
+            CustomAlertDialog(
+                onConfirmation = {
+                    openFullChargeAlertDialog = false
+                },
+                dialogTitle = "Charging Status",
+                dialogText = "Your vehicle is fully charged.",
+                icon = Icons.Default.Info,
+                showDismissButton = false,
+                confirmButtonText = "OK",
+            )
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -83,7 +102,7 @@ fun ChargerPage(onArrowBackClick: () -> Unit) {
 
                 val maxChargePercentage = 1f
 
-                var initialChargeAmount by remember { mutableFloatStateOf(0f) }
+                var initialChargeAmount by remember { mutableFloatStateOf(0.95f) }
                 var amountNecessaryForFullCharge: Float by remember {
                     mutableFloatStateOf(
                         maxChargePercentage - initialChargeAmount,
@@ -99,6 +118,11 @@ fun ChargerPage(onArrowBackClick: () -> Unit) {
                     percentageChargedUntilFull = 0f
                     amountNecessaryForFullCharge = maxChargePercentage - currentChargeAmount
                 }
+
+                // The condition is "< very small number" instead of "== 0f", in order to
+                // prevent button flickering to STOP button with indicator before showing dialog
+                // Since this float number isn't immediately going to be exactly 0f
+                fun isVehicleFullyCharged() = amountNecessaryForFullCharge < 0.01f
 
                 LaunchedEffect(charging) {
                     // Started charging
@@ -117,6 +141,7 @@ fun ChargerPage(onArrowBackClick: () -> Unit) {
                                 else {
                                     charging = false
                                     stopCharging()
+                                    openFullChargeAlertDialog = true
                                 }
                             }
                         }
@@ -153,7 +178,10 @@ fun ChargerPage(onArrowBackClick: () -> Unit) {
                 Box {
                     if (charging) {
                         ProgressBarCircle(
-                            progressBarFill = ProgressBarFill(percentageChargedUntilFull, amountNecessaryForFullCharge),
+                            progressBarFill = ProgressBarFill(
+                                percentageChargedUntilFull,
+                                amountNecessaryForFullCharge,
+                            ),
                             fillColor = MaterialTheme.colorScheme.tertiary,
                             Modifier.size(220.dp).padding(10.dp),
                         )
@@ -161,7 +189,11 @@ fun ChargerPage(onArrowBackClick: () -> Unit) {
                     CircleButton(
                         mode = if (!charging) "Start charging" else "Stop charging",
                         onClick = {
-                            charging = !charging
+                            if (isVehicleFullyCharged()) {
+                                openFullChargeAlertDialog = true
+                            } else {
+                                charging = !charging
+                            }
                         },
                         color = if (!charging) MaterialTheme.colorScheme.primary else colorBtnRed,
                         iconId = null,
