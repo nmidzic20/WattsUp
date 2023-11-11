@@ -74,7 +74,7 @@ namespace backend.Controllers
                 LastSyncAt = DateTime.Now,
                 Active = false
             };
-            
+            // TODO: add valid check
             _dbContext.Charger.Add(charger);
             await _dbContext.SaveChangesAsync();
 
@@ -82,7 +82,7 @@ namespace backend.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<Charger>> UpdateChargerByID(long id, ChargerCreateRequest _charger)
+        public async Task<ActionResult<Charger>> UpdateChargerByID(long id, Charger _charger)
         {
             var charger = await _dbContext.Charger
                 .Where(c => c.Id == id)
