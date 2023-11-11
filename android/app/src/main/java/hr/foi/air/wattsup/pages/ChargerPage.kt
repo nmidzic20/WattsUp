@@ -2,11 +2,13 @@ package hr.foi.air.wattsup.pages
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -32,6 +34,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.ui.component.CircleButton
+import hr.foi.air.wattsup.ui.component.ProgressBarCircle
+import hr.foi.air.wattsup.ui.component.ProgressBarFill
 import hr.foi.air.wattsup.ui.component.TopAppBar
 import hr.foi.air.wattsup.ui.theme.colorBtnRed
 import kotlinx.coroutines.CoroutineScope
@@ -121,14 +125,21 @@ fun ChargerPage(onArrowBackClick: () -> Unit) {
                     )
                 }
 
-                CircleButton(
-                    mode = if (!charging) "Start charging" else "Stop charging",
-                    onClick = {
-                        charging = !charging
-                    },
-                    color = if (!charging) MaterialTheme.colorScheme.primary else colorBtnRed,
-                    iconId = null,
-                )
+                Box {
+                    ProgressBarCircle(
+                        progressBarFill = ProgressBarFill(7.5f),
+                        fillColor = Color.Yellow,
+                        Modifier.size(220.dp).padding(12.dp),
+                    )
+                    CircleButton(
+                        mode = if (!charging) "Start charging" else "Stop charging",
+                        onClick = {
+                            charging = !charging
+                        },
+                        color = if (!charging) MaterialTheme.colorScheme.primary else colorBtnRed,
+                        iconId = null,
+                    )
+                }
             }
         }
     }
