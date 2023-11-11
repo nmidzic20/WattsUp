@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace backend.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
     public class CardController : ControllerBase
     {
         private readonly DatabaseContext _dbContext;
