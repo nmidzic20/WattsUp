@@ -20,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -82,16 +83,21 @@ fun ChargerPage(onArrowBackClick: () -> Unit) {
                 var timeElapsed by remember { mutableLongStateOf(0L) }
                 var timeTrackingJob: Job? by remember { mutableStateOf(null) }
 
+                val maxChargeAmount: Float = 10f
+                var currentChargeAmount by remember { mutableFloatStateOf(0f) }
+
                 LaunchedEffect(charging) {
                     // Started charging
                     if (charging) {
-                        if (timeElapsed != 0L) timeElapsed = 0L
                         startTime = System.currentTimeMillis()
                         timeTrackingJob = CoroutineScope(Dispatchers.Default).launch {
                             while (charging) {
                                 // Update time every second
                                 delay(1000)
                                 timeElapsed = System.currentTimeMillis() - startTime
+
+                                // For test purposes, charge amount is 1 unit per 10 seconds (0.1 unit per 1 second)
+                                if (currentChargeAmount < maxChargeAmount) currentChargeAmount += 0.1f
                             }
                         }
                     }
@@ -99,6 +105,8 @@ fun ChargerPage(onArrowBackClick: () -> Unit) {
                     else {
                         endTime = System.currentTimeMillis()
                         timeTrackingJob?.cancel()
+                        timeElapsed = 0L
+                        currentChargeAmount = 0f
                     }
                 }
 
@@ -126,11 +134,13 @@ fun ChargerPage(onArrowBackClick: () -> Unit) {
                 }
 
                 Box {
-                    ProgressBarCircle(
-                        progressBarFill = ProgressBarFill(7.5f),
-                        fillColor = Color.Yellow,
-                        Modifier.size(220.dp).padding(12.dp),
-                    )
+                    if (charging) {
+                        ProgressBarCircle(
+                            progressBarFill = ProgressBarFill(currentChargeAmount),
+                            fillColor = Color.Yellow,
+                            Modifier.size(220.dp).padding(10.dp),
+                        )
+                    }
                     CircleButton(
                         mode = if (!charging) "Start charging" else "Stop charging",
                         onClick = {
@@ -138,6 +148,8 @@ fun ChargerPage(onArrowBackClick: () -> Unit) {
                         },
                         color = if (!charging) MaterialTheme.colorScheme.primary else colorBtnRed,
                         iconId = null,
+                        Modifier.size(220.dp)
+                            .padding(16.dp),
                     )
                 }
             }

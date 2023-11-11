@@ -38,14 +38,14 @@ fun ProgressBarCircle(progressBarFill: ProgressBarFill, fillColor: Color, modifi
         ) {
             drawCircle(
                 color = colorCircle,
-                style = Stroke(10.dp.toPx(), cap = StrokeCap.Round),
+                style = Stroke(15.dp.toPx(), cap = StrokeCap.Round),
             )
             drawArc(
                 color = fillColor,
                 startAngle = -90f,
                 progressBarFill.progressSweepAngle,
                 useCenter = false,
-                style = Stroke(10.dp.toPx(), cap = StrokeCap.Round),
+                style = Stroke(15.dp.toPx(), cap = StrokeCap.Round),
             )
         }
     }
