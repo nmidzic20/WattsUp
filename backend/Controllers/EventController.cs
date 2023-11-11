@@ -134,9 +134,8 @@ namespace backend.Controllers
         {
             var chargerController = new ChargerController(_dbContext, _client);
             var result = (await chargerController.GetChargerByID(id)).Result as ObjectResult;
-            var charger = result.Value as Charger;
-            
-            if (charger == null)
+
+            if (result.Value is not Charger charger)
             {
                 return false;
             }

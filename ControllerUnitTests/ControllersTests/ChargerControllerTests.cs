@@ -246,7 +246,7 @@ namespace ControllerUnitTests.ControllersTests
             ChargerController chargerController = new(context, new HttpClient());
 
             // Act
-            var chargers = await chargerController.UpdateChargerByID(9999, new ChargerCreateRequest
+            var chargers = await chargerController.UpdateChargerByID(9999, new Charger
             {
                 Active = false,
                 Latitude = 1.0,
@@ -279,7 +279,7 @@ namespace ControllerUnitTests.ControllersTests
             context.SaveChanges();
 
             // Act
-            await chargerController.UpdateChargerByID(1, new ChargerCreateRequest
+            await chargerController.UpdateChargerByID(1, new Charger
             {
                 Active = false,
                 Latitude = 1.0,

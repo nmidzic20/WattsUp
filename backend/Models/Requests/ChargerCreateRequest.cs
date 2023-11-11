@@ -12,6 +12,5 @@ namespace backend.Models.Requests
         public double Longitude { get; set; }
         [Required]
         public int CreatedById { get; set; }
-        public bool Active { get; set; }
     }
 }
