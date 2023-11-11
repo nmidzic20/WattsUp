@@ -86,27 +86,37 @@ fun ChargerPage(onArrowBackClick: () -> Unit) {
                 val maxChargeAmount: Float = 10f
                 var currentChargeAmount by remember { mutableFloatStateOf(0f) }
 
+                fun stopCharging() {
+                    endTime = System.currentTimeMillis()
+                    timeTrackingJob?.cancel()
+                    timeElapsed = 0L
+                    currentChargeAmount = 0f
+                }
+
                 LaunchedEffect(charging) {
                     // Started charging
                     if (charging) {
                         startTime = System.currentTimeMillis()
-                        timeTrackingJob = CoroutineScope(Dispatchers.Default).launch {
+                        timeTrackingJob = CoroutineScope(Dispatchers.IO).launch {
                             while (charging) {
-                                // Update time every second
-                                delay(1000)
-                                timeElapsed = System.currentTimeMillis() - startTime
+                                if (currentChargeAmount < maxChargeAmount) { // Update time every second
+                                    delay(1000)
+                                    timeElapsed = System.currentTimeMillis() - startTime
 
-                                // For test purposes, charge amount is 1 unit per 10 seconds (0.1 unit per 1 second)
-                                if (currentChargeAmount < maxChargeAmount) currentChargeAmount += 0.1f
+                                    // For test purposes, charge amount is 1 unit per 10 seconds (0.1 unit per 1 second)
+                                    currentChargeAmount += 0.1f
+                                }
+                                // Stop charging automatically if EV is fully charged
+                                else {
+                                    charging = false
+                                    stopCharging()
+                                }
                             }
                         }
                     }
                     // Stopped charging
                     else {
-                        endTime = System.currentTimeMillis()
-                        timeTrackingJob?.cancel()
-                        timeElapsed = 0L
-                        currentChargeAmount = 0f
+                        stopCharging()
                     }
                 }
 
