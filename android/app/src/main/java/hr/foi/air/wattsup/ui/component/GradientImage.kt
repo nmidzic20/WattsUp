@@ -17,6 +17,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hr.foi.air.wattsup.R
+import hr.foi.air.wattsup.ui.theme.colorSilver
 import hr.foi.air.wattsup.ui.theme.colorTertiary
 
 @Composable
@@ -39,21 +40,6 @@ fun GradientImage(
         start = Offset(0f, y - 0.1f),
         end = Offset(0f, y),
     )
-    /*Icon(
-        modifier = modifier
-            .graphicsLayer(alpha = 0.99f)
-            .drawWithCache {
-                onDrawWithContent {
-                    drawContent()
-                    drawRect(
-                        gradient,
-                        blendMode = BlendMode.SrcAtop,
-                    )
-                }
-            },
-        imageVector = ImageVector.vectorResource(id = iconResource),
-        contentDescription = null,
-    )*/
     Image(
         modifier = modifier
             .height(heightDp)
@@ -79,7 +65,7 @@ fun GradientImage(
 fun PreviewGradientImage() {
     GradientImage(
         R.drawable.icon_electric_car,
-        Color.White,
+        colorSilver,
         colorTertiary,
         0.5f,
         150,

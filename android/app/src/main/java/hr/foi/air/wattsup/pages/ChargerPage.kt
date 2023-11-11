@@ -38,6 +38,7 @@ import hr.foi.air.wattsup.ui.component.ProgressBarCircle
 import hr.foi.air.wattsup.ui.component.ProgressBarFill
 import hr.foi.air.wattsup.ui.component.TopAppBar
 import hr.foi.air.wattsup.ui.theme.colorBtnRed
+import hr.foi.air.wattsup.ui.theme.colorSilver
 import hr.foi.air.wattsup.ui.theme.colorTertiary
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -102,7 +103,7 @@ fun ChargerPage(onArrowBackClick: () -> Unit) {
 
                 val maxChargePercentage = 1f
 
-                var initialChargeAmount by remember { mutableFloatStateOf(0.95f) }
+                var initialChargeAmount by remember { mutableFloatStateOf(0f) }
                 var amountNecessaryForFullCharge: Float by remember {
                     mutableFloatStateOf(
                         maxChargePercentage - initialChargeAmount,
@@ -154,7 +155,7 @@ fun ChargerPage(onArrowBackClick: () -> Unit) {
 
                 GradientImage(
                     R.drawable.icon_electric_car,
-                    Color.White,
+                    colorSilver,
                     colorTertiary,
                     currentChargeAmount,
                     150,

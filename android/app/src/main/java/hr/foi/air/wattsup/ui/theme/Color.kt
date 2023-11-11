@@ -11,3 +11,4 @@ val colorBackgroundDark = Color(0xff303030) // almost black
 val colorPrimaryDark = colorPrimary
 
 val colorBtnRed = Color(0xffFF6262)
+val colorSilver = Color(0xffC0C0C0)

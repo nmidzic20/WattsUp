@@ -16,14 +16,11 @@ import androidx.compose.ui.unit.dp
 class ProgressBarFill(_value: Float, _maxValue: Float = 1f) {
     val value: Float
     val maxValue: Float
-
-    // val percentage: Float
     val progressSweepAngle: Float
 
     init {
         value = _value.coerceIn(0f, 1f)
         maxValue = _maxValue.coerceIn(0f, 1f)
-        // percentage = (value / 10)
         progressSweepAngle = 360f * (value / maxValue)
     }
 }
