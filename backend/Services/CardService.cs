@@ -31,5 +31,22 @@ namespace backend.Services
 
             return newCard;
         }
+
+        public async Task<bool> CardBelongsToUser(Card card, User user)
+        {
+            var existingCard = await _context.Card.FirstOrDefaultAsync(c => c.Value == card.Value);
+            
+            if (existingCard == null)
+            {
+                return false;
+            }
+
+            if (existingCard.OwnedBy.Id != user.Id)
+            {
+                return false;
+            }
+
+            return true;
+        }
     }
 }
