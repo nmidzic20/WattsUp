@@ -16,8 +16,8 @@ namespace backend.Services
 
         public async Task<Card> CreateCardAsync(CardCreateRequest card, User user)
         {
-            var existingCard = await _context.Card.FirstOrDefaultAsync(c => c.Value == card.Value);
-            if (existingCard != null)
+            var eCard = await _context.Card.FirstOrDefaultAsync(c => c.Value == card.Value);
+            if (eCard != null)
             {
                 return null;
             }
@@ -34,10 +34,10 @@ namespace backend.Services
 
         public async Task<bool> CardBelongsToUser(Card card, User user)
         {
-            var existingCard = await _context.Card.FirstOrDefaultAsync(c => c.Value == card.Value);
-            var existingUser = await _context.User.FirstOrDefaultAsync(u => u.Email == user.Email);
+            var eCard = await _context.Card.FirstOrDefaultAsync(c => c.Value == card.Value);
+            var eUser = await _context.User.FirstOrDefaultAsync(u => u.Email == user.Email);
             
-            if (existingCard == null || existingUser == null || existingCard.OwnedBy.Id != existingUser.Id)
+            if (eCard == null || eUser == null || !eUser.Active || eCard.OwnedById != eUser.Id)
             {
                 return false;
             }

@@ -76,5 +76,41 @@ namespace ControllerUnitTests.ServicesTests
                 Assert.IsNull(result);
             }
         }
+
+        [TestMethod]
+        public async Task CardBelongsToUser_GivenCardBelongsToUser_ReturnTrue()
+        {
+            // Arrange
+            using var dbContext = new DatabaseContext(_options);
+            var user = new User { FirstName = "test", LastName = "test", Password = "test", Active = true, Id = 1, Email = "test@test.com" };
+            var card = new Card { Value = "test", OwnedById = 1 };
+            dbContext.User.Add(user);
+            dbContext.Card.Add(card);
+            dbContext.SaveChanges();
+
+            // Act
+            bool res = await new CardService(dbContext).CardBelongsToUser(card, user);
+
+            // Assert
+            Assert.IsTrue(res);
+        }
+
+        [TestMethod]
+        public async Task CardBelongsToUser_GivenCardDoesntBelongToUser_ReturnFalse()
+        {
+            // Arrange
+            using var dbContext = new DatabaseContext(_options);
+            var user = new User { FirstName = "test", LastName = "test", Password = "test", Active = true, Id = 2, Email = "test@test.com" };
+            var card = new Card { Value = "test", OwnedById = 1 };
+            dbContext.User.Add(user);
+            dbContext.Card.Add(card);
+            dbContext.SaveChanges();
+
+            // Act
+            bool res = await new CardService(dbContext).CardBelongsToUser(card, user);
+
+            // Assert
+            Assert.IsFalse(res);
+        }
     }
 }
