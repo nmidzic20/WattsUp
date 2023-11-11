@@ -13,20 +13,27 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
-class ProgressBarFill(_value: Float) {
+class ProgressBarFill(_value: Float, _maxValue: Float = 1f) {
     val value: Float
-    //val percentage: Float
+    val maxValue: Float
+
+    // val percentage: Float
     val progressSweepAngle: Float
 
     init {
         value = _value.coerceIn(0f, 1f)
-        //percentage = (value / 10)
-        progressSweepAngle = 360f * (value)
+        maxValue = _maxValue.coerceIn(0f, 1f)
+        // percentage = (value / 10)
+        progressSweepAngle = 360f * (value / maxValue)
     }
 }
 
 @Composable
-fun ProgressBarCircle(progressBarFill: ProgressBarFill, fillColor: Color, modifier: Modifier = Modifier) {
+fun ProgressBarCircle(
+    progressBarFill: ProgressBarFill,
+    fillColor: Color,
+    modifier: Modifier = Modifier,
+) {
     val colorCircle = MaterialTheme.colorScheme.background
 
     Box(
@@ -54,6 +61,6 @@ fun ProgressBarCircle(progressBarFill: ProgressBarFill, fillColor: Color, modifi
 @Preview
 @Composable
 fun ProgressBarCirclePreview() {
-    val progressBarFill = ProgressBarFill(0.75f)
-    ProgressBarCircle(progressBarFill, Color.Yellow, Modifier.size(42.dp))
+    val progressBarFill = ProgressBarFill(0.5f, 1f)
+    ProgressBarCircle(progressBarFill, Color.Yellow, Modifier.size(150.dp))
 }

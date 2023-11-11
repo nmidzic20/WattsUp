@@ -84,7 +84,11 @@ fun ChargerPage(onArrowBackClick: () -> Unit) {
                 val maxChargePercentage = 1f
 
                 var initialChargeAmount by remember { mutableFloatStateOf(0f) }
-                val amountNecessaryForFullCharge: Float = maxChargePercentage - initialChargeAmount
+                var amountNecessaryForFullCharge: Float by remember {
+                    mutableFloatStateOf(
+                        maxChargePercentage - initialChargeAmount,
+                    )
+                }
                 var currentChargeAmount by remember { mutableFloatStateOf(initialChargeAmount) }
                 var percentageChargedUntilFull by remember { mutableFloatStateOf(0f) }
 
@@ -93,7 +97,7 @@ fun ChargerPage(onArrowBackClick: () -> Unit) {
                     timeTrackingJob?.cancel()
                     timeElapsed = 0L
                     percentageChargedUntilFull = 0f
-                    initialChargeAmount = currentChargeAmount
+                    amountNecessaryForFullCharge = maxChargePercentage - currentChargeAmount
                 }
 
                 LaunchedEffect(charging) {
@@ -149,7 +153,7 @@ fun ChargerPage(onArrowBackClick: () -> Unit) {
                 Box {
                     if (charging) {
                         ProgressBarCircle(
-                            progressBarFill = ProgressBarFill(percentageChargedUntilFull),
+                            progressBarFill = ProgressBarFill(percentageChargedUntilFull, amountNecessaryForFullCharge),
                             fillColor = MaterialTheme.colorScheme.tertiary,
                             Modifier.size(220.dp).padding(10.dp),
                         )
