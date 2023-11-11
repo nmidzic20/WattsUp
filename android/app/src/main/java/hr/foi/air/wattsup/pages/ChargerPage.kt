@@ -1,12 +1,10 @@
 package hr.foi.air.wattsup.pages
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -28,17 +26,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.ui.component.CircleButton
+import hr.foi.air.wattsup.ui.component.GradientImage
 import hr.foi.air.wattsup.ui.component.ProgressBarCircle
 import hr.foi.air.wattsup.ui.component.ProgressBarFill
 import hr.foi.air.wattsup.ui.component.TopAppBar
 import hr.foi.air.wattsup.ui.theme.colorBtnRed
+import hr.foi.air.wattsup.ui.theme.colorTertiary
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -83,14 +81,19 @@ fun ChargerPage(onArrowBackClick: () -> Unit) {
                 var timeElapsed by remember { mutableLongStateOf(0L) }
                 var timeTrackingJob: Job? by remember { mutableStateOf(null) }
 
-                val maxChargeAmount: Float = 10f
-                var currentChargeAmount by remember { mutableFloatStateOf(0f) }
+                val maxChargePercentage = 1f
+
+                var initialChargeAmount by remember { mutableFloatStateOf(0f) }
+                val amountNecessaryForFullCharge: Float = maxChargePercentage - initialChargeAmount
+                var currentChargeAmount by remember { mutableFloatStateOf(initialChargeAmount) }
+                var percentageChargedUntilFull by remember { mutableFloatStateOf(0f) }
 
                 fun stopCharging() {
                     endTime = System.currentTimeMillis()
                     timeTrackingJob?.cancel()
                     timeElapsed = 0L
-                    currentChargeAmount = 0f
+                    percentageChargedUntilFull = 0f
+                    initialChargeAmount = currentChargeAmount
                 }
 
                 LaunchedEffect(charging) {
@@ -99,12 +102,12 @@ fun ChargerPage(onArrowBackClick: () -> Unit) {
                         startTime = System.currentTimeMillis()
                         timeTrackingJob = CoroutineScope(Dispatchers.IO).launch {
                             while (charging) {
-                                if (currentChargeAmount < maxChargeAmount) { // Update time every second
+                                if (percentageChargedUntilFull < amountNecessaryForFullCharge) { // Update time every second
                                     delay(1000)
                                     timeElapsed = System.currentTimeMillis() - startTime
 
-                                    // For test purposes, charge amount is 1 unit per 10 seconds (0.1 unit per 1 second)
-                                    currentChargeAmount += 0.1f
+                                    percentageChargedUntilFull += 0.01f
+                                    currentChargeAmount += 0.01f
                                 }
                                 // Stop charging automatically if EV is fully charged
                                 else {
@@ -120,13 +123,13 @@ fun ChargerPage(onArrowBackClick: () -> Unit) {
                     }
                 }
 
-                Image(
-                    painter = painterResource(id = R.drawable.icon_electric_car),
-                    contentDescription = null,
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(150.dp),
+                GradientImage(
+                    R.drawable.icon_electric_car,
+                    Color.White,
+                    colorTertiary,
+                    currentChargeAmount,
+                    150,
+                    Modifier.fillMaxWidth(),
                 )
 
                 Column(
@@ -146,8 +149,8 @@ fun ChargerPage(onArrowBackClick: () -> Unit) {
                 Box {
                     if (charging) {
                         ProgressBarCircle(
-                            progressBarFill = ProgressBarFill(currentChargeAmount),
-                            fillColor = Color.Yellow,
+                            progressBarFill = ProgressBarFill(percentageChargedUntilFull),
+                            fillColor = MaterialTheme.colorScheme.tertiary,
                             Modifier.size(220.dp).padding(10.dp),
                         )
                     }

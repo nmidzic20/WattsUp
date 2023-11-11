@@ -15,13 +15,13 @@ import androidx.compose.ui.unit.dp
 
 class ProgressBarFill(_value: Float) {
     val value: Float
-    val percentage: Float
+    //val percentage: Float
     val progressSweepAngle: Float
 
     init {
-        value = _value.coerceIn(0f, 10f)
-        percentage = (value / 10)
-        progressSweepAngle = 360f * (value / 10f)
+        value = _value.coerceIn(0f, 1f)
+        //percentage = (value / 10)
+        progressSweepAngle = 360f * (value)
     }
 }
 
@@ -54,6 +54,6 @@ fun ProgressBarCircle(progressBarFill: ProgressBarFill, fillColor: Color, modifi
 @Preview
 @Composable
 fun ProgressBarCirclePreview() {
-    val progressBarFill = ProgressBarFill(7.5f)
+    val progressBarFill = ProgressBarFill(0.75f)
     ProgressBarCircle(progressBarFill, Color.Yellow, Modifier.size(42.dp))
 }
