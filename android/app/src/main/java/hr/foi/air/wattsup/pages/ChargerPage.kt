@@ -1,6 +1,5 @@
 package hr.foi.air.wattsup.pages
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -53,17 +52,14 @@ fun ChargerPage(onArrowBackClick: () -> Unit, viewModel: ChargerViewModel) {
     val percentageChargedUntilFull by viewModel.percentageChargedUntilFull.observeAsState()
     val amountNecessaryForFullCharge by viewModel.amountNecessaryForFullCharge.observeAsState()
 
-    Log.i("VIEWMODELChargerPage", "Current Charge Amount: $currentChargeAmount")
-
     when {
         openFullChargeAlertDialog -> {
             CustomAlertDialog(
                 onConfirmation = {
                     openFullChargeAlertDialog = false
-                    Log.i("VIEWMODELCOMPOSABLEDISMISS", "$currentChargeAmount")
                 },
                 dialogTitle = "Charging Status",
-                dialogText = "Your vehicle is fully charged. $currentChargeAmount $amountNecessaryForFullCharge ${amountNecessaryForFullCharge!! < 0.01f}",
+                dialogText = "Your vehicle is fully charged.",
                 icon = Icons.Default.Info,
                 showDismissButton = false,
                 confirmButtonText = "OK",
@@ -138,7 +134,6 @@ fun ChargerPage(onArrowBackClick: () -> Unit, viewModel: ChargerViewModel) {
                         onClick = {
                             viewModel.toggleCharging {
                                 openFullChargeAlertDialog = true
-                                Log.i("VIEWMODELCOMPOSABLE", "$currentChargeAmount")
                             }
                         },
                         color = if (!charging!!) MaterialTheme.colorScheme.primary else colorBtnRed,

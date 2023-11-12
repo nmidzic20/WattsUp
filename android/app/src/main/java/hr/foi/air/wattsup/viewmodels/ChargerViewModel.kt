@@ -1,15 +1,12 @@
 package hr.foi.air.wattsup.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 
 class ChargerViewModel : ViewModel() {
@@ -68,17 +65,11 @@ class ChargerViewModel : ViewModel() {
                         // cut off as soon as charging is set to false
                         return@launch
                     }
-                    withContext(Dispatchers.Main) {
-                        _timeElapsed.value = System.currentTimeMillis() - _startTime.value!!
-                        _percentageChargedUntilFull.value =
-                            (_percentageChargedUntilFull.value!! + 0.01f)
-                        _currentChargeAmount.value =
-                            (_currentChargeAmount.value!! + 0.01f).coerceIn(0f, 1f)
-                        Log.i(
-                            "VIEWMODEL",
-                            "Curr private ${_currentChargeAmount.value} curr public ${currentChargeAmount.value}",
-                        )
-                    }
+                    _timeElapsed.value = System.currentTimeMillis() - _startTime.value!!
+                    _percentageChargedUntilFull.value =
+                        (_percentageChargedUntilFull.value!! + 0.01f)
+                    _currentChargeAmount.value =
+                        (_currentChargeAmount.value!! + 0.01f).coerceIn(0f, 1f)
                 } else {
                     // Stop charging automatically if the EV is fully charged
                     _charging.value = false
@@ -97,12 +88,6 @@ class ChargerViewModel : ViewModel() {
         _percentageChargedUntilFull.value = 0f
         _amountNecessaryForFullCharge.value =
             (maxChargePercentage - currentChargeAmount.value!!).coerceIn(0f, 1f)
-
-        Log.i(
-            "VIEWMODEL",
-            "Am private ${_amountNecessaryForFullCharge.value} am public ${amountNecessaryForFullCharge.value} " +
-                "Curr private ${_currentChargeAmount.value} curr public ${currentChargeAmount.value}",
-        )
     }
 
     fun formatTime(milliseconds: Long): String {
