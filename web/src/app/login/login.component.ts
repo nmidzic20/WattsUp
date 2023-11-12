@@ -20,7 +20,27 @@ export class LoginComponent implements OnInit {
 
   async submitLogin(form: NgForm){
     if(form.valid){
-      //implement endpoint fetch
+      let email = form.controls['email'].value;
+      let password = form.controls['password'].value;
+      let header = new Headers();
+
+      header.set("Content-Type", "application/json");
+      header.set("accept", "text/plain");
+      let body = {email: email, password: password}
+      let parameters = {method: 'POST', headers: header, body: JSON.stringify(body)};
+
+      try{
+        let response = await fetch("https://localhost:32770/api/Users/Login", parameters);
+
+        if(response.status == 200){
+          this.router.navigate(['/map']);
+        }else{
+          let errorMessage = JSON.parse(await response.text()).message;
+          this.errorMessageBox!!.innerHTML = response.status.toString() + ": " + errorMessage;
+        }
+      }catch (error){
+        this.errorMessageBox!!.innerHTML = (error as Error).message
+      }
     }else{
       this.errorMessageBox!!.innerHTML = this.showErrorMessage(form);
     }
