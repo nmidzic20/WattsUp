@@ -6,7 +6,13 @@ import { Injectable } from '@angular/core';
 export class UserManagerService {
   jwt?: string;
   refreshToken?: string;
-  refreshTokenExpiration?: Date;
+  refreshTokenExpiration?: string;
 
   constructor() { }
+
+  saveTokensToLocalStorage(){
+    localStorage.setItem ('jwt', this.jwt!!);
+    localStorage.setItem ('refreshToken', this.refreshToken!!);
+    localStorage.setItem ('refreshTokenExpiration', this.refreshTokenExpiration!!);
+  }
 }
