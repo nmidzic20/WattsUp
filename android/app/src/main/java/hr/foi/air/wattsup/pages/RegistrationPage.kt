@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ElevatedButton
@@ -39,14 +41,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.network.NetworkService
+import hr.foi.air.wattsup.network.models.RFIDCard
 import hr.foi.air.wattsup.network.models.RegistrationBody
 import hr.foi.air.wattsup.network.models.RegistrationResponseBody
 import hr.foi.air.wattsup.ui.component.TopAppBar
 import retrofit2.Call
-import retrofit2.Response
 import retrofit2.Callback
+import retrofit2.Response
 
 private val authService = NetworkService.authService
+
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,33 +64,33 @@ fun RegistrationPage() {
             )
         },
     ) {
-            RegistrationView()
+        RegistrationView()
     }
 }
 
 @Composable
-fun RegistrationView(){
-
+fun RegistrationView() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
-            .padding(0.dp, 5.dp),
+            .padding(0.dp, 5.dp)
+            .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
-    ){
+    ) {
         Text(
-            modifier = Modifier.padding(0.dp,90.dp,0.dp,40.dp),
+            modifier = Modifier.padding(0.dp, 90.dp, 0.dp, 40.dp),
             style = MaterialTheme.typography.headlineLarge,
-            text = stringResource(R.string.registerLabel)
+            text = stringResource(R.string.registerLabel),
         )
-        CentralView(Modifier.padding(0.dp,15.dp))
+        CentralView(Modifier.padding(0.dp, 15.dp))
     }
-
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CentralView(modifier: Modifier){
+fun CentralView(modifier: Modifier) {
     var firstName: String by remember { mutableStateOf("") }
     var lastName: String by remember { mutableStateOf("") }
     var email: String by remember { mutableStateOf("") }
@@ -101,14 +105,14 @@ fun CentralView(modifier: Modifier){
         modifier = modifier,
         value = firstName,
         onValueChange = { firstName = it },
-        label = { Text(stringResource(R.string.first_name_label)) }
+        label = { Text(stringResource(R.string.first_name_label)) },
     )
 
     OutlinedTextField(
         modifier = modifier,
         value = lastName,
         onValueChange = { lastName = it },
-        label = { Text(stringResource(R.string.last_name_label)) }
+        label = { Text(stringResource(R.string.last_name_label)) },
     )
 
     OutlinedTextField(
@@ -118,7 +122,7 @@ fun CentralView(modifier: Modifier){
             email = it
             invalidEmail = !Regex("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}\$").matches(it)
         },
-        label = { Text(stringResource(R.string.e_mail_label)) }
+        label = { Text(stringResource(R.string.e_mail_label)) },
     )
 
     OutlinedTextField(
@@ -127,19 +131,19 @@ fun CentralView(modifier: Modifier){
         onValueChange = {
             password = it
             invalidPassword = !Regex("^.{6,}\$").matches(it)
-            },
+        },
         visualTransformation = PasswordVisualTransformation(),
-        label = { Text(stringResource(R.string.password_label)) }
+        label = { Text(stringResource(R.string.password_label)) },
     )
 
-    Row (verticalAlignment = Alignment.CenterVertically){
+    Row(verticalAlignment = Alignment.CenterVertically) {
         OutlinedTextField(
             modifier = Modifier
                 .padding(0.dp, 15.dp)
                 .width(200.dp),
             value = RFIDcard,
             onValueChange = { RFIDcard = it },
-            label = { Text(stringResource(R.string.rfid_card_label)) }
+            label = { Text(stringResource(R.string.rfid_card_label)) },
         )
         Spacer(modifier = Modifier.width(4.dp))
         ElevatedButton(
@@ -147,56 +151,59 @@ fun CentralView(modifier: Modifier){
             modifier = Modifier
                 .padding(10.dp)
                 .clip(MaterialTheme.shapes.medium),
-            contentPadding = PaddingValues(10.dp,0.dp),
-            interactionSource = interactionSource) {
+            contentPadding = PaddingValues(10.dp, 0.dp),
+            interactionSource = interactionSource,
+        ) {
             Icon(
                 imageVector = Icons.Default.Add,
                 contentDescription = null,
                 tint = Color.White,
-                modifier = Modifier.size(10.dp)
+                modifier = Modifier.size(10.dp),
             )
         }
     }
 
     ElevatedButton(
         onClick = {
-            if(invalidPassword || invalidEmail){
-                //TODO: implement popup with notification what went wrong
-            }else{
+            if (invalidPassword || invalidEmail) {
+                // TODO: implement popup with notification what went wrong
+            } else {
                 authService.registerUser(
-                    RegistrationBody(firstName,lastName,email,password,RFIDcard)
-                ).enqueue(object : Callback<RegistrationResponseBody> {
-                    override fun onResponse(call: Call<RegistrationResponseBody>?, response: Response<RegistrationResponseBody>?) {
-                        if (response?.isSuccessful == true) {
-                            val responseBody = response.body()
-                            val message = responseBody!!.message
-                            Log.i("Response", message)
-                        } else {
-                            val responseBody = response!!.body()
-                            val message = responseBody!!.message
-                            Log.i("Response", message)
+                    RegistrationBody(firstName, lastName, email, password, checkCard(RFIDcard)),
+                ).enqueue(
+                    object : Callback<RegistrationResponseBody> {
+                        override fun onResponse(call: Call<RegistrationResponseBody>?, response: Response<RegistrationResponseBody>?) {
+                            Log.i("RES", response.toString())
+
+                            if (response?.isSuccessful == true) {
+                                val responseBody = response.body()
+                                val message = responseBody!!.message
+                                Log.i("Response", message)
+                            } else {
+                                val responseBody = response!!.body()
+                                val message = responseBody!!.message
+                                Log.i("Response", message)
+                            }
                         }
-                    }
-                    override fun onFailure(call: Call<RegistrationResponseBody>?, t: Throwable?) {
-                        val message = "Failed to register user"
-                        Log.i("Response", message)
-                        Log.i("Response",t.toString())
-                    }
-                }
+                        override fun onFailure(call: Call<RegistrationResponseBody>?, t: Throwable?) {
+                            val message = "Failed to register user"
+                            Log.i("Response", message)
+                            Log.i("Response", t.toString())
+                        }
+                    },
                 )
             }
-
-
         },
-        modifier = Modifier.padding(0.dp,70.dp,0.dp,0.dp),
-        contentPadding = PaddingValues(122.dp,0.dp),
-        interactionSource = interactionSource) {
-        Text(text = "Register",style = MaterialTheme.typography.bodyMedium, color = Color.White)
+        modifier = Modifier.padding(0.dp, 70.dp, 0.dp, 0.dp),
+        contentPadding = PaddingValues(122.dp, 0.dp),
+        interactionSource = interactionSource,
+    ) {
+        Text(text = "Register", style = MaterialTheme.typography.bodyMedium, color = Color.White)
     }
-    Row (verticalAlignment = Alignment.CenterVertically){
+    Row(verticalAlignment = Alignment.CenterVertically) {
         Text(
             stringResource(R.string.Alreadyhaveaccountlabel),
-            style = MaterialTheme.typography.bodySmall
+            style = MaterialTheme.typography.bodySmall,
         )
         Spacer(modifier = Modifier.width(2.dp))
         TextButton(
@@ -204,14 +211,15 @@ fun CentralView(modifier: Modifier){
                 .padding(0.dp)
                 .wrapContentWidth(Alignment.CenterHorizontally),
             contentPadding = PaddingValues(0.dp),
-            onClick = {  }
+            onClick = { },
         ) {
             Text(
-                stringResource(R.string.log_in_label)
+                stringResource(R.string.log_in_label),
             )
         }
     }
 }
+
 /*
 @Composable
 fun PopupWithMessage( isOpen: Boolean, message: String, onDismiss: () -> Unit) {
@@ -249,6 +257,14 @@ fun PopupWithMessage( isOpen: Boolean, message: String, onDismiss: () -> Unit) {
     }
 
 }*/
+
+fun checkCard(RFIDCardString: String): RFIDCard?{
+    if(RFIDCardString==""){
+        return null
+    }else{
+        return RFIDCard(RFIDCardString)
+    }
+}
 @Preview(showBackground = false)
 @Composable
 fun RegistrationPagePreview() {
