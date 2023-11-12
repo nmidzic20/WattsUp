@@ -3,6 +3,7 @@ package hr.foi.air.wattsup
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -14,8 +15,11 @@ import hr.foi.air.wattsup.pages.ChargerPage
 import hr.foi.air.wattsup.pages.LandingPage
 import hr.foi.air.wattsup.pages.ScanRFIDPage
 import hr.foi.air.wattsup.ui.theme.WattsUpTheme
+import hr.foi.air.wattsup.viewmodels.ChargerViewModel
 
 class MainActivity : ComponentActivity() {
+    private val chargerViewModel: ChargerViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -42,7 +46,7 @@ class MainActivity : ComponentActivity() {
                             ScanRFIDPage(onArrowBackClick, onScanRFID)
                         }
                         composable("chargerMode") {
-                            ChargerPage(onArrowBackClick)
+                            ChargerPage(onArrowBackClick, chargerViewModel)
                         }
                     }
                 }
