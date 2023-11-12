@@ -1,7 +1,7 @@
 <div id="formContainer">
     <h1>Login</h1>
     <div id="message"></div>
-    <form #loginForm="ngForm" novalidate>
+    <form #loginForm="ngForm" (ngSubmit)="submitLogin(loginForm)" novalidate>
         <div class="form-group">
             <label for="email">Email:</label>
             <input type="email" name="email" ngModel #email="ngModel" required>

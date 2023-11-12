@@ -22,7 +22,18 @@ export class LoginComponent implements OnInit {
     if(form.valid){
       //implement endpoint fetch
     }else{
-      //implement error message showing
+      this.errorMessageBox!!.innerHTML = this.showErrorMessage(form);
     }
+  }
+
+  showErrorMessage(form: NgForm){
+    let errMsg = "";
+    let email = form.controls['email'].errors;
+    let password = form.controls['password'].errors;
+
+    if(email?.['required']) errMsg += "Email is required! <br>";
+    if(password?.['required']) errMsg += "Password is required! <br>";
+
+    return errMsg;
   }
 }
