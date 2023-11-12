@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
+import { UserManagerService } from '../services/user-manager.service';
 
 @Component({
   selector: 'app-login',
@@ -10,7 +11,7 @@ import { Router } from '@angular/router';
 export class LoginComponent implements OnInit {
   errorMessageBox? : HTMLElement;
 
-  constructor(private router: Router){
+  constructor(private router: Router, private userManagerService: UserManagerService){
 
   }
 
@@ -31,12 +32,16 @@ export class LoginComponent implements OnInit {
 
       try{
         let response = await fetch("https://localhost:32770/api/Users/Login", parameters);
-
+        let body = await response.text();
         if(response.status == 200){
-          //store tokens
+          let bodyJSON = JSON.parse(body);
+          this.userManagerService.jwt = bodyJSON.jwt;
+          this.userManagerService.refreshToken = bodyJSON.refreshToken;
+          this.userManagerService.refreshTokenExpiration = new Date(bodyJSON.refreshTokenExpiresAt);
+
           this.router.navigate(['/map']);
         }else{
-          let errorMessage = JSON.parse(await response.text()).message;
+          let errorMessage = JSON.parse(body).message;
           this.errorMessageBox!!.innerHTML = response.status.toString() + ": " + errorMessage;
         }
       }catch (error){

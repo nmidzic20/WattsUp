@@ -4,6 +4,9 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class UserManagerService {
+  jwt?: string;
+  refreshToken?: string;
+  refreshTokenExpiration?: Date;
 
   constructor() { }
 }
