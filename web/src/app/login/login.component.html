@@ -1,0 +1,18 @@
+<div id="formContainer">
+    <h1>Login</h1>
+    <div id="message"></div>
+    <form #loginForm="ngForm" novalidate>
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" name="email" ngModel #email="ngModel" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" name="password" ngModel #password="ngModel" required>
+        </div>
+        <div class="form-group">
+            <button id="login" type="submit">Login</button>
+        </div>
+    </form>
+    <div id="registerInstead">Don't have an account? <a href="/registration" id="registrationLink">Register</a></div>
+</div>
