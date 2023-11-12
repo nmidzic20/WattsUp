@@ -1,5 +1,6 @@
 package hr.foi.air.wattsup.pages
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,10 +18,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -40,26 +39,31 @@ import hr.foi.air.wattsup.ui.component.TopAppBar
 import hr.foi.air.wattsup.ui.theme.colorBtnRed
 import hr.foi.air.wattsup.ui.theme.colorSilver
 import hr.foi.air.wattsup.ui.theme.colorTertiary
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit
+import hr.foi.air.wattsup.viewmodels.ChargerViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChargerPage(onArrowBackClick: () -> Unit) {
+fun ChargerPage(onArrowBackClick: () -> Unit, viewModel: ChargerViewModel) {
     var openFullChargeAlertDialog by remember { mutableStateOf(false) }
+
+    // Observe LiveData from the ViewModel
+    val charging by viewModel.charging.observeAsState()
+    val currentChargeAmount by viewModel.currentChargeAmount.observeAsState()
+    val timeElapsed by viewModel.timeElapsed.observeAsState()
+    val percentageChargedUntilFull by viewModel.percentageChargedUntilFull.observeAsState()
+    val amountNecessaryForFullCharge by viewModel.amountNecessaryForFullCharge.observeAsState()
+
+    Log.i("VIEWMODELChargerPage", "Current Charge Amount: $currentChargeAmount")
 
     when {
         openFullChargeAlertDialog -> {
             CustomAlertDialog(
                 onConfirmation = {
                     openFullChargeAlertDialog = false
+                    Log.i("VIEWMODELCOMPOSABLEDISMISS", "$currentChargeAmount")
                 },
                 dialogTitle = "Charging Status",
-                dialogText = "Your vehicle is fully charged.",
+                dialogText = "Your vehicle is fully charged. $currentChargeAmount $amountNecessaryForFullCharge ${amountNecessaryForFullCharge!! < 0.01f}",
                 icon = Icons.Default.Info,
                 showDismissButton = false,
                 confirmButtonText = "OK",
@@ -95,69 +99,11 @@ fun ChargerPage(onArrowBackClick: () -> Unit) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceEvenly,
             ) {
-                var charging by remember { mutableStateOf(false) }
-                var startTime by remember { mutableLongStateOf(0L) }
-                var endTime by remember { mutableLongStateOf(0L) }
-                var timeElapsed by remember { mutableLongStateOf(0L) }
-                var timeTrackingJob: Job? by remember { mutableStateOf(null) }
-
-                val maxChargePercentage = 1f
-
-                var initialChargeAmount by remember { mutableFloatStateOf(0f) }
-                var amountNecessaryForFullCharge: Float by remember {
-                    mutableFloatStateOf(
-                        maxChargePercentage - initialChargeAmount,
-                    )
-                }
-                var currentChargeAmount by remember { mutableFloatStateOf(initialChargeAmount) }
-                var percentageChargedUntilFull by remember { mutableFloatStateOf(0f) }
-
-                fun stopCharging() {
-                    endTime = System.currentTimeMillis()
-                    timeTrackingJob?.cancel()
-                    timeElapsed = 0L
-                    percentageChargedUntilFull = 0f
-                    amountNecessaryForFullCharge = maxChargePercentage - currentChargeAmount
-                }
-
-                // The condition is "< very small number" instead of "== 0f", in order to
-                // prevent button flickering to STOP button with indicator before showing dialog
-                // Since this float number isn't immediately going to be exactly 0f
-                fun isVehicleFullyCharged() = amountNecessaryForFullCharge < 0.01f
-
-                LaunchedEffect(charging) {
-                    // Started charging
-                    if (charging) {
-                        startTime = System.currentTimeMillis()
-                        timeTrackingJob = CoroutineScope(Dispatchers.IO).launch {
-                            while (charging) {
-                                if (percentageChargedUntilFull < amountNecessaryForFullCharge) { // Update time every second
-                                    delay(1000)
-                                    timeElapsed = System.currentTimeMillis() - startTime
-
-                                    percentageChargedUntilFull += 0.01f
-                                    currentChargeAmount += 0.01f
-                                }
-                                // Stop charging automatically if EV is fully charged
-                                else {
-                                    charging = false
-                                    stopCharging()
-                                    openFullChargeAlertDialog = true
-                                }
-                            }
-                        }
-                    }
-                    // Stopped charging
-                    else {
-                        stopCharging()
-                    }
-                }
-
                 GradientImage(
                     R.drawable.icon_electric_car,
                     colorSilver,
                     colorTertiary,
-                    currentChargeAmount,
+                    currentChargeAmount!!,
                     150,
                     Modifier.fillMaxWidth(),
                 )
@@ -171,32 +117,31 @@ fun ChargerPage(onArrowBackClick: () -> Unit) {
                     )
 
                     Text(
-                        text = "${formatTime(timeElapsed)}",
+                        text = viewModel.formatTime(timeElapsed!!),
                         style = MaterialTheme.typography.titleLarge,
                     )
                 }
 
                 Box {
-                    if (charging) {
+                    if (charging!!) {
                         ProgressBarCircle(
                             progressBarFill = ProgressBarFill(
-                                percentageChargedUntilFull,
-                                amountNecessaryForFullCharge,
+                                percentageChargedUntilFull!!,
+                                amountNecessaryForFullCharge!!,
                             ),
                             fillColor = MaterialTheme.colorScheme.tertiary,
                             Modifier.size(220.dp).padding(10.dp),
                         )
                     }
                     CircleButton(
-                        mode = if (!charging) "Start charging" else "Stop charging",
+                        mode = if (!charging!!) "Start charging" else "Stop charging",
                         onClick = {
-                            if (isVehicleFullyCharged()) {
+                            viewModel.toggleCharging {
                                 openFullChargeAlertDialog = true
-                            } else {
-                                charging = !charging
+                                Log.i("VIEWMODELCOMPOSABLE", "$currentChargeAmount")
                             }
                         },
-                        color = if (!charging) MaterialTheme.colorScheme.primary else colorBtnRed,
+                        color = if (!charging!!) MaterialTheme.colorScheme.primary else colorBtnRed,
                         iconId = null,
                         Modifier.size(220.dp)
                             .padding(16.dp),
@@ -207,16 +152,7 @@ fun ChargerPage(onArrowBackClick: () -> Unit) {
     }
 }
 
-fun formatTime(milliseconds: Long): String {
-    val hours = TimeUnit.MILLISECONDS.toHours(milliseconds)
-    val minutes = TimeUnit.MILLISECONDS.toMinutes(milliseconds) % 60
-    val seconds = TimeUnit.MILLISECONDS.toSeconds(milliseconds) % 60
-
-    return String.format("%02d:%02d:%02d", hours, minutes, seconds)
-}
-
 @Preview
 @Composable
 fun ChargerPagePreview() {
-    ChargerPage {}
 }

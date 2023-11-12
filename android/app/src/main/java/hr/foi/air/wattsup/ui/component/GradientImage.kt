@@ -1,5 +1,6 @@
 package hr.foi.air.wattsup.ui.component
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -58,6 +59,8 @@ fun GradientImage(
         contentScale = ContentScale.Fit,
 
     )
+
+    Log.i("VIEWMODELGRADIENTCOMPOSE", fillPercentage.toString())
 }
 
 @Preview()
@@ -67,7 +70,7 @@ fun PreviewGradientImage() {
         R.drawable.icon_electric_car,
         colorSilver,
         colorTertiary,
-        0.5f,
+        1f,
         150,
         Modifier.fillMaxWidth(),
     )
