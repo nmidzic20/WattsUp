@@ -37,7 +37,8 @@ export class LoginComponent implements OnInit {
           let bodyJSON = JSON.parse(body);
           this.userManagerService.jwt = bodyJSON.jwt;
           this.userManagerService.refreshToken = bodyJSON.refreshToken;
-          this.userManagerService.refreshTokenExpiration = new Date(bodyJSON.refreshTokenExpiresAt);
+          this.userManagerService.refreshTokenExpiration = bodyJSON.refreshTokenExpiresAt;
+          this.userManagerService.saveTokensToLocalStorage();
 
           this.router.navigate(['/map']);
         }else{
