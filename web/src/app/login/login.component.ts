@@ -33,6 +33,7 @@ export class LoginComponent implements OnInit {
         let response = await fetch("https://localhost:32770/api/Users/Login", parameters);
 
         if(response.status == 200){
+          //store tokens
           this.router.navigate(['/map']);
         }else{
           let errorMessage = JSON.parse(await response.text()).message;
