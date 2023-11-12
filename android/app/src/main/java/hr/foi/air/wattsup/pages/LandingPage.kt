@@ -20,7 +20,7 @@ import hr.foi.air.wattsup.ui.component.TopAppBarLogoTitle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LandingPage(onChargerModeClick: () -> Unit) {
+fun LandingPage(onChargerModeClick: () -> Unit, onUserModeClick: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar({ TopAppBarLogoTitle() }, {})
@@ -42,7 +42,7 @@ fun LandingPage(onChargerModeClick: () -> Unit) {
             CircleButton(
                 mode = "User mode",
                 iconId = R.drawable.icon_user_mode,
-                onClick = { },
+                onClick = onUserModeClick,
                 color = null,
             )
 
@@ -59,5 +59,5 @@ fun LandingPage(onChargerModeClick: () -> Unit) {
 @Preview
 @Composable
 fun LandingPagePreview() {
-    LandingPage {}
+    LandingPage({ },{ })
 }

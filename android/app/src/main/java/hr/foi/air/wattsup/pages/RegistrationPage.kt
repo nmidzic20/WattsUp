@@ -1,6 +1,7 @@
 package hr.foi.air.wattsup.pages
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -33,11 +34,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hr.foi.air.wattsup.R
+import hr.foi.air.wattsup.network.NetworkService
+import hr.foi.air.wattsup.network.models.RegistrationBody
+import hr.foi.air.wattsup.network.models.RegistrationResponseBody
 import hr.foi.air.wattsup.ui.component.TopAppBar
+import retrofit2.Call
+import retrofit2.Response
+import retrofit2.Callback
 
+private val authService = NetworkService.authService
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,17 +80,22 @@ fun RegistrationView(){
             style = MaterialTheme.typography.headlineLarge,
             text = stringResource(R.string.registerLabel)
         )
-        PasswordAndEmailOutlinedTextField(Modifier.padding(0.dp,15.dp))
-        ButtonRegisterActionAndText()
+        CentralView(Modifier.padding(0.dp,15.dp))
     }
 
 }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PasswordAndEmailOutlinedTextField(modifier: Modifier){
-    val interactionSource = remember { MutableInteractionSource() }
-
+fun CentralView(modifier: Modifier){
     var firstName: String by remember { mutableStateOf("") }
+    var lastName: String by remember { mutableStateOf("") }
+    var email: String by remember { mutableStateOf("") }
+    var password: String by remember { mutableStateOf("") }
+    var RFIDcard: String by remember { mutableStateOf("") }
+    var invalidEmail by remember { mutableStateOf(false) }
+    var invalidPassword by remember { mutableStateOf(false) }
+
+    val interactionSource = remember { MutableInteractionSource() }
 
     OutlinedTextField(
         modifier = modifier,
@@ -90,8 +104,6 @@ fun PasswordAndEmailOutlinedTextField(modifier: Modifier){
         label = { Text(stringResource(R.string.first_name_label)) }
     )
 
-    var lastName: String by remember { mutableStateOf("") }
-
     OutlinedTextField(
         modifier = modifier,
         value = lastName,
@@ -99,25 +111,27 @@ fun PasswordAndEmailOutlinedTextField(modifier: Modifier){
         label = { Text(stringResource(R.string.last_name_label)) }
     )
 
-    var email: String by remember { mutableStateOf("") }
-
     OutlinedTextField(
         modifier = modifier,
         value = email,
-        onValueChange = { email = it },
+        onValueChange = {
+            email = it
+            invalidEmail = !Regex("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}\$").matches(it)
+        },
         label = { Text(stringResource(R.string.e_mail_label)) }
     )
-
-    var password: String by remember { mutableStateOf("") }
 
     OutlinedTextField(
         modifier = modifier,
         value = password,
-        onValueChange = { password = it },
+        onValueChange = {
+            password = it
+            invalidPassword = !Regex("^.{6,}\$").matches(it)
+            },
+        visualTransformation = PasswordVisualTransformation(),
         label = { Text(stringResource(R.string.password_label)) }
     )
 
-    var RFIDcard: String by remember { mutableStateOf("") }
     Row (verticalAlignment = Alignment.CenterVertically){
         OutlinedTextField(
             modifier = Modifier
@@ -143,16 +157,41 @@ fun PasswordAndEmailOutlinedTextField(modifier: Modifier){
             )
         }
     }
-}
-@Composable
-fun ButtonRegisterActionAndText() {
-    val interactionSource = remember { MutableInteractionSource() }
+
     ElevatedButton(
-        onClick = { /* do something */ },
-        modifier = Modifier.padding(0.dp,90.dp,0.dp,0.dp),
+        onClick = {
+            if(invalidPassword || invalidEmail){
+                //TODO: implement popup with notification what went wrong
+            }else{
+                authService.registerUser(
+                    RegistrationBody(firstName,lastName,email,password,RFIDcard)
+                ).enqueue(object : Callback<RegistrationResponseBody> {
+                    override fun onResponse(call: Call<RegistrationResponseBody>?, response: Response<RegistrationResponseBody>?) {
+                        if (response?.isSuccessful == true) {
+                            val responseBody = response.body()
+                            val message = responseBody!!.message
+                            Log.i("Response", message)
+                        } else {
+                            val responseBody = response!!.body()
+                            val message = responseBody!!.message
+                            Log.i("Response", message)
+                        }
+                    }
+                    override fun onFailure(call: Call<RegistrationResponseBody>?, t: Throwable?) {
+                        val message = "Failed to register user"
+                        Log.i("Response", message)
+                        Log.i("Response",t.toString())
+                    }
+                }
+                )
+            }
+
+
+        },
+        modifier = Modifier.padding(0.dp,70.dp,0.dp,0.dp),
         contentPadding = PaddingValues(122.dp,0.dp),
         interactionSource = interactionSource) {
-        Text(text = "Register",style = MaterialTheme.typography.bodyMedium)
+        Text(text = "Register",style = MaterialTheme.typography.bodyMedium, color = Color.White)
     }
     Row (verticalAlignment = Alignment.CenterVertically){
         Text(
@@ -173,7 +212,43 @@ fun ButtonRegisterActionAndText() {
         }
     }
 }
+/*
+@Composable
+fun PopupWithMessage( isOpen: Boolean, message: String, onDismiss: () -> Unit) {
+    if(isOpen){
+        Dialog(
+            onDismissRequest = {  },
+            content = {
+                Card(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = null,
+                            tint = Color.Blue,
+                            modifier = Modifier
+                                .size(48.dp)
+                                .padding(8.dp)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(text = message, modifier = Modifier.padding(8.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
+                        ElevatedButton(onClick = { onDismiss }) {
+                            Text("OK")
+                        }
+                    }
+                }
+            }
+        )
+    }
 
+}*/
 @Preview(showBackground = false)
 @Composable
 fun RegistrationPagePreview() {
