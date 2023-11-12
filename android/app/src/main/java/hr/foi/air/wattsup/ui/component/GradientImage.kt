@@ -1,9 +1,7 @@
 package hr.foi.air.wattsup.ui.component
 
-import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
@@ -31,7 +29,6 @@ fun GradientImage(
     modifier: Modifier = Modifier,
 ) {
     val y = (1f - fillPercentage) * height * 2.8f
-    val heightDp = height.dp
 
     val gradient = Brush.linearGradient(
         colors = listOf(
@@ -43,7 +40,6 @@ fun GradientImage(
     )
     Image(
         modifier = modifier
-            .height(heightDp)
             .graphicsLayer(alpha = 0.99f)
             .drawWithCache {
                 onDrawWithContent {
@@ -57,21 +53,20 @@ fun GradientImage(
         imageVector = ImageVector.vectorResource(id = iconResource),
         contentDescription = null,
         contentScale = ContentScale.Fit,
-
     )
-
-    Log.i("VIEWMODELGRADIENTCOMPOSE", fillPercentage.toString())
 }
 
 @Preview()
 @Composable
 fun PreviewGradientImage() {
+    val height = 150
+
     GradientImage(
         R.drawable.icon_electric_car,
         colorSilver,
         colorTertiary,
         1f,
-        150,
-        Modifier.fillMaxWidth(),
+        height,
+        Modifier.size(height.dp),
     )
 }

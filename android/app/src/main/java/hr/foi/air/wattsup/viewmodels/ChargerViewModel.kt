@@ -34,6 +34,12 @@ class ChargerViewModel : ViewModel() {
     val amountNecessaryForFullCharge: LiveData<Float> get() = _amountNecessaryForFullCharge
     val currentChargeAmount: LiveData<Float> get() = _currentChargeAmount
 
+    private val _openFullChargeAlertDialog = MutableLiveData(false)
+    val openFullChargeAlertDialog: LiveData<Boolean> = _openFullChargeAlertDialog
+    fun setOpenFullChargeAlertDialog(value: Boolean) {
+        _openFullChargeAlertDialog.value = value
+    }
+
     fun toggleCharging(onFullyCharged: () -> Unit) {
         if (isVehicleFullyCharged()) {
             onFullyCharged()
