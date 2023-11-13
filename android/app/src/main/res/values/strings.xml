@@ -9,4 +9,8 @@
     <string name="e_mail_label">E-mail</string>
     <string name="password_label">Password</string>
     <string name="rfid_card_label">RFID card (optional)</string>
+    <string name="emailLabel">E-mail</string>
+    <string name="passwordLabel">Password</string>
+    <string name="LoginDontHaveAccountLabel">"Don\'t have an account?"</string>
+    <string name="login">Login</string>
 </resources>
