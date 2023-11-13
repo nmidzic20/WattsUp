@@ -1,6 +1,7 @@
 package hr.foi.air.wattsup.pages
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -32,10 +33,19 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hr.foi.air.wattsup.R
+import hr.foi.air.wattsup.network.NetworkService
+import hr.foi.air.wattsup.network.TokenManager
+import hr.foi.air.wattsup.network.models.LoginBody
+import hr.foi.air.wattsup.network.models.LoginResponseBody
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+
+private val authService = NetworkService.authService
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginPage() {
+fun LoginPage(onRegisterClick: () -> Unit) {
 
     Scaffold(
         topBar = {
@@ -50,7 +60,7 @@ fun LoginPage() {
                 )
                  },
         ){
-        LoginView()
+        LoginView(onRegisterClick)
     }
 
 }
@@ -85,9 +95,12 @@ fun Header() {
     }
 }
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginView(){
-
+fun LoginView(onRegisterClick: () -> Unit){
+    val interactionSource = remember { MutableInteractionSource() }
+    var email: String by remember { mutableStateOf("")}
+    var password: String by remember { mutableStateOf("")}
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -101,62 +114,75 @@ fun LoginView(){
             style = MaterialTheme.typography.headlineLarge,
             text = stringResource(R.string.login)
         )
-        PasswordandEmailOutlinedTextField(Modifier.padding(0.dp,15.dp))
-        ButtonLoginActionAndText()
-    }
+        val modifier = Modifier.padding(0.dp,15.dp)
 
-}
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun PasswordandEmailOutlinedTextField(modifier: Modifier){
-    var email: String by remember { mutableStateOf("")}
-
-    OutlinedTextField(
-        modifier = modifier,
-        value = email,
-        onValueChange = { email = it },
-        label = { Text(stringResource(R.string.emailLabel)) }
-    )
-    
-    var password: String by remember { mutableStateOf("")}
-
-    OutlinedTextField(
-        modifier = modifier,
-        value = password,
-        onValueChange = { password = it },
-        label = { Text(stringResource(R.string.passwordLabel)) }
-    )
-
-}
-@Composable
-fun ButtonLoginActionAndText() {
-    val interactionSource = remember { MutableInteractionSource() }
-    ElevatedButton(
-        onClick = { /* do something */ },
-        modifier = Modifier.padding(0.dp,240.dp,0.dp,0.dp),
-        contentPadding = PaddingValues(122.dp,0.dp),
-        interactionSource = interactionSource) {
-        Text(text = "Login",style = MaterialTheme.typography.bodyMedium)
-    }
-    Row (verticalAlignment = Alignment.CenterVertically){
-        Text(
-            stringResource(R.string.LoginDontHaveAccountLabel),
-            style = MaterialTheme.typography.bodySmall
+        OutlinedTextField(
+            modifier = modifier,
+            value = email,
+            onValueChange = { email = it },
+            label = { Text(stringResource(R.string.emailLabel)) }
         )
-        Spacer(modifier = Modifier.width(2.dp))
-        TextButton(
-            modifier = Modifier.padding(0.dp).wrapContentWidth(Alignment.CenterHorizontally),
-            contentPadding = PaddingValues(0.dp),
-            onClick = {  }
-        ) {
-            Text(stringResource(R.string.registerLabel))
 
+
+
+        OutlinedTextField(
+            modifier = modifier,
+            value = password,
+            onValueChange = { password = it },
+            label = { Text(stringResource(R.string.passwordLabel)) }
+        )
+
+        ElevatedButton(
+            onClick = {
+                authService.loginUser(
+                LoginBody(email,password),
+            ).enqueue(object : Callback<LoginResponseBody> {
+                    override fun onResponse(call: Call<LoginResponseBody>?, response: Response<LoginResponseBody>?) {
+                        Log.i("RES", response.toString())
+                        if (response?.isSuccessful == true) {
+                            val responseBody = response.body()
+                            val tokenManager = TokenManager(responseBody!!.jwt,responseBody.refreshToken,responseBody.refreshTokenExpiresAt)
+                            Log.i("Response", responseBody.jwt)
+                            //TODO: make page where login goes to and implement localstorage handling of JWT token
+                        } else {
+                            val responseBody = response!!.body()
+                            val message = "Invalid username or password"
+                            Log.i("Response", message)
+                            //TODO: make page where login goes to
+                        }
+                    }
+                    override fun onFailure(call: Call<LoginResponseBody>?, t: Throwable?) {
+                        val message = "Failed to login user"
+                        Log.i("Response", message)
+                        Log.i("Response", t.toString())
+                        //TODO: make page where login goes to
+                    }
+                },
+            ) },
+            modifier = Modifier.padding(0.dp,180.dp,0.dp,0.dp),
+            contentPadding = PaddingValues(122.dp,0.dp),
+            interactionSource = interactionSource) {
+            Text(text = "Login",style = MaterialTheme.typography.bodyMedium,color = androidx.compose.ui.graphics.Color.White)
         }
+        Row (verticalAlignment = Alignment.CenterVertically){
+            Text(
+                stringResource(R.string.LoginDontHaveAccountLabel),
+                style = MaterialTheme.typography.bodySmall
+            )
+            Spacer(modifier = Modifier.width(2.dp))
+            TextButton(
+                modifier = Modifier.padding(0.dp).wrapContentWidth(Alignment.CenterHorizontally),
+                contentPadding = PaddingValues(0.dp),
+                onClick = onRegisterClick
+            ) {
+                Text(stringResource(R.string.registerLabel), color= androidx.compose.ui.graphics.Color.White)
+            }
         }
     }
 
+}
 @Preview(showBackground = false)
 @Composable
 fun LoginPreview() {
-    LoginPage()
+    LoginPage {}
 }

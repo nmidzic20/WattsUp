@@ -18,9 +18,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -54,22 +56,25 @@ private val authService = NetworkService.authService
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegistrationPage() {
+fun RegistrationPage(onArrowBackClick: () -> Unit, onLogInClick: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.app_name)) },
                 navigationIcon = {
+                    IconButton(onClick = { onArrowBackClick() }) {
+                        Icon(Icons.Filled.ArrowBack, null, tint = Color.White)
+                    }
                 },
             )
         },
     ) {
-        RegistrationView()
+        RegistrationView(onLogInClick)
     }
 }
 
 @Composable
-fun RegistrationView() {
+fun RegistrationView(onLogInClick: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -84,13 +89,13 @@ fun RegistrationView() {
             style = MaterialTheme.typography.headlineLarge,
             text = stringResource(R.string.registerLabel),
         )
-        CentralView(Modifier.padding(0.dp, 15.dp))
+        CentralView(Modifier.padding(0.dp, 15.dp),onLogInClick)
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CentralView(modifier: Modifier) {
+fun CentralView(modifier: Modifier,onLogInClick: () -> Unit) {
     var firstName: String by remember { mutableStateOf("") }
     var lastName: String by remember { mutableStateOf("") }
     var email: String by remember { mutableStateOf("") }
@@ -179,22 +184,25 @@ fun CentralView(modifier: Modifier) {
                                 val responseBody = response.body()
                                 val message = responseBody!!.message
                                 Log.i("Response", message)
+                                onLogInClick
                             } else {
                                 val responseBody = response!!.body()
                                 val message = responseBody!!.message
                                 Log.i("Response", message)
+                                onLogInClick
                             }
                         }
                         override fun onFailure(call: Call<RegistrationResponseBody>?, t: Throwable?) {
                             val message = "Failed to register user"
                             Log.i("Response", message)
                             Log.i("Response", t.toString())
+                            onLogInClick
                         }
                     },
                 )
             }
         },
-        modifier = Modifier.padding(0.dp, 70.dp, 0.dp, 0.dp),
+        modifier = Modifier.padding(0.dp, 40.dp, 0.dp, 0.dp),
         contentPadding = PaddingValues(122.dp, 0.dp),
         interactionSource = interactionSource,
     ) {
@@ -211,7 +219,7 @@ fun CentralView(modifier: Modifier) {
                 .padding(0.dp)
                 .wrapContentWidth(Alignment.CenterHorizontally),
             contentPadding = PaddingValues(0.dp),
-            onClick = { },
+            onClick = onLogInClick,
         ) {
             Text(
                 stringResource(R.string.log_in_label),
@@ -268,5 +276,5 @@ fun checkCard(RFIDCardString: String): RFIDCard?{
 @Preview(showBackground = false)
 @Composable
 fun RegistrationPagePreview() {
-    RegistrationPage()
+    RegistrationPage({},{})
 }
