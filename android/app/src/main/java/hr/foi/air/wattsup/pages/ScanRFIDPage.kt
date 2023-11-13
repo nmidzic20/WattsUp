@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -88,6 +89,8 @@ fun ScanRFIDPage(onArrowBackClick: () -> Unit, onScanRFID: () -> Unit) {
                         },
                         null,
                         null,
+                        Modifier.size(220.dp)
+                            .padding(16.dp),
                     )
                     Spacer(
                         modifier = Modifier.height(30.dp),

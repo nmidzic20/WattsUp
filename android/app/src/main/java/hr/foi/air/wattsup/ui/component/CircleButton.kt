@@ -26,14 +26,12 @@ import androidx.compose.ui.unit.dp
 import hr.foi.air.wattsup.R
 
 @Composable
-fun CircleButton(mode: String, onClick: () -> Unit, color: Color?, iconId: Int?) {
+fun CircleButton(mode: String, onClick: () -> Unit, color: Color?, iconId: Int?, modifier: Modifier = Modifier) {
     Button(
         onClick = {
             onClick()
         },
-        modifier = Modifier
-            .size(220.dp)
-            .padding(16.dp),
+        modifier = modifier,
         colors = ButtonDefaults.buttonColors(
             containerColor = color ?: MaterialTheme.colorScheme.primary,
             contentColor = Color.White,
@@ -73,5 +71,12 @@ fun CircleButton(mode: String, onClick: () -> Unit, color: Color?, iconId: Int?)
 @Preview
 @Composable
 fun ModeButtonPreview() {
-    CircleButton("Preview mode", { }, null, R.drawable.icon_user_mode)
+    CircleButton(
+        "Preview mode",
+        { },
+        null,
+        R.drawable.icon_user_mode,
+        Modifier.size(220.dp)
+            .padding(16.dp),
+    )
 }
