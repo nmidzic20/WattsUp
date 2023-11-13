@@ -21,7 +21,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,7 +37,6 @@ import hr.foi.air.wattsup.ui.component.ProgressBarFill
 import hr.foi.air.wattsup.ui.component.TopAppBar
 import hr.foi.air.wattsup.ui.theme.colorBtnRed
 import hr.foi.air.wattsup.ui.theme.colorSilver
-import hr.foi.air.wattsup.ui.theme.colorTertiary
 import hr.foi.air.wattsup.viewmodels.ChargerViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -176,7 +174,7 @@ fun ChargingIndicators(
     GradientImage(
         R.drawable.icon_electric_car,
         colorSilver,
-        colorTertiary,
+        MaterialTheme.colorScheme.secondary,
         currentChargeAmount,
         height,
         Modifier.size(height.dp),
@@ -203,7 +201,7 @@ fun ChargingIndicators(
                     percentageChargedUntilFull,
                     amountNecessaryForFullCharge,
                 ),
-                fillColor = MaterialTheme.colorScheme.tertiary,
+                fillColor = MaterialTheme.colorScheme.secondary,
                 Modifier.size(220.dp).padding(10.dp),
             )
         }

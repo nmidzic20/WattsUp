@@ -12,14 +12,6 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-val colorPrimary = Color(0xff11CB54) // green
-val colorIterativeView = Color(0xff26D465) //lighter green
-val colorSecondary = Color(0xffFFFFFF) // White
-val colorBackground = Color(0xffF5FFF6) // light green
-
-val colorBackgroundDark = Color(0xff303030) // almost black
-val colorPrimaryDark = colorPrimary
-
 private val DarkColorScheme = darkColorScheme(
     primary = colorPrimaryDark,
     secondary = colorSecondary,

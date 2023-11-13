@@ -89,13 +89,13 @@ fun RegistrationView(onLogInClick: () -> Unit) {
             style = MaterialTheme.typography.headlineLarge,
             text = stringResource(R.string.registerLabel),
         )
-        CentralView(Modifier.padding(0.dp, 15.dp),onLogInClick)
+        CentralView(Modifier.padding(0.dp, 15.dp), onLogInClick)
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CentralView(modifier: Modifier,onLogInClick: () -> Unit) {
+fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
     var firstName: String by remember { mutableStateOf("") }
     var lastName: String by remember { mutableStateOf("") }
     var email: String by remember { mutableStateOf("") }
@@ -266,15 +266,16 @@ fun PopupWithMessage( isOpen: Boolean, message: String, onDismiss: () -> Unit) {
 
 }*/
 
-fun checkCard(RFIDCardString: String): RFIDCard?{
-    if(RFIDCardString==""){
+fun checkCard(RFIDCardString: String): RFIDCard? {
+    if (RFIDCardString == "") {
         return null
-    }else{
+    } else {
         return RFIDCard(RFIDCardString)
     }
 }
+
 @Preview(showBackground = false)
 @Composable
 fun RegistrationPagePreview() {
-    RegistrationPage({},{})
+    RegistrationPage({}, {})
 }

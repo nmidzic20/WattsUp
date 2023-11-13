@@ -2,6 +2,7 @@ package hr.foi.air.wattsup.ui.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
@@ -17,7 +18,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.ui.theme.colorSilver
-import hr.foi.air.wattsup.ui.theme.colorTertiary
 
 @Composable
 fun GradientImage(
@@ -64,7 +64,7 @@ fun PreviewGradientImage() {
     GradientImage(
         R.drawable.icon_electric_car,
         colorSilver,
-        colorTertiary,
+        MaterialTheme.colorScheme.secondary,
         1f,
         height,
         Modifier.size(height.dp),
