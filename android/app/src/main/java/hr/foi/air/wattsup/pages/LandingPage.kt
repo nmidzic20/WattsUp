@@ -24,20 +24,20 @@ import hr.foi.air.wattsup.ui.component.TopAppBar
 import hr.foi.air.wattsup.ui.component.TopAppBarLogoTitle
 
 @Composable
-fun LandingPage(onChargerModeClick: () -> Unit) {
+fun LandingPage(onChargerModeClick: () -> Unit, onUserModeClick: () -> Unit) {
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     if (isLandscape) {
-        LandscapeLayout(onChargerModeClick)
+        LandscapeLayout(onChargerModeClick,onUserModeClick)
     } else {
-        PortraitLayout(onChargerModeClick)
+        PortraitLayout(onChargerModeClick,onUserModeClick)
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun LandscapeLayout(onChargerModeClick: () -> Unit) {
+private fun LandscapeLayout(onChargerModeClick: () -> Unit, onUserModeClick: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar({ TopAppBarLogoTitle() }, {})
@@ -51,14 +51,14 @@ private fun LandscapeLayout(onChargerModeClick: () -> Unit) {
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            ModeSelection(onChargerModeClick)
+            ModeSelection(onChargerModeClick,onUserModeClick)
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun PortraitLayout(onChargerModeClick: () -> Unit) {
+private fun PortraitLayout(onChargerModeClick: () -> Unit, onUserModeClick: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar({ TopAppBarLogoTitle() }, {})
@@ -72,13 +72,13 @@ private fun PortraitLayout(onChargerModeClick: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceEvenly,
         ) {
-            ModeSelection(onChargerModeClick)
+            ModeSelection(onChargerModeClick,onUserModeClick)
         }
     }
 }
 
 @Composable
-fun ModeSelection(onChargerModeClick: () -> Unit) {
+fun ModeSelection(onChargerModeClick: () -> Unit, onUserModeClick: () -> Unit) {
     Text(
         text = "Select app mode:",
         style = MaterialTheme.typography.titleLarge,
@@ -87,7 +87,7 @@ fun ModeSelection(onChargerModeClick: () -> Unit) {
     CircleButton(
         mode = "User mode",
         iconId = R.drawable.icon_user_mode,
-        onClick = { },
+        onClick = onUserModeClick,
         color = null,
         modifier = Modifier.size(220.dp)
             .padding(16.dp),
@@ -106,5 +106,5 @@ fun ModeSelection(onChargerModeClick: () -> Unit) {
 @Preview
 @Composable
 fun LandingPagePreview() {
-    LandingPage {}
+    LandingPage({ },{ })
 }

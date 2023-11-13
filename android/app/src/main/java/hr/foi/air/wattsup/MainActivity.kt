@@ -13,6 +13,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import hr.foi.air.wattsup.pages.ChargerPage
 import hr.foi.air.wattsup.pages.LandingPage
+import hr.foi.air.wattsup.pages.RegistrationPage
 import hr.foi.air.wattsup.pages.ScanRFIDPage
 import hr.foi.air.wattsup.ui.theme.WattsUpTheme
 import hr.foi.air.wattsup.viewmodels.ChargerViewModel
@@ -37,8 +38,9 @@ class MainActivity : ComponentActivity() {
                     NavHost(navController = navController, startDestination = "landing") {
                         composable("landing") {
                             val onChargerModeClick = { navController.navigate("scanRFID") }
+                            val onUserModeClick= { navController.navigate("registration") }
 
-                            LandingPage(onChargerModeClick)
+                            LandingPage(onChargerModeClick,onUserModeClick)
                         }
                         composable("scanRFID") {
                             val onScanRFID = { navController.navigate("chargerMode") }
@@ -47,6 +49,9 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("chargerMode") {
                             ChargerPage(onArrowBackClick, chargerViewModel)
+                        }
+                        composable("registration"){
+                            RegistrationPage()
                         }
                     }
                 }
