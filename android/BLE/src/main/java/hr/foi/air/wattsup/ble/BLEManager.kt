@@ -19,7 +19,10 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.ComponentActivity
 import androidx.core.content.ContextCompat
 
-class BLEManager(private val context: Context) {
+class BLEManager(
+    private val context: Context,
+    private val permissionCallback: PermissionCallback? = null,
+) {
 
     private val REQUIRED_PERMISSIONS = arrayOf(
         Manifest.permission.BLUETOOTH,
@@ -34,7 +37,10 @@ class BLEManager(private val context: Context) {
     private var bluetoothLeScanner: BluetoothLeScanner? = bluetoothAdapter?.bluetoothLeScanner
     private var bluetoothGatt: BluetoothGatt? = null
 
+    private var scanCallback: ScanCallback? = null
+
     init {
+        requestBluetoothPermissions(context)
         initializeBluetooth()
     }
 
@@ -61,7 +67,7 @@ class BLEManager(private val context: Context) {
         Log.i("BLUETOOTH", "Supported and enabled")
     }
 
-    fun requestBluetoothPermissions(context: Context) {
+    private fun requestBluetoothPermissions(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val permissionsToRequest = REQUIRED_PERMISSIONS.filter {
                 ContextCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED
@@ -76,7 +82,9 @@ class BLEManager(private val context: Context) {
         }
     }
 
-    fun startScanning(scanCallback: ScanCallback) {
+    fun startScanning(scanCallback: ScanCallback, bleScanCallback: BLEScanCallback?) {
+        this.scanCallback = scanCallback
+
         val scanFilters = mutableListOf<ScanFilter>()
         val scanSettings = ScanSettings.Builder()
             .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
@@ -87,14 +95,18 @@ class BLEManager(private val context: Context) {
             REQUEST_PERMISSIONS_SCAN,
         )
         bluetoothLeScanner?.startScan(scanFilters, scanSettings, scanCallback)
+        bleScanCallback?.onScanStarted()
     }
 
-    fun stopScanning(scanCallback: ScanCallback) {
+    fun stopScanning() {
         checkAndRequestPermission(
             Manifest.permission.BLUETOOTH_SCAN,
             REQUEST_PERMISSIONS_SCAN,
         )
-        bluetoothLeScanner?.stopScan(scanCallback)
+        if (scanCallback != null) {
+            bluetoothLeScanner?.stopScan(scanCallback)
+            scanCallback = null
+        }
     }
 
     fun connectToDevice(device: BluetoothDevice, gattCallback: BluetoothGattCallback) {
@@ -138,31 +150,9 @@ class BLEManager(private val context: Context) {
                 )
             }
             return
+        } else {
+            // Permission is already granted
+            permissionCallback?.onPermissionGranted(permission)
         }
     }
-
-    /*
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray,
-    ) {
-        when (requestCode) {
-            REQUEST_PERMISSIONS -> {
-
-            }
-
-            REQUEST_PERMISSIONS_CONNECT -> {
-
-            }
-
-            REQUEST_PERMISSIONS_SCAN -> {
-
-            }
-
-            //other cases - call super method
-
-        }
-    }
-    */
 }
