@@ -1,4 +1,4 @@
-package hr.foi.air.wattsup.pages
+package hr.foi.air.wattsup.screens
 
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
@@ -46,7 +46,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ScanRFIDPage(onArrowBackClick: () -> Unit, onScanRFID: () -> Unit) {
+fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit) {
     val bleManager = BLEManager(
         LocalContext.current,
         object : PermissionCallback {
@@ -97,7 +97,7 @@ fun ScanRFIDPage(onArrowBackClick: () -> Unit, onScanRFID: () -> Unit) {
                             initiallyScanned = true
                             scanSuccess = true
                             Log.i("BLUETOOTH", "Scanning succeeded, result: $result")
-                            onScanRFID()
+                            onScan()
                         }
 
                         override fun onBatchScanResults(results: List<ScanResult?>?) {
@@ -107,7 +107,7 @@ fun ScanRFIDPage(onArrowBackClick: () -> Unit, onScanRFID: () -> Unit) {
                             initiallyScanned = true
                             scanSuccess = true
                             Log.i("BLUETOOTH", "Scanning succeeded, batch results: $results")
-                            onScanRFID()
+                            onScan()
                         }
 
                         override fun onScanFailed(errorCode: Int) {
@@ -187,7 +187,7 @@ fun ScanRFIDPage(onArrowBackClick: () -> Unit, onScanRFID: () -> Unit) {
                                 initiallyScanned = true
                                 scanSuccess = true
 
-                                onScanRFID()
+                                onScan()
                             },
                             modifier = Modifier.padding(vertical = 30.dp),
                         )
@@ -214,6 +214,6 @@ fun ScanRFIDPage(onArrowBackClick: () -> Unit, onScanRFID: () -> Unit) {
 
 @Preview
 @Composable
-fun ScanRFIDPagePreview() {
-    ScanRFIDPage({}, {})
+fun ScanScreenPreview() {
+    ScanScreen({}, {})
 }

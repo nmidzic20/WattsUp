@@ -11,11 +11,11 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import hr.foi.air.wattsup.pages.ChargerPage
-import hr.foi.air.wattsup.pages.LandingPage
-import hr.foi.air.wattsup.pages.LoginPage
-import hr.foi.air.wattsup.pages.RegistrationPage
-import hr.foi.air.wattsup.pages.ScanRFIDPage
+import hr.foi.air.wattsup.screens.ChargerScreen
+import hr.foi.air.wattsup.screens.LandingScreen
+import hr.foi.air.wattsup.screens.LoginScreen
+import hr.foi.air.wattsup.screens.RegistrationScreen
+import hr.foi.air.wattsup.screens.ScanScreen
 import hr.foi.air.wattsup.ui.theme.WattsUpTheme
 import hr.foi.air.wattsup.viewmodels.ChargerViewModel
 
@@ -41,23 +41,23 @@ class MainActivity : ComponentActivity() {
                             val onChargerModeClick = { navController.navigate("scanRFID") }
                             val onUserModeClick = { navController.navigate("login") }
 
-                            LandingPage(onChargerModeClick, onUserModeClick)
+                            LandingScreen(onChargerModeClick, onUserModeClick)
                         }
                         composable("scanRFID") {
                             val onScanRFID = { navController.navigate("chargerMode") }
 
-                            ScanRFIDPage(onArrowBackClick, onScanRFID)
+                            ScanScreen(onArrowBackClick, onScanRFID)
                         }
                         composable("chargerMode") {
-                            ChargerPage(onArrowBackClick, chargerViewModel)
+                            ChargerScreen(onArrowBackClick, chargerViewModel)
                         }
                         composable("registration") {
                             val onLogInClick = { navController.navigate("login") }
-                            RegistrationPage(onArrowBackClick, onLogInClick)
+                            RegistrationScreen(onArrowBackClick, onLogInClick)
                         }
                         composable("login") {
                             val onRegisterClick = { navController.navigate("registration") }
-                            LoginPage(onRegisterClick)
+                            LoginScreen(onRegisterClick)
                         }
                     }
                 }

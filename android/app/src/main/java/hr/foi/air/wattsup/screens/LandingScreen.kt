@@ -1,4 +1,4 @@
-package hr.foi.air.wattsup.pages
+package hr.foi.air.wattsup.screens
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
@@ -24,14 +24,14 @@ import hr.foi.air.wattsup.ui.component.TopAppBar
 import hr.foi.air.wattsup.ui.component.TopAppBarLogoTitle
 
 @Composable
-fun LandingPage(onChargerModeClick: () -> Unit, onUserModeClick: () -> Unit) {
+fun LandingScreen(onChargerModeClick: () -> Unit, onUserModeClick: () -> Unit) {
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     if (isLandscape) {
-        LandscapeLayout(onChargerModeClick,onUserModeClick)
+        LandscapeLayout(onChargerModeClick, onUserModeClick)
     } else {
-        PortraitLayout(onChargerModeClick,onUserModeClick)
+        PortraitLayout(onChargerModeClick, onUserModeClick)
     }
 }
 
@@ -51,7 +51,7 @@ private fun LandscapeLayout(onChargerModeClick: () -> Unit, onUserModeClick: () 
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            ModeSelection(onChargerModeClick,onUserModeClick)
+            ModeSelection(onChargerModeClick, onUserModeClick)
         }
     }
 }
@@ -72,7 +72,7 @@ private fun PortraitLayout(onChargerModeClick: () -> Unit, onUserModeClick: () -
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceEvenly,
         ) {
-            ModeSelection(onChargerModeClick,onUserModeClick)
+            ModeSelection(onChargerModeClick, onUserModeClick)
         }
     }
 }
@@ -105,6 +105,6 @@ fun ModeSelection(onChargerModeClick: () -> Unit, onUserModeClick: () -> Unit) {
 
 @Preview
 @Composable
-fun LandingPagePreview() {
-    LandingPage({ },{ })
+fun LandingScreenPreview() {
+    LandingScreen({ }, { })
 }
