@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import hr.foi.air.wattsup.ble.BLEManager
 import hr.foi.air.wattsup.pages.ChargerPage
 import hr.foi.air.wattsup.pages.LandingPage
 import hr.foi.air.wattsup.pages.LoginPage
@@ -21,6 +22,8 @@ import hr.foi.air.wattsup.viewmodels.ChargerViewModel
 
 class MainActivity : ComponentActivity() {
     private val chargerViewModel: ChargerViewModel by viewModels()
+
+    private val ble = BLEManager(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,9 +42,9 @@ class MainActivity : ComponentActivity() {
                     NavHost(navController = navController, startDestination = "landing") {
                         composable("landing") {
                             val onChargerModeClick = { navController.navigate("scanRFID") }
-                            val onUserModeClick= { navController.navigate("login") }
+                            val onUserModeClick = { navController.navigate("login") }
 
-                            LandingPage(onChargerModeClick,onUserModeClick)
+                            LandingPage(onChargerModeClick, onUserModeClick)
                         }
                         composable("scanRFID") {
                             val onScanRFID = { navController.navigate("chargerMode") }
@@ -51,12 +54,12 @@ class MainActivity : ComponentActivity() {
                         composable("chargerMode") {
                             ChargerPage(onArrowBackClick, chargerViewModel)
                         }
-                        composable("registration"){
-                            val onLogInClick = {navController.navigate("login")}
+                        composable("registration") {
+                            val onLogInClick = { navController.navigate("login") }
                             RegistrationPage(onArrowBackClick, onLogInClick)
                         }
-                        composable("login"){
-                            val onRegisterClick = {navController.navigate("registration")}
+                        composable("login") {
+                            val onRegisterClick = { navController.navigate("registration") }
                             LoginPage(onRegisterClick)
                         }
                     }
