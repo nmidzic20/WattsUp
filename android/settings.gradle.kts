@@ -15,3 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "WattsUp"
 include(":app")
+include(":RFID")
