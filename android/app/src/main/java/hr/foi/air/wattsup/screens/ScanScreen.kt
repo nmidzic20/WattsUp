@@ -72,6 +72,7 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit) {
             }
         },
     )
+    val targetDeviceAddress = "AC:23:3F:AB:9B:9F"
     var bluetoothStatusMessage = if (!bleManager.isBluetoothSupported()) {
         "Bluetooth is not supported on this device"
     } else if (!bleManager.isBluetoothEnabled()) {
@@ -140,7 +141,6 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceEvenly,
         ) {
-            var initiallyScanned by remember { mutableStateOf(false) }
             var scanning by remember { mutableStateOf(false) }
             var scanSuccess by remember { mutableStateOf(false) }
             var scanAttemptCoroutine by remember { mutableStateOf<Job?>(null) }
@@ -150,30 +150,45 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit) {
                 bleManager.startScanning(
                     object : ScanCallback() {
                         override fun onScanResult(callbackType: Int, result: ScanResult?) {
-                            // Handle the discovered BLE device here
-                            bleManager.stopScanning()
-                            scanning = false
-                            initiallyScanned = true
-                            scanSuccess = true
-                            userMessage = "Scan successful"
-                            Log.i("BLUETOOTH", "Scanning succeeded, result: $result")
-                            onScan()
+                            scanSuccess = if (result != null) {
+                                val device = result.device
+                                device.address == targetDeviceAddress
+                            } else {
+                                false
+                            }
+                            if (scanSuccess) {
+                                bleManager.stopScanning()
+                                scanning = false
+                                userMessage = "Scan successful"
+                                onScan()
+                            } else {
+                                // Scanning continues until right device found or until time allotted for scanning is up
+                            }
+                            Log.i("BLUETOOTH", "Scanning result: ${result?.device}")
                         }
 
                         override fun onBatchScanResults(results: List<ScanResult?>?) {
-                            // Handle a batch of scan results
-                            bleManager.stopScanning()
-                            scanning = false
-                            initiallyScanned = true
-                            scanSuccess = true
-                            userMessage = "Scan successful"
-                            Log.i("BLUETOOTH", "Scanning succeeded, batch results: $results")
-                            onScan()
+                            results?.forEach { result ->
+                                scanSuccess = if (result != null) {
+                                    val device = result.device
+                                    device.address == targetDeviceAddress
+                                } else {
+                                    false
+                                }
+                                Log.i("BLUETOOTH", "Scanning result from batch: ${result?.device}")
+                            }
+                            if (scanSuccess) {
+                                bleManager.stopScanning()
+                                scanning = false
+                                userMessage = "Scan successful"
+                                onScan()
+                            } else {
+                                // Scanning continues until right device found or until time allotted for scanning is up
+                            }
                         }
 
                         override fun onScanFailed(errorCode: Int) {
                             scanning = false
-                            initiallyScanned = true
                             scanSuccess = false
                             userMessage = "Unable to scan card"
                             Log.i("BLUETOOTH", "Scanning failed, error code: $errorCode")
@@ -189,14 +204,13 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit) {
                                 if (scanning && !scanSuccess) {
                                     bleManager.stopScanning()
                                     scanning = false
-                                    initiallyScanned = true
                                     scanSuccess = false
                                     userMessage = if (!bleManager.isBluetoothSupported()) {
                                         "Bluetooth is not supported on this device"
                                     } else if (!bleManager.isBluetoothEnabled()) {
                                         "Bluetooth is not enabled on this device"
                                     } else {
-                                        "No Bluetooth card found"
+                                        "No BLE card found"
                                     }
                                 }
                             }
@@ -226,7 +240,6 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit) {
                             scanAttemptCoroutine = CoroutineScope(Dispatchers.Default).launch {
                                 delay(5000)
                                 scanning = false
-                                initiallyScanned = true
                                 scanSuccess = false
                                 userMessage = "Unable to scan card"
                             }
@@ -262,7 +275,6 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit) {
                                 scanAttemptCoroutine?.cancel()
 
                                 scanning = false
-                                initiallyScanned = true
                                 scanSuccess = true
 
                                 onScan()
