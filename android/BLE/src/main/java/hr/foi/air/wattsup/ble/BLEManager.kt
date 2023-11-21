@@ -48,23 +48,27 @@ class BLEManager(
         private const val REQUEST_PERMISSIONS = 1
         private const val REQUEST_PERMISSIONS_CONNECT = 2
         private const val REQUEST_PERMISSIONS_SCAN = 3
+        private const val REQUEST_ENABLE_BLUETOOTH = 4
     }
 
-    private fun isBluetoothSupported(): Boolean = bluetoothAdapter != null
-    private fun isBluetoothEnabled(): Boolean = bluetoothAdapter?.isEnabled == true
+    fun isBluetoothSupported(): Boolean = bluetoothAdapter != null
+    fun isBluetoothEnabled(): Boolean = bluetoothAdapter?.isEnabled == true
 
     private fun initializeBluetooth() {
         if (!isBluetoothSupported()) {
-            Log.i("BLUETOOTH", "Not supported on this device")
+            val message = "Bluetooth not supported on this device"
+            Log.i("BLUETOOTH", message)
             return
         }
 
         if (!isBluetoothEnabled()) {
-            Log.i("BLUETOOTH", "Not enabled on this device - launch settings for user to enable")
+            val message = "Not enabled - please enable Bluetooth in Settings on your device"
+            Log.i("BLUETOOTH", message)
             return
         }
 
         Log.i("BLUETOOTH", "Supported and enabled")
+        return
     }
 
     private fun requestBluetoothPermissions(context: Context) {

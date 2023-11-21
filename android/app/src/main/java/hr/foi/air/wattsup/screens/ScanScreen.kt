@@ -1,7 +1,12 @@
 package hr.foi.air.wattsup.screens
 
+import android.Manifest
+import android.app.Activity
+import android.bluetooth.BluetoothAdapter
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,11 +24,17 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,6 +43,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
 import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.ble.BLEManager
 import hr.foi.air.wattsup.ble.BLEScanCallback
@@ -60,8 +72,56 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit) {
             }
         },
     )
+    var bluetoothStatusMessage = if (!bleManager.isBluetoothSupported()) {
+        "Bluetooth is not supported on this device"
+    } else if (!bleManager.isBluetoothEnabled()) {
+        "Bluetooth is not enabled on this device"
+    } else {
+        "Bluetooth is supported and enabled on this device"
+    }
+
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
+
+    LaunchedEffect(snackbarHostState) {
+        scope.launch {
+            val result = snackbarHostState
+                .showSnackbar(
+                    message = bluetoothStatusMessage,
+                    actionLabel = if (bleManager.isBluetoothSupported() && !bleManager.isBluetoothEnabled()) "Turn on Bluetooth" else "OK",
+                    duration = SnackbarDuration.Indefinite,
+                )
+            when (result) {
+                SnackbarResult.ActionPerformed -> {
+                    Log.i("BLUETOOTH ACTION", "Action clicked")
+                    if (bleManager.isBluetoothSupported() && !bleManager.isBluetoothEnabled()) {
+                        Log.i("BLUETOOTH ACTION", "User settings")
+
+                        val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+                        if (ActivityCompat.checkSelfPermission(
+                                context,
+                                Manifest.permission.BLUETOOTH_CONNECT,
+                            ) != PackageManager.PERMISSION_GRANTED
+                        ) {
+                        }
+                        (context as? Activity)?.startActivityForResult(
+                            enableBtIntent,
+                            4,
+                        )
+                    }
+                }
+
+                SnackbarResult.Dismissed -> {
+                }
+            }
+        }
+    }
 
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.charger_mode)) },
