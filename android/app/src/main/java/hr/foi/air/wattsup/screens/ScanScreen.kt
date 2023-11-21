@@ -1,11 +1,6 @@
 package hr.foi.air.wattsup.screens
 
 import ScanViewModel
-import android.Manifest
-import android.app.Activity
-import android.bluetooth.BluetoothAdapter
-import android.content.Intent
-import android.content.pm.PackageManager
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -31,15 +26,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.app.ActivityCompat
 import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.ui.component.CircleButton
 import hr.foi.air.wattsup.ui.component.TopAppBar
@@ -52,7 +48,9 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit, viewModel: Scan
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
     val userMessage by viewModel.userMessage.observeAsState()
-    val bluetoothStatusMessage by viewModel.bluetoothStatusMessage.observeAsState()
+    var bluetoothStatusMessage by remember {
+        mutableStateOf(viewModel.getBluetoothStatusMessage())
+    }
 
     val scanning by viewModel.scanning.observeAsState()
     val scanSuccess by viewModel.scanSuccess.observeAsState()
@@ -69,17 +67,7 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit, viewModel: Scan
             when (result) {
                 SnackbarResult.ActionPerformed -> {
                     if (viewModel.bleManager.isBluetoothSupported() && !viewModel.bleManager.isBluetoothEnabled()) {
-                        val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-                        if (ActivityCompat.checkSelfPermission(
-                                context,
-                                Manifest.permission.BLUETOOTH_CONNECT,
-                            ) != PackageManager.PERMISSION_GRANTED
-                        ) {
-                        }
-                        (context as? Activity)?.startActivityForResult(
-                            enableBtIntent,
-                            4,
-                        )
+                        viewModel.bleManager.showEnableBluetoothOption(context)
                     }
                 }
 

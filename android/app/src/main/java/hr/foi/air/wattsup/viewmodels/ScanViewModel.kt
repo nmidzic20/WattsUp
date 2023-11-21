@@ -32,9 +32,6 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
     private val _includeTestButton = MutableLiveData(true)
     val includeTestButton: LiveData<Boolean> get() = _includeTestButton
 
-    private val _bluetoothStatusMessage = MutableLiveData("")
-    val bluetoothStatusMessage: LiveData<String> get() = _bluetoothStatusMessage
-
     val bleManager = BLEManager(
         context,
         object : PermissionCallback {
@@ -48,15 +45,14 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
         },
     )
 
-    init {
-        _bluetoothStatusMessage.value = if (!bleManager.isBluetoothSupported()) {
+    fun getBluetoothStatusMessage(): String =
+        if (!bleManager.isBluetoothSupported()) {
             "Bluetooth is not supported on this device"
         } else if (!bleManager.isBluetoothEnabled()) {
             "Bluetooth is not enabled on this device"
         } else {
             "Bluetooth is supported and enabled on this device"
         }
-    }
 
     fun startBLEScanning(onScan: () -> Unit) {
         _includeTestButton.value = false

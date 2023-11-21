@@ -12,6 +12,7 @@ import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanSettings
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
@@ -137,6 +138,20 @@ class BLEManager(
             REQUEST_PERMISSIONS_CONNECT,
         )
         bluetoothGatt?.writeCharacteristic(characteristic)
+    }
+
+    fun showEnableBluetoothOption(context: Context) {
+        val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+        if (ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.BLUETOOTH_CONNECT,
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+        }
+        (context as? Activity)?.startActivityForResult(
+            enableBtIntent,
+            REQUEST_ENABLE_BLUETOOTH,
+        )
     }
 
     private fun checkAndRequestPermission(permission: String, requestCode: Int) {
