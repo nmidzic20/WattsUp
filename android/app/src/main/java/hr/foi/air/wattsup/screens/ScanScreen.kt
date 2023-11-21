@@ -1,13 +1,11 @@
 package hr.foi.air.wattsup.screens
 
+import ScanViewModel
 import android.Manifest
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
-import android.bluetooth.le.ScanCallback
-import android.bluetooth.le.ScanResult
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -32,73 +30,45 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import hr.foi.air.wattsup.R
-import hr.foi.air.wattsup.ble.BLEManager
-import hr.foi.air.wattsup.ble.BLEScanCallback
-import hr.foi.air.wattsup.ble.PermissionCallback
 import hr.foi.air.wattsup.ui.component.CircleButton
 import hr.foi.air.wattsup.ui.component.TopAppBar
-import hr.foi.air.wattsup.viewmodels.ScanViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit, viewModel: ScanViewModel) {
-    val bleManager = BLEManager(
-        LocalContext.current,
-        object : PermissionCallback {
-
-            override fun onPermissionGranted(permission: String) {
-                // Handle permission granted
-            }
-
-            override fun onPermissionDenied(permission: String) {
-                // Handle permission denied
-            }
-        },
-    )
-    val targetDeviceAddress = "AC:23:3F:AB:9B:9F"
-    var bluetoothStatusMessage = if (!bleManager.isBluetoothSupported()) {
-        "Bluetooth is not supported on this device"
-    } else if (!bleManager.isBluetoothEnabled()) {
-        "Bluetooth is not enabled on this device"
-    } else {
-        "Bluetooth is supported and enabled on this device"
-    }
-
-    var userMessage by remember { mutableStateOf("") }
-
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
+    val userMessage by viewModel.userMessage.observeAsState()
+    val bluetoothStatusMessage by viewModel.bluetoothStatusMessage.observeAsState()
+
+    val scanning by viewModel.scanning.observeAsState()
+    val scanSuccess by viewModel.scanSuccess.observeAsState()
+    val includeTestButton by viewModel.includeTestButton.observeAsState()
 
     LaunchedEffect(snackbarHostState) {
         scope.launch {
             val result = snackbarHostState
                 .showSnackbar(
-                    message = bluetoothStatusMessage,
-                    actionLabel = if (bleManager.isBluetoothSupported() && !bleManager.isBluetoothEnabled()) "Turn on Bluetooth" else "OK",
+                    message = bluetoothStatusMessage.toString(),
+                    actionLabel = if (viewModel.bleManager.isBluetoothSupported() && !viewModel.bleManager.isBluetoothEnabled()) "Turn on Bluetooth" else "OK",
                     duration = SnackbarDuration.Indefinite,
                 )
             when (result) {
                 SnackbarResult.ActionPerformed -> {
-                    if (bleManager.isBluetoothSupported() && !bleManager.isBluetoothEnabled()) {
+                    if (viewModel.bleManager.isBluetoothSupported() && !viewModel.bleManager.isBluetoothEnabled()) {
                         val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
                         if (ActivityCompat.checkSelfPermission(
                                 context,
@@ -142,88 +112,6 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit, viewModel: Scan
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceEvenly,
         ) {
-            var scanning by remember { mutableStateOf(false) }
-            var scanSuccess by remember { mutableStateOf(false) }
-            var scanAttemptCoroutine by remember { mutableStateOf<Job?>(null) }
-            var includeTestButton by remember { mutableStateOf(true) }
-
-            val onBLEClick = {
-                bleManager.startScanning(
-                    object : ScanCallback() {
-                        override fun onScanResult(callbackType: Int, result: ScanResult?) {
-                            scanSuccess = if (result != null) {
-                                val device = result.device
-                                device.address == targetDeviceAddress
-                            } else {
-                                false
-                            }
-                            if (scanSuccess) {
-                                bleManager.stopScanning()
-                                scanning = false
-                                userMessage = "Scan successful"
-                                onScan()
-                            } else {
-                                // Scanning continues until right device found or until time allotted for scanning is up
-                            }
-                            Log.i("BLUETOOTH", "Scanning result: ${result?.device}")
-                        }
-
-                        override fun onBatchScanResults(results: List<ScanResult?>?) {
-                            results?.forEach { result ->
-                                scanSuccess = if (result != null) {
-                                    val device = result.device
-                                    device.address == targetDeviceAddress
-                                } else {
-                                    false
-                                }
-                                Log.i("BLUETOOTH", "Scanning result from batch: ${result?.device}")
-                            }
-                            if (scanSuccess) {
-                                bleManager.stopScanning()
-                                scanning = false
-                                userMessage = "Scan successful"
-                                onScan()
-                            } else {
-                                // Scanning continues until right device found or until time allotted for scanning is up
-                            }
-                        }
-
-                        override fun onScanFailed(errorCode: Int) {
-                            scanning = false
-                            scanSuccess = false
-                            userMessage = "Unable to scan card"
-                            Log.i("BLUETOOTH", "Scanning failed, error code: $errorCode")
-                        }
-                    },
-                    object : BLEScanCallback {
-                        private var scanTimeoutJob: Job? = null
-
-                        override fun onScanStarted() {
-                            scanTimeoutJob = scope.launch {
-                                // Stop scanning after 5 seconds if no device is found
-                                delay(5000)
-                                if (scanning && !scanSuccess) {
-                                    bleManager.stopScanning()
-                                    scanning = false
-                                    scanSuccess = false
-                                    userMessage = if (!bleManager.isBluetoothSupported()) {
-                                        "Bluetooth is not supported on this device"
-                                    } else if (!bleManager.isBluetoothEnabled()) {
-                                        "Bluetooth is not enabled on this device"
-                                    } else {
-                                        "No BLE card found"
-                                    }
-                                }
-                            }
-                        }
-
-                        override fun onScanStopped() {
-                            scanTimeoutJob?.cancel()
-                        }
-                    },
-                )
-            }
-
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -232,18 +120,11 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit, viewModel: Scan
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
             ) {
-                if (!scanning && !scanSuccess) {
+                if (!scanning!! && !scanSuccess!!) {
                     CircleButton(
                         "Scan RFID card",
                         {
-                            includeTestButton = true
-                            scanning = true
-                            scanAttemptCoroutine = CoroutineScope(Dispatchers.Default).launch {
-                                delay(5000)
-                                scanning = false
-                                scanSuccess = false
-                                userMessage = "Unable to scan card"
-                            }
+                            viewModel.startRFIDScanning()
                         },
                         null,
                         null,
@@ -256,9 +137,7 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit, viewModel: Scan
                     CircleButton(
                         "Scan BLE card",
                         {
-                            includeTestButton = false
-                            scanning = true
-                            onBLEClick()
+                            viewModel.startBLEScanning(onScan)
                         },
                         null,
                         null,
@@ -269,24 +148,19 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit, viewModel: Scan
                     // This button is only for testing purposes in place of touching the phone
                     // with a real RFID card, will be replaced with logic to detect RFID cards
                     // once we can test with them
-                    if (includeTestButton) {
+                    if (includeTestButton == true) {
                         Button(
                             content = { Text(text = "Click for successful scan or wait 5 seconds") },
                             onClick = {
-                                scanAttemptCoroutine?.cancel()
-
-                                scanning = false
-                                scanSuccess = true
-
-                                onScan()
+                                viewModel.cancelScanAttempt(onScan)
                             },
                             modifier = Modifier.padding(vertical = 30.dp),
                         )
                     }
                 }
                 Text(
-                    text = if (!scanning) {
-                        userMessage
+                    text = if (!scanning!!) {
+                        userMessage!!
                     } else {
                         "Scanning for card..."
                     },
@@ -295,10 +169,4 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit, viewModel: Scan
             }
         }
     }
-}
-
-@Preview
-@Composable
-fun ScanScreenPreview() {
-    ScanScreen({}, {}, ScanViewModel())
 }

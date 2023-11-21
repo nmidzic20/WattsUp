@@ -1,5 +1,6 @@
 package hr.foi.air.wattsup
 
+import ScanViewModel
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -18,7 +19,6 @@ import hr.foi.air.wattsup.screens.RegistrationScreen
 import hr.foi.air.wattsup.screens.ScanScreen
 import hr.foi.air.wattsup.ui.theme.WattsUpTheme
 import hr.foi.air.wattsup.viewmodels.ChargerViewModel
-import hr.foi.air.wattsup.viewmodels.ScanViewModel
 
 class MainActivity : ComponentActivity() {
     private val chargerViewModel: ChargerViewModel by viewModels()
