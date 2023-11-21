@@ -1,6 +1,5 @@
 package hr.foi.air.wattsup.pages
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -26,21 +25,25 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hr.foi.air.wattsup.R
+import hr.foi.air.wattsup.rfid.RFIDManager
+import hr.foi.air.wattsup.rfid.RFIDScanResult
 import hr.foi.air.wattsup.ui.component.CircleButton
 import hr.foi.air.wattsup.ui.component.TopAppBar
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScanRFIDPage(onArrowBackClick: () -> Unit, onScanRFID: () -> Unit) {
+    val rfidManager = RFIDManager(
+        LocalContext.current
+    )
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -65,6 +68,46 @@ fun ScanRFIDPage(onArrowBackClick: () -> Unit, onScanRFID: () -> Unit) {
             var scanning by remember { mutableStateOf(false) }
             var scanSuccess by remember { mutableStateOf(false) }
             var scanAttemptCoroutine by remember { mutableStateOf<Job?>(null) }
+            var includeTestButton by remember { mutableStateOf(true) }
+            var scanResultText by remember { mutableStateOf("") }
+
+            val onRFIDClick = {
+                rfidManager.scanRFID { result ->
+                    when (result) {
+                        is RFIDScanResult.ValidCard -> {
+                            scanning = false
+                            initiallyScanned = true
+                            scanSuccess = true
+                            onScanRFID()
+                        }
+                        is RFIDScanResult.InvalidCard -> {
+                            scanResultText = "Register RFID card in User mode"
+                            scanning = false
+                            initiallyScanned = true
+                            scanSuccess = false
+                        }
+                        is RFIDScanResult.NothingScanned -> {
+                            scanResultText = "RFID card not detected"
+                            scanning = false
+                            initiallyScanned = true
+                            scanSuccess = false
+                        }
+                        is RFIDScanResult.NotSupported -> {
+                            scanResultText = "Scanning RFID is not supported on this phone"
+                            scanning = false
+                            initiallyScanned = true
+                            scanSuccess = false
+                        }
+                        is RFIDScanResult.NFCTurnedOff -> {
+                            scanResultText = "Please turn on NFC"
+                            scanning = false
+                            initiallyScanned = true
+                            scanSuccess = false
+                        }
+                    }
+                }
+            }
+
 
             Column(
                 modifier = Modifier
@@ -78,18 +121,14 @@ fun ScanRFIDPage(onArrowBackClick: () -> Unit, onScanRFID: () -> Unit) {
                     CircleButton(
                         "Scan RFID card",
                         {
+                            includeTestButton = false
                             scanning = true
-                            scanAttemptCoroutine = CoroutineScope(Dispatchers.Default).launch {
-                                delay(5000)
-                                scanning = false
-                                initiallyScanned = true
-                                scanSuccess = false
-                            }
-                            Log.i("MSG", "Coroutine " + scanAttemptCoroutine?.isActive)
+                            onRFIDClick()
                         },
                         null,
                         null,
-                        Modifier.size(220.dp)
+                        Modifier
+                            .size(220.dp)
                             .padding(16.dp),
                     )
                     Spacer(
@@ -99,19 +138,21 @@ fun ScanRFIDPage(onArrowBackClick: () -> Unit, onScanRFID: () -> Unit) {
                     // This button is only for testing purposes in place of touching the phone
                     // with a real RFID card, will be replaced with logic to detect RFID cards
                     // once we can test with them
-                    Button(
-                        content = { Text(text = "Click for successful scan or wait 5 seconds") },
-                        onClick = {
-                            scanAttemptCoroutine?.cancel()
+                    if (includeTestButton) {
+                        Button(
+                            content = { Text(text = "Click for successful scan or wait 5 seconds") },
+                            onClick = {
+                                scanAttemptCoroutine?.cancel()
 
-                            scanning = false
-                            initiallyScanned = true
-                            scanSuccess = true
+                                scanning = false
+                                initiallyScanned = true
+                                scanSuccess = true
 
-                            onScanRFID()
-                        },
-                        modifier = Modifier.padding(vertical = 30.dp),
-                    )
+                                onScanRFID()
+                            },
+                            modifier = Modifier.padding(vertical = 30.dp),
+                        )
+                    }
                 }
                 Text(
                     text = if (!scanning) {
@@ -120,7 +161,7 @@ fun ScanRFIDPage(onArrowBackClick: () -> Unit, onScanRFID: () -> Unit) {
                         } else if (scanSuccess) {
                             "Scan successful"
                         } else {
-                            "Unable to scan RFID card"
+                            scanResultText
                         }
                     } else {
                         "Scanning for RFID card..."
