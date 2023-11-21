@@ -94,10 +94,7 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit) {
                 )
             when (result) {
                 SnackbarResult.ActionPerformed -> {
-                    Log.i("BLUETOOTH ACTION", "Action clicked")
                     if (bleManager.isBluetoothSupported() && !bleManager.isBluetoothEnabled()) {
-                        Log.i("BLUETOOTH ACTION", "User settings")
-
                         val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
                         if (ActivityCompat.checkSelfPermission(
                                 context,
@@ -178,14 +175,24 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit) {
                         }
                     },
                     object : BLEScanCallback {
+                        private var scanTimeoutJob: Job? = null
+
                         override fun onScanStarted() {
-                            // Handle scan started, e.g., show loading indicator
-                            Log.i("BLUETOOTH", "Scanning started")
+                            scanTimeoutJob = scope.launch {
+                                // Stop scanning after 10 seconds if no device is found
+                                delay(10000)
+                                if (scanning && !scanSuccess) {
+                                    bleManager.stopScanning()
+                                    scanning = false
+                                    initiallyScanned = true
+                                    scanSuccess = false
+                                    bluetoothStatusMessage = "No Bluetooth device found"
+                                }
+                            }
                         }
 
                         override fun onScanStopped() {
-                            // Handle scan stopped, e.g., hide loading indicator
-                            Log.i("BLUETOOTH", "Scanning stopped")
+                            scanTimeoutJob?.cancel()
                         }
                     },
                 )
@@ -211,7 +218,6 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit) {
                                 initiallyScanned = true
                                 scanSuccess = false
                             }
-                            Log.i("MSG", "Coroutine " + scanAttemptCoroutine?.isActive)
                         },
                         null,
                         null,
