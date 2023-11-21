@@ -49,7 +49,7 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit, viewModel: Scan
     val context = LocalContext.current
     val userMessage by viewModel.userMessage.observeAsState()
     var bluetoothStatusMessage by remember {
-        mutableStateOf(viewModel.getBluetoothStatusMessage())
+        mutableStateOf(viewModel.getBluetoothStatusMessage(false))
     }
 
     val scanning by viewModel.scanning.observeAsState()
@@ -140,7 +140,7 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit, viewModel: Scan
                         Button(
                             content = { Text(text = "Click for successful scan or wait 5 seconds") },
                             onClick = {
-                                viewModel.cancelScanAttempt(onScan)
+                                viewModel.cancelRFIDScanAttempt(onScan)
                             },
                             modifier = Modifier.padding(vertical = 30.dp),
                         )

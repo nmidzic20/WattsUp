@@ -14,9 +14,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class ScanViewModel(application: Application) : AndroidViewModel(application) {
-    private val targetDeviceAddress = "AC:23:3F:AB:9B:9F"
-    private var scanAttemptCoroutine: Job? = null
-    private var scanTimeoutJob: Job? = null
+    private val BLEtargetDeviceAddress = "AC:23:3F:AB:9B:9F"
+    private var RFIDscanTimeoutJob: Job? = null
+    private var BLEscanTimeoutJob: Job? = null
 
     private val context = application.applicationContext
 
@@ -45,13 +45,13 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
         },
     )
 
-    fun getBluetoothStatusMessage(): String =
+    fun getBluetoothStatusMessage(scanning: Boolean): String =
         if (!bleManager.isBluetoothSupported()) {
             "Bluetooth is not supported on this device"
         } else if (!bleManager.isBluetoothEnabled()) {
             "Bluetooth is not enabled on this device"
         } else {
-            "Bluetooth is supported and enabled on this device"
+            if (scanning) "No BLE card found" else "Bluetooth is supported and enabled on this device"
         }
 
     fun startBLEScanning(onScan: () -> Unit) {
@@ -79,37 +79,31 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
             },
             object : BLEScanCallback {
                 override fun onScanStarted() {
-                    scanTimeoutJob = viewModelScope.launch {
+                    BLEscanTimeoutJob = viewModelScope.launch {
                         // Stop scanning after 5 seconds if no device is found
                         delay(5000)
                         if (_scanning.value == true && !_scanSuccess.value!!) {
                             bleManager.stopScanning()
                             _scanning.value = false
                             _scanSuccess.value = false
-                            _userMessage.value = if (!bleManager.isBluetoothSupported()) {
-                                "Bluetooth is not supported on this device"
-                            } else if (!bleManager.isBluetoothEnabled()) {
-                                "Bluetooth is not enabled on this device"
-                            } else {
-                                "No BLE card found"
-                            }
+                            _userMessage.value = getBluetoothStatusMessage(true)
                         }
                     }
                 }
 
                 override fun onScanStopped() {
-                    scanTimeoutJob?.cancel()
+                    BLEscanTimeoutJob?.cancel()
                 }
             },
         )
     }
 
     fun startRFIDScanning() {
-        scanTimeoutJob?.cancel()
+        BLEscanTimeoutJob?.cancel()
 
         _includeTestButton.value = true
         _scanning.value = true
-        scanAttemptCoroutine = viewModelScope.launch {
+        RFIDscanTimeoutJob = viewModelScope.launch {
             delay(5000)
             _scanning.value = false
             _scanSuccess.value = false
@@ -117,8 +111,8 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun cancelScanAttempt(onScan: () -> Unit) {
-        scanAttemptCoroutine?.cancel()
+    fun cancelRFIDScanAttempt(onScan: () -> Unit) {
+        RFIDscanTimeoutJob?.cancel()
         _scanning.value = false
         _scanSuccess.value = true
         _userMessage.value = "Scan successful"
@@ -131,7 +125,7 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
     private fun handleBLEScanResult(result: ScanResult?, onScan: () -> Unit) {
         if (result != null) {
             val device = result.device
-            if (device.address == targetDeviceAddress) {
+            if (device.address == BLEtargetDeviceAddress) {
                 // The target BLE device is detected
                 _scanSuccess.value = true
                 bleManager.stopScanning()
