@@ -80,6 +80,8 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit) {
         "Bluetooth is supported and enabled on this device"
     }
 
+    var userMessage by remember { mutableStateOf("") }
+
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
@@ -153,6 +155,7 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit) {
                             scanning = false
                             initiallyScanned = true
                             scanSuccess = true
+                            userMessage = "Scan successful"
                             Log.i("BLUETOOTH", "Scanning succeeded, result: $result")
                             onScan()
                         }
@@ -163,6 +166,7 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit) {
                             scanning = false
                             initiallyScanned = true
                             scanSuccess = true
+                            userMessage = "Scan successful"
                             Log.i("BLUETOOTH", "Scanning succeeded, batch results: $results")
                             onScan()
                         }
@@ -171,6 +175,7 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit) {
                             scanning = false
                             initiallyScanned = true
                             scanSuccess = false
+                            userMessage = "Unable to scan card"
                             Log.i("BLUETOOTH", "Scanning failed, error code: $errorCode")
                         }
                     },
@@ -179,14 +184,20 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit) {
 
                         override fun onScanStarted() {
                             scanTimeoutJob = scope.launch {
-                                // Stop scanning after 10 seconds if no device is found
-                                delay(10000)
+                                // Stop scanning after 5 seconds if no device is found
+                                delay(5000)
                                 if (scanning && !scanSuccess) {
                                     bleManager.stopScanning()
                                     scanning = false
                                     initiallyScanned = true
                                     scanSuccess = false
-                                    bluetoothStatusMessage = "No Bluetooth device found"
+                                    userMessage = if (!bleManager.isBluetoothSupported()) {
+                                        "Bluetooth is not supported on this device"
+                                    } else if (!bleManager.isBluetoothEnabled()) {
+                                        "Bluetooth is not enabled on this device"
+                                    } else {
+                                        "No Bluetooth card found"
+                                    }
                                 }
                             }
                         }
@@ -217,6 +228,7 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit) {
                                 scanning = false
                                 initiallyScanned = true
                                 scanSuccess = false
+                                userMessage = "Unable to scan card"
                             }
                         },
                         null,
@@ -261,13 +273,7 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit) {
                 }
                 Text(
                     text = if (!scanning) {
-                        if (!initiallyScanned) {
-                            ""
-                        } else if (scanSuccess) {
-                            "Scan successful"
-                        } else {
-                            "Unable to scan card"
-                        }
+                        userMessage
                     } else {
                         "Scanning for card..."
                     },
