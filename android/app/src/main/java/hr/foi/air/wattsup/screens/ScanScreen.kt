@@ -50,6 +50,7 @@ import hr.foi.air.wattsup.ble.BLEScanCallback
 import hr.foi.air.wattsup.ble.PermissionCallback
 import hr.foi.air.wattsup.ui.component.CircleButton
 import hr.foi.air.wattsup.ui.component.TopAppBar
+import hr.foi.air.wattsup.viewmodels.ScanViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -58,7 +59,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit) {
+fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit, viewModel: ScanViewModel) {
     val bleManager = BLEManager(
         LocalContext.current,
         object : PermissionCallback {
@@ -299,5 +300,5 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit) {
 @Preview
 @Composable
 fun ScanScreenPreview() {
-    ScanScreen({}, {})
+    ScanScreen({}, {}, ScanViewModel())
 }

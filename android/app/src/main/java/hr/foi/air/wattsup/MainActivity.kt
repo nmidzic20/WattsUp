@@ -18,9 +18,11 @@ import hr.foi.air.wattsup.screens.RegistrationScreen
 import hr.foi.air.wattsup.screens.ScanScreen
 import hr.foi.air.wattsup.ui.theme.WattsUpTheme
 import hr.foi.air.wattsup.viewmodels.ChargerViewModel
+import hr.foi.air.wattsup.viewmodels.ScanViewModel
 
 class MainActivity : ComponentActivity() {
     private val chargerViewModel: ChargerViewModel by viewModels()
+    private val scanViewModel: ScanViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,7 +48,7 @@ class MainActivity : ComponentActivity() {
                         composable("scanRFID") {
                             val onScanRFID = { navController.navigate("chargerMode") }
 
-                            ScanScreen(onArrowBackClick, onScanRFID)
+                            ScanScreen(onArrowBackClick, onScanRFID, scanViewModel)
                         }
                         composable("chargerMode") {
                             ChargerScreen(onArrowBackClick, chargerViewModel)
