@@ -55,6 +55,14 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
         }
 
     fun startBLEScanning(onScan: () -> Unit) {
+        if (!bleManager.isBluetoothEnabled()) {
+            bleManager.stopScanning()
+            _scanning.value = false
+            _scanSuccess.value = false
+            _userMessage.value = "Bluetooth is not enabled on this device"
+            return
+        }
+
         _includeTestButton.value = false
         _scanning.value = true
 
@@ -125,6 +133,7 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
     private fun handleBLEScanResult(result: ScanResult?, onScan: () -> Unit) {
         if (result != null) {
             val device = result.device
+            Log.i("BLUETOOTH", "Scanned: $device")
             if (device.address == BLEtargetDeviceAddress) {
                 // The target BLE device is detected
                 _scanSuccess.value = true
