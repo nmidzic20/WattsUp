@@ -55,6 +55,14 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
         }
 
     fun startBLEScanning(onScan: () -> Unit) {
+        if (!bleManager.isBluetoothEnabled()) {
+            bleManager.stopScanning()
+            _scanning.value = false
+            _scanSuccess.value = false
+            _userMessage.value = "Bluetooth is not enabled on this device"
+            return
+        }
+
         _includeTestButton.value = false
         _scanning.value = true
 
