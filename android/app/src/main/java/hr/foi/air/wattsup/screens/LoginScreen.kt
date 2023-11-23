@@ -1,4 +1,4 @@
-package hr.foi.air.wattsup.pages
+package hr.foi.air.wattsup.screens
 
 import android.annotation.SuppressLint
 import android.util.Log
@@ -48,7 +48,7 @@ private val authService = NetworkService.authService
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginPage(onRegisterClick: () -> Unit) {
+fun LoginScreen(onRegisterClick: () -> Unit) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -202,5 +202,5 @@ fun LoginView(onRegisterClick: () -> Unit) {
 @Preview(showBackground = false)
 @Composable
 fun LoginPreview() {
-    LoginPage {}
+    LoginScreen {}
 }

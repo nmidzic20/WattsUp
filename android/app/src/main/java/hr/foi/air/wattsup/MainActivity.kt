@@ -1,5 +1,6 @@
 package hr.foi.air.wattsup
 
+import ScanViewModel
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -11,16 +12,17 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import hr.foi.air.wattsup.pages.ChargerPage
-import hr.foi.air.wattsup.pages.LandingPage
-import hr.foi.air.wattsup.pages.LoginPage
-import hr.foi.air.wattsup.pages.RegistrationPage
-import hr.foi.air.wattsup.pages.ScanRFIDPage
+import hr.foi.air.wattsup.screens.ChargerScreen
+import hr.foi.air.wattsup.screens.LandingScreen
+import hr.foi.air.wattsup.screens.LoginScreen
+import hr.foi.air.wattsup.screens.RegistrationScreen
+import hr.foi.air.wattsup.screens.ScanScreen
 import hr.foi.air.wattsup.ui.theme.WattsUpTheme
 import hr.foi.air.wattsup.viewmodels.ChargerViewModel
 
 class MainActivity : ComponentActivity() {
     private val chargerViewModel: ChargerViewModel by viewModels()
+    private val scanViewModel: ScanViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,25 +41,25 @@ class MainActivity : ComponentActivity() {
                     NavHost(navController = navController, startDestination = "landing") {
                         composable("landing") {
                             val onChargerModeClick = { navController.navigate("scanRFID") }
-                            val onUserModeClick= { navController.navigate("login") }
+                            val onUserModeClick = { navController.navigate("login") }
 
-                            LandingPage(onChargerModeClick,onUserModeClick)
+                            LandingScreen(onChargerModeClick, onUserModeClick)
                         }
                         composable("scanRFID") {
                             val onScanRFID = { navController.navigate("chargerMode") }
 
-                            ScanRFIDPage(onArrowBackClick, onScanRFID)
+                            ScanScreen(onArrowBackClick, onScanRFID, scanViewModel)
                         }
                         composable("chargerMode") {
-                            ChargerPage(onArrowBackClick, chargerViewModel)
+                            ChargerScreen(onArrowBackClick, chargerViewModel)
                         }
-                        composable("registration"){
-                            val onLogInClick = {navController.navigate("login")}
-                            RegistrationPage(onArrowBackClick, onLogInClick)
+                        composable("registration") {
+                            val onLogInClick = { navController.navigate("login") }
+                            RegistrationScreen(onArrowBackClick, onLogInClick)
                         }
-                        composable("login"){
-                            val onRegisterClick = {navController.navigate("registration")}
-                            LoginPage(onRegisterClick)
+                        composable("login") {
+                            val onRegisterClick = { navController.navigate("registration") }
+                            LoginScreen(onRegisterClick)
                         }
                     }
                 }
