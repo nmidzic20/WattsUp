@@ -125,6 +125,7 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
     private fun handleBLEScanResult(result: ScanResult?, onScan: () -> Unit) {
         if (result != null) {
             val device = result.device
+            Log.i("BLUETOOTH", "Scanned: $device")
             if (device.address == BLEtargetDeviceAddress) {
                 // The target BLE device is detected
                 _scanSuccess.value = true
