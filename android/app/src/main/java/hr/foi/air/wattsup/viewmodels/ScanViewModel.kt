@@ -29,7 +29,42 @@ class ScanViewModel(
     private val BLEtargetDeviceAddress = "AC:23:3F:AB:9B:9F"
     private val _cardAddressList = MutableLiveData<List<String>>(emptyList())
 
+    private var RFIDscanTimeoutJob: Job? = null
+    private var BLEscanTimeoutJob: Job? = null
+
+    private val context = application.applicationContext
+
+    private val _scanning = MutableLiveData(false)
+    val scanning: LiveData<Boolean> get() = _scanning
+
+    private val _scanSuccess = MutableLiveData(false)
+    val scanSuccess: LiveData<Boolean> get() = _scanSuccess
+
+    private val _userMessage = MutableLiveData("")
+    val userMessage: LiveData<String> get() = _userMessage
+
+    private val _includeTestButton = MutableLiveData(true)
+
+    val includeTestButton: LiveData<Boolean> get() = _includeTestButton
+
+    val bleManager = BLEManager(
+        context,
+        object : PermissionCallback {
+            override fun onPermissionGranted(permission: String) {
+                // Handle permission granted
+            }
+
+            override fun onPermissionDenied(permission: String) {
+                // Handle permission denied
+            }
+        },
+    )
+
     init {
+        refreshCardAddressList()
+    }
+
+    fun refreshCardAddressList() {
         viewModelScope.launch {
             cardService.getCards().enqueue(object : Callback<List<Card?>> {
                 override fun onResponse(call: Call<List<Card?>>, response: Response<List<Card?>>) {
@@ -55,36 +90,6 @@ class ScanViewModel(
             })
         }
     }
-
-    private var RFIDscanTimeoutJob: Job? = null
-    private var BLEscanTimeoutJob: Job? = null
-
-    private val context = application.applicationContext
-
-    private val _scanning = MutableLiveData(false)
-    val scanning: LiveData<Boolean> get() = _scanning
-
-    private val _scanSuccess = MutableLiveData(false)
-    val scanSuccess: LiveData<Boolean> get() = _scanSuccess
-
-    private val _userMessage = MutableLiveData("")
-    val userMessage: LiveData<String> get() = _userMessage
-
-    private val _includeTestButton = MutableLiveData(true)
-    val includeTestButton: LiveData<Boolean> get() = _includeTestButton
-
-    val bleManager = BLEManager(
-        context,
-        object : PermissionCallback {
-            override fun onPermissionGranted(permission: String) {
-                // Handle permission granted
-            }
-
-            override fun onPermissionDenied(permission: String) {
-                // Handle permission denied
-            }
-        },
-    )
 
     fun getBluetoothStatusMessage(scanning: Boolean): String =
         if (!bleManager.isBluetoothSupported()) {
