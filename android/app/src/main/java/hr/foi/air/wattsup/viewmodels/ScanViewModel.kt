@@ -82,11 +82,13 @@ class ScanViewModel(
                     } else {
                         val errorBody = response.errorBody()
                         Log.i("CARD", "Handle error, error: $errorBody")
+                        _userMessage.value = "Error when fetching cards: $errorBody"
                     }
                 }
 
                 override fun onFailure(call: Call<List<Card?>>, t: Throwable) {
                     Log.i("CARD", "Network request failed")
+                    _userMessage.value = "Network request failed (turn on backend first)"
                 }
             })
         }
@@ -98,7 +100,7 @@ class ScanViewModel(
         } else if (!bleManager.isBluetoothEnabled()) {
             "Bluetooth is not enabled on this device"
         } else {
-            if (scanning) "No BLE card found" else "Bluetooth is supported and enabled on this device"
+            if (scanning) "No registered BLE card found" else "Bluetooth is supported and enabled on this device"
         }
 
     fun startBLEScanning(onScan: () -> Unit) {
