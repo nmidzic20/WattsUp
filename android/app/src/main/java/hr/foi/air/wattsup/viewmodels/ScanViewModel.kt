@@ -9,12 +9,53 @@ import androidx.lifecycle.viewModelScope
 import hr.foi.air.wattsup.ble.BLEManager
 import hr.foi.air.wattsup.ble.BLEScanCallback
 import hr.foi.air.wattsup.ble.PermissionCallback
+import hr.foi.air.wattsup.network.CardService
+import hr.foi.air.wattsup.network.NetworkService
+import hr.foi.air.wattsup.network.models.Card
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
-class ScanViewModel(application: Application) : AndroidViewModel(application) {
+class ScanViewModel(
+    application: Application,
+) :
+    AndroidViewModel(application) {
+
+    private val cardService: CardService = NetworkService.cardService
+
     private val BLEtargetDeviceAddress = "AC:23:3F:AB:9B:9F"
+    private val _cardAddressList = MutableLiveData<List<String>>(emptyList())
+
+    init {
+        viewModelScope.launch {
+            cardService.getCards().enqueue(object : Callback<List<Card?>> {
+                override fun onResponse(call: Call<List<Card?>>, response: Response<List<Card?>>) {
+                    if (response.isSuccessful) {
+                        val cardList: List<Card?>? = response.body()
+                        if (cardList != null) {
+                            _cardAddressList.value =
+                                cardList.map { card -> card?.value ?: "" }
+                            Log.i("CARD", "Received cards, cards addresses: ")
+                            _cardAddressList.value!!.forEach { Log.i("CARD ADDR", "$it") }
+                        } else {
+                            Log.i("CARD", "Received cards as null")
+                        }
+                    } else {
+                        val errorBody = response.errorBody()
+                        Log.i("CARD", "Handle error, error: $errorBody")
+                    }
+                }
+
+                override fun onFailure(call: Call<List<Card?>>, t: Throwable) {
+                    Log.i("CARD", "Network request failed, handle")
+                }
+            })
+        }
+    }
+
     private var RFIDscanTimeoutJob: Job? = null
     private var BLEscanTimeoutJob: Job? = null
 
@@ -134,7 +175,7 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
         if (result != null) {
             val device = result.device
             Log.i("BLUETOOTH", "Scanned: $device")
-            if (device.address == BLEtargetDeviceAddress) {
+            if (_cardAddressList.value!!.contains(device.address)) {
                 // The target BLE device is detected
                 _scanSuccess.value = true
                 bleManager.stopScanning()

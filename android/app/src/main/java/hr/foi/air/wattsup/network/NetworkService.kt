@@ -8,7 +8,7 @@ import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
 
 object NetworkService {
-    private const val BASE_URL = "https://192.168.56.1:32770/"
+    private const val BASE_URL = "https://192.168.1.4:32770/"
 
     /*private var instance: Retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)
@@ -51,4 +51,5 @@ object NetworkService {
     }
 
     val authService: AuthenticationService by lazy { instance.create(AuthenticationService::class.java) }
+    val cardService: CardService by lazy { instance.create(CardService::class.java) }
 }
