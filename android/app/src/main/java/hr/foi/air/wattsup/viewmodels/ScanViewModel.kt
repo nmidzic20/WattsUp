@@ -12,6 +12,7 @@ import hr.foi.air.wattsup.ble.PermissionCallback
 import hr.foi.air.wattsup.network.CardService
 import hr.foi.air.wattsup.network.NetworkService
 import hr.foi.air.wattsup.network.models.Card
+import hr.foi.air.wattsup.utils.HexUtils
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -74,7 +75,7 @@ class ScanViewModel(
                             _cardAddressList.value =
                                 cardList.map { card -> card?.value ?: "" }
                             Log.i("CARD", "Received cards, cards addresses: ")
-                            _cardAddressList.value!!.forEach { Log.i("CARD ADDR", "$it") }
+                            _cardAddressList.value!!.forEach { Log.i("CARD ADDRESS", "$it") }
                         } else {
                             Log.i("CARD", "Received cards as null")
                         }
@@ -85,7 +86,7 @@ class ScanViewModel(
                 }
 
                 override fun onFailure(call: Call<List<Card?>>, t: Throwable) {
-                    Log.i("CARD", "Network request failed, handle")
+                    Log.i("CARD", "Network request failed")
                 }
             })
         }
@@ -179,8 +180,10 @@ class ScanViewModel(
     private fun handleBLEScanResult(result: ScanResult?, onScan: () -> Unit) {
         if (result != null) {
             val device = result.device
-            Log.i("BLUETOOTH", "Scanned: $device")
-            if (_cardAddressList.value!!.contains(device.address)) {
+            val deviceAddress = HexUtils.formatHexToPrefix(device.address)
+            Log.i("BLUETOOTH", "Scanned: $device $deviceAddress")
+
+            if (deviceAddressMatchesDatabaseCardValue(deviceAddress)) {
                 // The target BLE device is detected
                 _scanSuccess.value = true
                 bleManager.stopScanning()
@@ -192,4 +195,7 @@ class ScanViewModel(
             }
         }
     }
+
+    private fun deviceAddressMatchesDatabaseCardValue(deviceAddress: String): Boolean =
+        _cardAddressList.value!!.any { HexUtils.compareHexStrings(it, deviceAddress) }
 }
