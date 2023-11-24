@@ -19,9 +19,6 @@ class RFIDManager(
 ) {
     private val nfcManager = context.getSystemService(Context.NFC_SERVICE) as NfcManager?
     private val nfcAdapter: NfcAdapter? = nfcManager?.defaultAdapter
-    private var pendingIntent: PendingIntent? = null
-    private var filters: Array<IntentFilter>? = null
-    private var techLists: Array<Array<String>>? = null
 
     init {
         initializeRFID()
@@ -52,27 +49,6 @@ class RFIDManager(
             return
         }
         Log.i("RFID", "RFID supported and enabled")
-
-        val intent = Intent(context, javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-        pendingIntent = PendingIntent.getActivity(context, 0, intent, 0)
-
-        filters = arrayOf(IntentFilter(NfcAdapter.ACTION_TECH_DISCOVERED))
-        techLists = arrayOf(arrayOf(NfcA::class.java.name))
-
-        disableNFC()
-    }
-
-    private fun enableNFC() {
-        nfcAdapter?.enableForegroundDispatch(
-            context as Activity,
-            pendingIntent,
-            filters,
-            techLists
-        )
-    }
-
-    private fun disableNFC() {
-        nfcAdapter?.disableForegroundDispatch(context as Activity)
     }
 
     fun showEnableRFIDOption(context: Context) {
@@ -84,11 +60,17 @@ class RFIDManager(
     }
 
     fun startScanning(scanCallback: ScanCallback, rfidScanCallback: RFIDScanCallback?) {
-        enableNFC()
-
+        try {
+            val intent = Intent(context, NfcReaderActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            context.startActivity(intent)
+        }
+        catch (e: Exception) {
+            Log.e("RFID", "Error: " + e.message)
+        }
     }
 
     fun stopScanning() {
-        disableNFC()
+
     }
 }

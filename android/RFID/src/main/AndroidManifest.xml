@@ -3,9 +3,10 @@
     <uses-permission android:name="android.permission.NFC" />
     <application>
         <activity android:name=".RFIDManager" android:exported="true">
+        </activity>
+        <activity android:name=".NfcReaderActivity" android:launchMode="singleTop" android:exported="true" android:theme="@android:style/Theme.Translucent.NoTitleBar">
             <intent-filter>
                 <action android:name="android.nfc.action.TECH_DISCOVERED"/>
-                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
             <meta-data
                 android:name="android.nfc.action.TECH_DISCOVERED"
