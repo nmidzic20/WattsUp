@@ -100,7 +100,7 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
     var lastName: String by remember { mutableStateOf("") }
     var email: String by remember { mutableStateOf("") }
     var password: String by remember { mutableStateOf("") }
-    var card: String by remember { mutableStateOf("") }
+    var card: Card? by remember { mutableStateOf(null) }
     var invalidEmail by remember { mutableStateOf(false) }
     var invalidPassword by remember { mutableStateOf(false) }
 
@@ -146,13 +146,15 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
             modifier = Modifier
                 .padding(0.dp, 15.dp)
                 .width(200.dp),
-            value = card,
-            onValueChange = { card = it },
+            value = card?.value ?: "",
+            onValueChange = { card = Card(it) },
             label = { Text(stringResource(R.string.card_label)) },
         )
         Spacer(modifier = Modifier.width(4.dp))
         ElevatedButton(
-            onClick = { /* do something */ },
+            onClick = {
+
+            },
             modifier = Modifier
                 .padding(10.dp)
                 .clip(MaterialTheme.shapes.medium),
@@ -174,7 +176,7 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
                 // TODO: implement popup with notification what went wrong
             } else {
                 authService.registerUser(
-                    RegistrationBody(firstName, lastName, email, password, checkCard(card)),
+                    RegistrationBody(firstName, lastName, email, password, card),
                 ).enqueue(
                     object : Callback<RegistrationResponseBody> {
                         override fun onResponse(
@@ -185,14 +187,14 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
 
                             if (response?.isSuccessful == true) {
                                 val responseBody = response.body()
-                                val message = responseBody!!.message
-                                Log.i("Response", message)
-                                onLogInClick
+                                val message = responseBody?.message
+                                Log.i("Response", (message ?: response).toString())
+                                onLogInClick()
                             } else {
-                                val responseBody = response!!.body()
-                                val message = responseBody!!.message
-                                Log.i("Response", message)
-                                onLogInClick
+                                val responseBody = response?.body()
+                                val message = responseBody?.message
+                                Log.i("Response", (message ?: response).toString())
+                                onLogInClick()
                             }
                         }
 
@@ -203,7 +205,7 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
                             val message = "Failed to register user"
                             Log.i("Response", message)
                             Log.i("Response", t.toString())
-                            onLogInClick
+                            onLogInClick()
                         }
                     },
                 )
@@ -272,8 +274,6 @@ fun PopupWithMessage( isOpen: Boolean, message: String, onDismiss: () -> Unit) {
     }
 
 }*/
-
-fun checkCard(cardString: String): Card? = if (cardString.isEmpty()) null else Card(cardString)
 
 @Preview(showBackground = false)
 @Composable
