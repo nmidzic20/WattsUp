@@ -7,7 +7,3 @@ data class RegistrationBody(
     val password: String,
     val card: Card?,
 )
-
-data class Card(
-    val value: String,
-)

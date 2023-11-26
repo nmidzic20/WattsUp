@@ -63,7 +63,7 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit, viewModel: Scan
         scope.launch {
             val bleResult = snackbarHostState
                 .showSnackbar(
-                    message = bluetoothStatusMessage.toString(),
+                    message = bluetoothStatusMessage,
                     actionLabel = if (viewModel.bleManager.isBluetoothSupported() && !viewModel.bleManager.isBluetoothEnabled()) "Turn on Bluetooth" else "OK",
                     duration = SnackbarDuration.Indefinite,
                 )
