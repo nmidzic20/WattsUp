@@ -12,10 +12,10 @@ import android.nfc.Tag
 import android.nfc.tech.NfcA
 import android.provider.Settings
 import android.util.Log
+import java.io.Serializable
 
 class RFIDManager(
     private val context: Context,
-    private val permissionCallback: PermissionCallbackRFID? = null,
 ) {
     private val nfcManager = context.getSystemService(Context.NFC_SERVICE) as NfcManager?
     private val nfcAdapter: NfcAdapter? = nfcManager?.defaultAdapter
@@ -59,18 +59,17 @@ class RFIDManager(
         )
     }
 
-    fun startScanning(scanCallback: ScanCallback, rfidScanCallback: RFIDScanCallback?) {
+    fun startScanning(rfidScanCallback: RFIDScanCallback?) {
         try {
+            CallbackHolder.rfidScanCallback = rfidScanCallback
+
             val intent = Intent(context, NfcReaderActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             context.startActivity(intent)
         }
         catch (e: Exception) {
             Log.e("RFID", "Error: " + e.message)
+            rfidScanCallback?.onRFIDScanError("Error starting RFID scan: ${e.message}")
         }
-    }
-
-    fun stopScanning() {
-
     }
 }
