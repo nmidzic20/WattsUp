@@ -123,7 +123,7 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
         _scanning.value = true
 
         rfidManager.startScanning(object : RFIDScanCallback {
-            override fun onRFIDScanResult(uid: String) {
+            override fun onRFIDScanResult(uid: ByteArray) {
                 handleRFIDScanResult(onScan, uid)
             }
 
@@ -169,7 +169,7 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun handleRFIDScanResult(onScan: () -> Unit, uid: String) {
+    private fun handleRFIDScanResult(onScan: () -> Unit, uid: ByteArray) {
         viewModelScope.launch(Dispatchers.Main) {
             Log.i("RFID", "UID: $uid")
             _scanSuccess.value = true

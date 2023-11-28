@@ -3,16 +3,13 @@ package hr.foi.air.wattsup.rfid
 import android.app.Activity
 import android.app.PendingIntent
 import android.content.Intent
-import android.content.IntentFilter
 import android.nfc.NfcAdapter
 import android.nfc.Tag
-import android.nfc.tech.NfcA
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.Parcelable
 import android.util.Log
-import androidx.appcompat.app.AppCompatActivity
 
 class NfcReaderActivity : Activity(), NfcAdapter.ReaderCallback {
     private var mNfcAdapter: NfcAdapter? = null
@@ -73,24 +70,14 @@ class NfcReaderActivity : Activity(), NfcAdapter.ReaderCallback {
     }
     private fun handleNfcTag(tag: Parcelable) {
         if (tag is Tag) {
-            val uidBytes: ByteArray = tag.id
-            val uidHexString: String = bytesToHexString(uidBytes)
-
-            Log.d("RFID", "NFC tag UID: $uidHexString")
-            rfidScanCallback?.onRFIDScanResult(uidHexString)
+            val uid = tag.id
+            Log.d("RFID", "NFC tag UID: $uid")
+            rfidScanCallback?.onRFIDScanResult(uid)
         } else {
             Log.e("RFID", "Invalid tag type: ${tag.javaClass.simpleName}")
             rfidScanCallback?.onRFIDScanError("Invalid tag type: ${tag.javaClass.simpleName}")
         }
         CallbackHolder.rfidScanCallback = null
         finish()
-    }
-    private fun bytesToHexString(bytes: ByteArray): String {
-        val stringBuilder = StringBuilder()
-        for (byte in bytes) {
-            stringBuilder.append(String.format("%02X", byte))
-            stringBuilder.append(":")
-        }
-        return stringBuilder.toString()
     }
 }
