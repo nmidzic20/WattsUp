@@ -19,6 +19,7 @@ import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ComponentActivity
 import androidx.core.content.ContextCompat
+import hr.foi.air.wattsup.core.CardScanCallback
 
 class BLEManager(
     private val context: Context,
@@ -86,7 +87,7 @@ class BLEManager(
         }
     }
 
-    fun startScanning(scanCallback: ScanCallback, bleScanCallback: BLEScanCallback?) {
+    fun startScanning(scanCallback: ScanCallback, bleScanCallback: CardScanCallback?) {
         this.scanCallback = scanCallback
 
         val scanFilters = mutableListOf<ScanFilter>()

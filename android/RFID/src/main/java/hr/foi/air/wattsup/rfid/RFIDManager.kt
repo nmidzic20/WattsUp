@@ -1,18 +1,12 @@
 package hr.foi.air.wattsup.rfid
 
 import android.app.Activity
-import android.app.PendingIntent
-import android.bluetooth.le.ScanCallback
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.nfc.NfcAdapter
 import android.nfc.NfcManager
-import android.nfc.Tag
-import android.nfc.tech.NfcA
 import android.provider.Settings
 import android.util.Log
-import java.io.Serializable
 
 class RFIDManager(
     private val context: Context,
@@ -66,8 +60,7 @@ class RFIDManager(
             val intent = Intent(context, NfcReaderActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             context.startActivity(intent)
-        }
-        catch (e: Exception) {
+        } catch (e: Exception) {
             Log.e("RFID", "Error: " + e.message)
             rfidScanCallback?.onRFIDScanError("Error starting RFID scan: ${e.message}")
         }

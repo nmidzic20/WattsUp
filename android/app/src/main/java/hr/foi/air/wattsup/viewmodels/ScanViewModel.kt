@@ -7,8 +7,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import hr.foi.air.wattsup.ble.BLEManager
-import hr.foi.air.wattsup.ble.BLEScanCallback
 import hr.foi.air.wattsup.ble.PermissionCallback
+import hr.foi.air.wattsup.core.CardScanCallback
 import hr.foi.air.wattsup.network.CardService
 import hr.foi.air.wattsup.network.NetworkService
 import hr.foi.air.wattsup.network.models.Card
@@ -148,7 +148,7 @@ class ScanViewModel(
                     Log.i("BLUETOOTH", "Scanning failed, error code: $errorCode")
                 }
             },
-            object : BLEScanCallback {
+            object : CardScanCallback {
                 override fun onScanStarted() {
                     BLEscanTimeoutJob = viewModelScope.launch {
                         // Stop scanning after 5 seconds if no device is found

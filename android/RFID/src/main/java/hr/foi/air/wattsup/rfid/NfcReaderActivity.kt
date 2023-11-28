@@ -39,12 +39,12 @@ class NfcReaderActivity : Activity(), NfcAdapter.ReaderCallback {
             this,
             this,
             NfcAdapter.FLAG_READER_NFC_A or
-                    NfcAdapter.FLAG_READER_NFC_B or
-                    NfcAdapter.FLAG_READER_NFC_F or
-                    NfcAdapter.FLAG_READER_NFC_V or
-                    NfcAdapter.FLAG_READER_NFC_BARCODE or
-                    NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK,
-            null
+                NfcAdapter.FLAG_READER_NFC_B or
+                NfcAdapter.FLAG_READER_NFC_F or
+                NfcAdapter.FLAG_READER_NFC_V or
+                NfcAdapter.FLAG_READER_NFC_BARCODE or
+                NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK,
+            null,
         )
 
         handler.postDelayed({
@@ -68,6 +68,7 @@ class NfcReaderActivity : Activity(), NfcAdapter.ReaderCallback {
             finish()
         }
     }
+
     private fun handleNfcTag(tag: Parcelable) {
         if (tag is Tag) {
             val uid = tag.id
