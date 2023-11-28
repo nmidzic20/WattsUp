@@ -26,6 +26,7 @@ class ChargerViewModel : ViewModel() {
     private val _currentChargeAmount: MutableLiveData<Float> =
         MutableLiveData(_initialChargeAmount.value)
     private val _percentageChargedUntilFull = MutableLiveData(0f)
+    private val _currentChargeVolume = MutableLiveData(0f)
 
     val charging: LiveData<Boolean> get() = _charging
     val timeElapsed: LiveData<Long> get() = _timeElapsed
@@ -33,6 +34,7 @@ class ChargerViewModel : ViewModel() {
     val percentageChargedUntilFull: LiveData<Float> get() = _percentageChargedUntilFull
     val amountNecessaryForFullCharge: LiveData<Float> get() = _amountNecessaryForFullCharge
     val currentChargeAmount: LiveData<Float> get() = _currentChargeAmount
+    val currentChargeVolume: LiveData<Float> get() = _currentChargeVolume
 
     private val _openFullChargeAlertDialog = MutableLiveData(false)
     val openFullChargeAlertDialog: LiveData<Boolean> = _openFullChargeAlertDialog
@@ -59,6 +61,7 @@ class ChargerViewModel : ViewModel() {
 
     private fun startCharging(onFullyCharged: () -> Unit) {
         _startTime.value = System.currentTimeMillis()
+        _currentChargeVolume.value = 0f
         viewModelScope.launch {
             while (_charging.value == true) {
                 if (_percentageChargedUntilFull.value!! < _amountNecessaryForFullCharge.value!!) {
@@ -76,6 +79,7 @@ class ChargerViewModel : ViewModel() {
                         (_percentageChargedUntilFull.value!! + 0.01f)
                     _currentChargeAmount.value =
                         (_currentChargeAmount.value!! + 0.01f).coerceIn(0f, 1f)
+                    _currentChargeVolume.value = (_currentChargeVolume.value!! + 0.03f)
                 } else {
                     // Stop charging automatically if the EV is fully charged
                     _charging.value = false
@@ -94,6 +98,7 @@ class ChargerViewModel : ViewModel() {
         _percentageChargedUntilFull.value = 0f
         _amountNecessaryForFullCharge.value =
             (maxChargePercentage - currentChargeAmount.value!!).coerceIn(0f, 1f)
+        saveChargingData(0, 0, currentChargeVolume.value!!)
     }
 
     fun formatTime(milliseconds: Long): String {
@@ -102,5 +107,9 @@ class ChargerViewModel : ViewModel() {
         val seconds = TimeUnit.MILLISECONDS.toSeconds(milliseconds) % 60
 
         return String.format("%02d:%02d:%02d", hours, minutes, seconds)
+    }
+
+    private fun saveChargingData(chargerID: Int, cardID: Int, volumeKwh: Float){
+        // Fetch Event POST endpoint
     }
 }

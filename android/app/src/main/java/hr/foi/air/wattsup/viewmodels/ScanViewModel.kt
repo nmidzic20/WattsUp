@@ -31,7 +31,7 @@ class ScanViewModel(
     private val cardService: CardService = NetworkService.cardService
 
     private val BLEtargetDeviceAddress = "AC:23:3F:AB:9B:9F"
-    private val _cardAddressList = MutableLiveData<List<String>>(emptyList())
+    private val _cardList = MutableLiveData<List<Card>>(emptyList())
 
     private var RFIDscanTimeoutJob: Job? = null
     private var BLEscanTimeoutJob: Job? = null
@@ -50,6 +50,7 @@ class ScanViewModel(
     private val _includeTestButton = MutableLiveData(true)
 
     val includeTestButton: LiveData<Boolean> get() = _includeTestButton
+    val userCard: MutableLiveData<Card?> = MutableLiveData(null)
 
     val bleManager = BLEManager(
         context,
@@ -77,10 +78,10 @@ class ScanViewModel(
                     if (response.isSuccessful) {
                         val cardList: List<Card?>? = response.body()
                         if (cardList != null) {
-                            _cardAddressList.value =
-                                cardList.map { card -> card?.value ?: "" }
+                            _cardList.value =
+                                cardList.map { card -> card!!}
                             Log.i("CARD", "Received cards, cards addresses: ")
-                            _cardAddressList.value!!.forEach { Log.i("CARD ADDRESS", "$it") }
+                            _cardList.value!!.forEach { Log.i("CARD ADDRESS", "${it.value}") }
                         } else {
                             Log.i("CARD", "Received cards as null")
                         }
@@ -241,7 +242,12 @@ class ScanViewModel(
         }
     }
 
-    private fun deviceAddressMatchesDatabaseCardValue(deviceAddress: String): Boolean =
-        _cardAddressList.value!!.any { HexUtils.compareHexStrings(it, deviceAddress) }
-
+    private fun deviceAddressMatchesDatabaseCardValue(deviceAddress: String): Boolean {
+        val cardList = _cardList.value ?: emptyList()
+        val card = cardList.find { card -> HexUtils.compareHexStrings(card.value, deviceAddress) }
+        return if(card != null){
+            userCard.value = card
+            true
+        }else false
+    }
 }
