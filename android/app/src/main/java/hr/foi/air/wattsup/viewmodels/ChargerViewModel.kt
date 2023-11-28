@@ -126,8 +126,8 @@ class ChargerViewModel : ViewModel() {
                     call: Call<EventResponseBody>,
                     response: Response<EventResponseBody>
                 ) {
-                    Log.i("RES", "Event saved")
-                    Log.i("RES", response.toString())
+                    Log.i("RES_EVENT", "Event saved")
+                    Log.i("RES_EVENT", response.toString())
                 }
 
                 override fun onFailure(call: Call<EventResponseBody>, t: Throwable) {

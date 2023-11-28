@@ -233,6 +233,11 @@ class ScanViewModel(
     private fun handleRFIDScanResult(onScan: () -> Unit, uid: ByteArray) {
         viewModelScope.launch(Dispatchers.Main) {
             Log.i("RFID", "UID: $uid")
+
+            // Next 2 lines are for debugging purposes
+            val probnaKartica = Card(1, "1234567890")
+            UserCard.userCard.value = probnaKartica
+
             _scanSuccess.value = true
             _scanning.value = false
             _userMessage.value = "Scan successful"
