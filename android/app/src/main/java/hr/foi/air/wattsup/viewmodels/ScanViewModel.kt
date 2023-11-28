@@ -9,13 +9,13 @@ import androidx.lifecycle.viewModelScope
 import hr.foi.air.wattsup.ble.BLEManager
 import hr.foi.air.wattsup.ble.BLEScanCallback
 import hr.foi.air.wattsup.ble.PermissionCallback
-import hr.foi.air.wattsup.rfid.RFIDManager
-import hr.foi.air.wattsup.rfid.RFIDScanCallback
-import kotlinx.coroutines.Dispatchers
 import hr.foi.air.wattsup.network.CardService
 import hr.foi.air.wattsup.network.NetworkService
 import hr.foi.air.wattsup.network.models.Card
+import hr.foi.air.wattsup.rfid.RFIDManager
+import hr.foi.air.wattsup.rfid.RFIDScanCallback
 import hr.foi.air.wattsup.utils.HexUtils
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -185,7 +185,7 @@ class ScanViewModel(
             }
 
             override fun onRFIDScanError(errorMessage: String) {
-                if(errorMessage == "RFID scan timed out"){
+                if (errorMessage == "RFID scan timed out") {
                     _scanning.value = false
                     _scanSuccess.value = false
                     _userMessage.value = getRFIDStatusMessage(true)
@@ -243,5 +243,4 @@ class ScanViewModel(
 
     private fun deviceAddressMatchesDatabaseCardValue(deviceAddress: String): Boolean =
         _cardAddressList.value!!.any { HexUtils.compareHexStrings(it, deviceAddress) }
-
 }
