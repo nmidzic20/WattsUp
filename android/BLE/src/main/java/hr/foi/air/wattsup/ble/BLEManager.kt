@@ -41,7 +41,6 @@ class BLEManager(
     private var scanCallback: ScanCallback? = null
 
     init {
-        requestBluetoothPermissions(context)
         initializeBluetooth()
     }
 
