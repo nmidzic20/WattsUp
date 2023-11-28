@@ -16,6 +16,7 @@ import hr.foi.air.wattsup.network.CardService
 import hr.foi.air.wattsup.network.NetworkService
 import hr.foi.air.wattsup.network.models.Card
 import hr.foi.air.wattsup.utils.HexUtils
+import hr.foi.air.wattsup.utils.UserCard
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -50,7 +51,6 @@ class ScanViewModel(
     private val _includeTestButton = MutableLiveData(true)
 
     val includeTestButton: LiveData<Boolean> get() = _includeTestButton
-    val userCard: MutableLiveData<Card?> = MutableLiveData(null)
 
     val bleManager = BLEManager(
         context,
@@ -246,7 +246,8 @@ class ScanViewModel(
         val cardList = _cardList.value ?: emptyList()
         val card = cardList.find { card -> HexUtils.compareHexStrings(card.value, deviceAddress) }
         return if(card != null){
-            userCard.value = card
+            Log.i("CARD_MATCH", "ID: ${card.id} | VALUE: ${card.value}")
+            UserCard.userCard.value = card
             true
         }else false
     }
