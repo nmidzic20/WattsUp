@@ -51,6 +51,9 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit, viewModel: Scan
     var bluetoothStatusMessage by remember {
         mutableStateOf(viewModel.getBluetoothStatusMessage(false))
     }
+    var rfidStatusMessage by remember {
+        mutableStateOf(viewModel.getRFIDStatusMessage(false))
+    }
 
     val scanning by viewModel.scanning.observeAsState()
     val scanSuccess by viewModel.scanSuccess.observeAsState()
@@ -58,19 +61,33 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit, viewModel: Scan
 
     LaunchedEffect(snackbarHostState) {
         scope.launch {
-            val result = snackbarHostState
+            val bleResult = snackbarHostState
                 .showSnackbar(
                     message = bluetoothStatusMessage,
                     actionLabel = if (viewModel.bleManager.isBluetoothSupported() && !viewModel.bleManager.isBluetoothEnabled()) "Turn on Bluetooth" else "OK",
                     duration = SnackbarDuration.Indefinite,
                 )
-            when (result) {
+            when (bleResult) {
                 SnackbarResult.ActionPerformed -> {
                     if (viewModel.bleManager.isBluetoothSupported() && !viewModel.bleManager.isBluetoothEnabled()) {
                         viewModel.bleManager.showEnableBluetoothOption(context)
                     }
                 }
+                SnackbarResult.Dismissed -> {
+                }
+            }
 
+            val rfidResult = snackbarHostState.showSnackbar(
+                message = rfidStatusMessage.toString(),
+                actionLabel = if (viewModel.rfidManager.isRFIDSupported() && !viewModel.rfidManager.isRFIDEnabled()) "Enable RFID/NFC" else "OK",
+                duration = SnackbarDuration.Indefinite,
+            )
+            when (rfidResult) {
+                SnackbarResult.ActionPerformed -> {
+                    if (viewModel.rfidManager.isRFIDSupported() && !viewModel.rfidManager.isRFIDEnabled()) {
+                        viewModel.rfidManager.showEnableRFIDOption(context)
+                    }
+                }
                 SnackbarResult.Dismissed -> {
                 }
             }
@@ -112,7 +129,7 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit, viewModel: Scan
                     CircleButton(
                         "Scan RFID card",
                         {
-                            viewModel.startRFIDScanning()
+                            viewModel.startRFIDScanning(onScan)
                         },
                         null,
                         null,
