@@ -57,7 +57,7 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("login"){
                             val onRegisterClick = {navController.navigate("registration")}
-                            LoginPage(onRegisterClick)
+                            LoginPage(onArrowBackClick, onRegisterClick)
                         }
                     }
                 }

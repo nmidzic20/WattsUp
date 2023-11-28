@@ -28,6 +28,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -127,6 +128,15 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
             email = it
             invalidEmail = !Regex("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}\$").matches(it)
         },
+        colors = if(invalidEmail){
+            TextFieldDefaults.outlinedTextFieldColors(
+                focusedBorderColor = Color.Red,
+                unfocusedBorderColor = Color.Red,
+                cursorColor = Color.Red,
+                textColor = Color.Red)
+        }else{
+            TextFieldDefaults.outlinedTextFieldColors()
+        },
         label = { Text(stringResource(R.string.e_mail_label)) },
     )
 
@@ -136,6 +146,15 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
         onValueChange = {
             password = it
             invalidPassword = !Regex("^.{6,}\$").matches(it)
+        },
+        colors = if(invalidPassword){
+            TextFieldDefaults.outlinedTextFieldColors(
+                focusedBorderColor = Color.Red,
+                unfocusedBorderColor = Color.Red,
+                cursorColor = Color.Red,
+                textColor = Color.Red)
+        }else{
+            TextFieldDefaults.outlinedTextFieldColors()
         },
         visualTransformation = PasswordVisualTransformation(),
         label = { Text(stringResource(R.string.password_label)) },
