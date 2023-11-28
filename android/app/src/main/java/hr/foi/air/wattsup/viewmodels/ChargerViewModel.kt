@@ -1,13 +1,19 @@
 package hr.foi.air.wattsup.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import hr.foi.air.wattsup.network.NetworkService
+import hr.foi.air.wattsup.network.models.EventBody
+import hr.foi.air.wattsup.network.models.EventResponseBody
 import hr.foi.air.wattsup.utils.UserCard
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Response
 import java.util.concurrent.TimeUnit
 
 class ChargerViewModel : ViewModel() {
@@ -112,6 +118,23 @@ class ChargerViewModel : ViewModel() {
     }
 
     private fun saveChargingData(chargerID: Int, cardID: Int, volumeKwh: Float){
-        // Fetch Event POST endpoint
+        val eventService = NetworkService.eventService
+
+        eventService.logEvent(EventBody(chargerID, cardID, volumeKwh)).enqueue(
+            object : retrofit2.Callback<EventResponseBody>{
+                override fun onResponse(
+                    call: Call<EventResponseBody>,
+                    response: Response<EventResponseBody>
+                ) {
+                    Log.i("RES", "Event saved")
+                    Log.i("RES", response.toString())
+                }
+
+                override fun onFailure(call: Call<EventResponseBody>, t: Throwable) {
+                    Log.i("Response", t.toString())
+                }
+
+            }
+        )
     }
 }
