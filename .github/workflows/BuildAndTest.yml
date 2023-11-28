@@ -21,12 +21,9 @@ jobs:
       
       - name: Navigate to Workspace
         run: cd $GITHUB_WORKSPACE
-      
-      - name: Navigate to solution folder
-        run: cd backend
         
       - name: Restore NuGet packages for backend
-        run: nuget restore backend.sln
+        run: nuget restore backend/backend.sln
 
       - name: Restore NuGet packages for unit tests
         run: nuget restore ControllerUnitTests/ControllerUnitTests.csproj
