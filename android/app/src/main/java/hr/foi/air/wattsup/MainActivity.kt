@@ -1,5 +1,11 @@
 package hr.foi.air.wattsup
 
+import ScanViewModel
+import android.Manifest
+import android.app.Activity
+import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -8,22 +14,38 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import hr.foi.air.wattsup.pages.ChargerPage
-import hr.foi.air.wattsup.pages.LandingPage
-import hr.foi.air.wattsup.pages.LoginPage
-import hr.foi.air.wattsup.pages.RegistrationPage
-import hr.foi.air.wattsup.pages.ScanRFIDPage
+import hr.foi.air.wattsup.screens.ChargerScreen
+import hr.foi.air.wattsup.screens.LandingScreen
+import hr.foi.air.wattsup.screens.LoginScreen
+import hr.foi.air.wattsup.screens.RegistrationScreen
+import hr.foi.air.wattsup.screens.ScanScreen
 import hr.foi.air.wattsup.ui.theme.WattsUpTheme
 import hr.foi.air.wattsup.viewmodels.ChargerViewModel
 
 class MainActivity : ComponentActivity() {
+
+    private val REQUEST_PERMISSIONS = 1
+
+    private val REQUIRED_PERMISSIONS = arrayOf(
+        Manifest.permission.BLUETOOTH,
+        Manifest.permission.BLUETOOTH_ADMIN,
+        Manifest.permission.ACCESS_COARSE_LOCATION,
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.BLUETOOTH_CONNECT,
+        Manifest.permission.BLUETOOTH_SCAN,
+    )
+
     private val chargerViewModel: ChargerViewModel by viewModels()
+    private val scanViewModel: ScanViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        requestPermissions(this)
         setContent {
             WattsUpTheme {
                 Surface(
@@ -39,28 +61,43 @@ class MainActivity : ComponentActivity() {
                     NavHost(navController = navController, startDestination = "landing") {
                         composable("landing") {
                             val onChargerModeClick = { navController.navigate("scanRFID") }
-                            val onUserModeClick= { navController.navigate("login") }
+                            val onUserModeClick = { navController.navigate("login") }
 
-                            LandingPage(onChargerModeClick,onUserModeClick)
+                            LandingScreen(onChargerModeClick, onUserModeClick)
                         }
                         composable("scanRFID") {
                             val onScanRFID = { navController.navigate("chargerMode") }
 
-                            ScanRFIDPage(onArrowBackClick, onScanRFID)
+                            ScanScreen(onArrowBackClick, onScanRFID, scanViewModel)
                         }
                         composable("chargerMode") {
-                            ChargerPage(onArrowBackClick, chargerViewModel)
+                            ChargerScreen(onArrowBackClick, chargerViewModel)
                         }
-                        composable("registration"){
-                            val onLogInClick = {navController.navigate("login")}
-                            RegistrationPage(onArrowBackClick, onLogInClick)
+                        composable("registration") {
+                            val onLogInClick = { navController.navigate("login") }
+                            RegistrationScreen(onArrowBackClick, onLogInClick)
                         }
-                        composable("login"){
-                            val onRegisterClick = {navController.navigate("registration")}
-                            LoginPage(onArrowBackClick, onRegisterClick)
+                        composable("login") {
+                            val onRegisterClick = { navController.navigate("registration") }
+                            LoginScreen(onRegisterClick)
                         }
                     }
                 }
+            }
+        }
+    }
+
+    private fun requestPermissions(context: Context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val permissionsToRequest = REQUIRED_PERMISSIONS.filter {
+                ContextCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED
+            }
+            if (permissionsToRequest.isNotEmpty()) {
+                ActivityCompat.requestPermissions(
+                    context as Activity,
+                    permissionsToRequest.toTypedArray(),
+                    REQUEST_PERMISSIONS,
+                )
             }
         }
     }

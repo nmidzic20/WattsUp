@@ -5,9 +5,5 @@ data class RegistrationBody(
     val lastName: String,
     val email: String,
     val password: String,
-    val card: RFIDCard?,
-)
-
-data class RFIDCard(
-    val value: String,
+    val card: Card?,
 )

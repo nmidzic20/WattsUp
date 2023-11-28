@@ -1,4 +1,4 @@
-package hr.foi.air.wattsup.pages
+package hr.foi.air.wattsup.screens
 
 import android.annotation.SuppressLint
 import android.util.Log
@@ -44,7 +44,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.network.NetworkService
-import hr.foi.air.wattsup.network.models.RFIDCard
+import hr.foi.air.wattsup.network.models.Card
 import hr.foi.air.wattsup.network.models.RegistrationBody
 import hr.foi.air.wattsup.network.models.RegistrationResponseBody
 import hr.foi.air.wattsup.ui.component.TopAppBar
@@ -57,7 +57,7 @@ private val authService = NetworkService.authService
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegistrationPage(onArrowBackClick: () -> Unit, onLogInClick: () -> Unit) {
+fun RegistrationScreen(onArrowBackClick: () -> Unit, onLogInClick: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -101,7 +101,7 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
     var lastName: String by remember { mutableStateOf("") }
     var email: String by remember { mutableStateOf("") }
     var password: String by remember { mutableStateOf("") }
-    var RFIDcard: String by remember { mutableStateOf("") }
+    var card: Card? by remember { mutableStateOf(null) }
     var invalidEmail by remember { mutableStateOf(false) }
     var invalidPassword by remember { mutableStateOf(false) }
 
@@ -165,13 +165,15 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
             modifier = Modifier
                 .padding(0.dp, 15.dp)
                 .width(200.dp),
-            value = RFIDcard,
-            onValueChange = { RFIDcard = it },
-            label = { Text(stringResource(R.string.rfid_card_label)) },
+            value = card?.value ?: "",
+            onValueChange = { card = Card(it) },
+            label = { Text(stringResource(R.string.card_label)) },
         )
         Spacer(modifier = Modifier.width(4.dp))
         ElevatedButton(
-            onClick = { /* do something */ },
+            onClick = {
+
+            },
             modifier = Modifier
                 .padding(10.dp)
                 .clip(MaterialTheme.shapes.medium),
@@ -193,29 +195,36 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
                 // TODO: implement popup with notification what went wrong
             } else {
                 authService.registerUser(
-                    RegistrationBody(firstName, lastName, email, password, checkCard(RFIDcard)),
+                    RegistrationBody(firstName, lastName, email, password, card),
                 ).enqueue(
                     object : Callback<RegistrationResponseBody> {
-                        override fun onResponse(call: Call<RegistrationResponseBody>?, response: Response<RegistrationResponseBody>?) {
+                        override fun onResponse(
+                            call: Call<RegistrationResponseBody>?,
+                            response: Response<RegistrationResponseBody>?,
+                        ) {
                             Log.i("RES", response.toString())
 
                             if (response?.isSuccessful == true) {
                                 val responseBody = response.body()
-                                val message = responseBody!!.message
-                                Log.i("Response", message)
-                                onLogInClick
+                                val message = responseBody?.message
+                                Log.i("Response", (message ?: response).toString())
+                                onLogInClick()
                             } else {
-                                val responseBody = response!!.body()
-                                val message = responseBody!!.message
-                                Log.i("Response", message)
-                                onLogInClick
+                                val responseBody = response?.body()
+                                val message = responseBody?.message
+                                Log.i("Response", (message ?: response).toString())
+                                onLogInClick()
                             }
                         }
-                        override fun onFailure(call: Call<RegistrationResponseBody>?, t: Throwable?) {
+
+                        override fun onFailure(
+                            call: Call<RegistrationResponseBody>?,
+                            t: Throwable?,
+                        ) {
                             val message = "Failed to register user"
                             Log.i("Response", message)
                             Log.i("Response", t.toString())
-                            onLogInClick
+                            onLogInClick()
                         }
                     },
                 )
@@ -285,16 +294,8 @@ fun PopupWithMessage( isOpen: Boolean, message: String, onDismiss: () -> Unit) {
 
 }*/
 
-fun checkCard(RFIDCardString: String): RFIDCard? {
-    if (RFIDCardString == "") {
-        return null
-    } else {
-        return RFIDCard(RFIDCardString)
-    }
-}
-
 @Preview(showBackground = false)
 @Composable
-fun RegistrationPagePreview() {
-    RegistrationPage({}, {})
+fun RegistrationPreview() {
+    RegistrationScreen({}, {})
 }

@@ -1,4 +1,4 @@
-package hr.foi.air.wattsup.pages
+package hr.foi.air.wattsup.screens
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
@@ -41,7 +41,7 @@ import hr.foi.air.wattsup.viewmodels.ChargerViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChargerPage(onArrowBackClick: () -> Unit, viewModel: ChargerViewModel) {
+fun ChargerScreen(onArrowBackClick: () -> Unit, viewModel: ChargerViewModel) {
     val openFullChargeAlertDialog by viewModel.openFullChargeAlertDialog.observeAsState()
     val charging by viewModel.charging.observeAsState()
     val currentChargeAmount by viewModel.currentChargeAmount.observeAsState()
@@ -225,6 +225,6 @@ fun ChargingIndicators(
     device = "spec:width=411dp,height=891dp,dpi=420,isRound=false,chinSize=0dp,orientation=landscape",
 )
 @Composable
-fun ChargerPagePreview() {
-    ChargerPage({}, ChargerViewModel())
+fun ChargerScreenPreview() {
+    ChargerScreen({}, ChargerViewModel())
 }
