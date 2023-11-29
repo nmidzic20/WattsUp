@@ -93,7 +93,7 @@ namespace backend.Controllers
                 ChargerId = eventRequest.ChargerId,
                 CardId = eventRequest.CardId,
                 VolumeKwh = eventRequest.VolumeKwh,
-                StartedAt = DateTime.Now,
+                StartedAt = DateTime.UtcNow,
                 EndedAt = DateTime.MaxValue
             };
 
@@ -104,7 +104,7 @@ namespace backend.Controllers
 
             _dbContext.Event.Add(newEvent);
             await _dbContext.SaveChangesAsync();
-            return Ok($"Created event {newEvent.Id}");
+            return Ok(newEvent);
         }
 
         [HttpPut("{id}")]
@@ -119,7 +119,7 @@ namespace backend.Controllers
                 return NotFound();
             }
 
-            eventToUpdate.EndedAt = DateTime.Now;
+            eventToUpdate.EndedAt = DateTime.UtcNow;
 
             if (!await UpdateChargerState(false, eventToUpdate.ChargerId))
             {
@@ -141,7 +141,7 @@ namespace backend.Controllers
             }
 
             charger.Active = state;
-            charger.LastSyncAt = DateTime.Now;
+            charger.LastSyncAt = DateTime.UtcNow;
             var response = await chargerController.UpdateChargerByID(id, charger);
 
             return response.Result is OkObjectResult;

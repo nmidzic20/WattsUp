@@ -68,10 +68,10 @@ namespace backend.Controllers
                 Name = _charger.Name,
                 Latitude = _charger.Latitude,
                 Longitude = _charger.Longitude,
-                CreatedAt = DateTime.Now,
+                CreatedAt = DateTime.UtcNow,
                 CreatedById = _charger.CreatedById,
                 CreatedBy = user,
-                LastSyncAt = DateTime.Now,
+                LastSyncAt = DateTime.UtcNow,
                 Active = false
             };
             // TODO: add valid check
@@ -96,7 +96,7 @@ namespace backend.Controllers
             charger.Name = _charger.Name;
             charger.Latitude = _charger.Latitude;
             charger.Longitude = _charger.Longitude;
-            charger.LastSyncAt = DateTime.Now;
+            charger.LastSyncAt = DateTime.UtcNow;
             charger.Active = _charger.Active;
 
             await _dbContext.SaveChangesAsync();
