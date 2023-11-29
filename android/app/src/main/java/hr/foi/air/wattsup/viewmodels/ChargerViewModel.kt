@@ -105,8 +105,8 @@ class ChargerViewModel : ViewModel() {
         _percentageChargedUntilFull.value = 0f
         _amountNecessaryForFullCharge.value =
             (maxChargePercentage - currentChargeAmount.value!!).coerceIn(0f, 1f)
-        saveChargingData(0, UserCard.userCard.value!!.id, currentChargeVolume.value!!)
-        // chargerID is sent as 0 since charger selection is yet to be implemented
+        saveChargingData(1, UserCard.userCard.value!!.id, currentChargeVolume.value!!)
+        // chargerID is sent as 1 since charger selection is yet to be implemented
     }
 
     fun formatTime(milliseconds: Long): String {
