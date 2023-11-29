@@ -45,6 +45,9 @@ class ChargerViewModel : ViewModel() {
 
     private val _openFullChargeAlertDialog = MutableLiveData(false)
     val openFullChargeAlertDialog: LiveData<Boolean> = _openFullChargeAlertDialog
+
+    private val _toastMessage = MutableLiveData<String>()
+    val toastMessage: LiveData<String> get() = _toastMessage
     fun setOpenFullChargeAlertDialog(value: Boolean) {
         _openFullChargeAlertDialog.value = value
     }
@@ -128,13 +131,19 @@ class ChargerViewModel : ViewModel() {
                 ) {
                     Log.i("RES_EVENT", "Event saved")
                     Log.i("RES_EVENT", response.toString())
+                    _toastMessage.value = "Event saved successfully"
                 }
 
                 override fun onFailure(call: Call<EventResponseBody>, t: Throwable) {
                     Log.i("Response", t.toString())
+                    _toastMessage.value = "Error saving event"
                 }
 
             }
         )
+    }
+
+    fun clearToastMessage() {
+        _toastMessage.value = null
     }
 }
