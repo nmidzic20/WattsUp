@@ -1,0 +1,35 @@
+name: Build and test
+
+on:
+  push:
+    branches: [ "dev_backend**" ]
+  pull_request:
+    branches: [ "dev_backend**" ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.1
+
+      - name: Set up NuGet
+        uses: NuGet/setup-nuget@v1.2.0
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1.3.1
+      
+      - name: Navigate to Workspace
+        run: cd $GITHUB_WORKSPACE
+        
+      - name: Restore NuGet packages for backend
+        run: nuget restore backend/backend.sln
+
+      - name: Restore NuGet packages for unit tests
+        run: nuget restore ControllerUnitTests/ControllerUnitTests.csproj
+
+      - name: Build Dockerfile
+        run: msbuild backend/backend.sln /p:platform="Any CPU" /p:configuration=Release
+
+      - name: Run unit tests
+        run: dotnet test ControllerUnitTests/ControllerUnitTests.csproj --configuration Release
