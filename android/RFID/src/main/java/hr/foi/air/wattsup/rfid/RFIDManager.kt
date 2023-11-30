@@ -7,6 +7,7 @@ import android.nfc.NfcAdapter
 import android.nfc.NfcManager
 import android.provider.Settings
 import android.util.Log
+import hr.foi.air.wattsup.core.CardScanCallback
 
 class RFIDManager(
     private val context: Context,
@@ -53,7 +54,7 @@ class RFIDManager(
         )
     }
 
-    fun startScanning(rfidScanCallback: RFIDScanCallback?) {
+    fun startScanning(rfidScanCallback: CardScanCallback?) {
         try {
             CallbackHolder.rfidScanCallback = rfidScanCallback
 
@@ -62,7 +63,7 @@ class RFIDManager(
             context.startActivity(intent)
         } catch (e: Exception) {
             Log.e("RFID", "Error: " + e.message)
-            rfidScanCallback?.onRFIDScanError("Error starting RFID scan: ${e.message}")
+            rfidScanCallback?.onScanFailed("Error starting RFID scan: ${e.message}")
         }
     }
 }
