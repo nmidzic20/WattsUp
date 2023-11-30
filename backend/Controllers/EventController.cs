@@ -92,7 +92,7 @@ namespace backend.Controllers
             {
                 ChargerId = eventRequest.ChargerId,
                 CardId = eventRequest.CardId,
-                VolumeKwh = eventRequest.VolumeKwh,
+                VolumeKwh = 0,
                 StartedAt = DateTime.UtcNow,
                 EndedAt = DateTime.MaxValue
             };
@@ -108,7 +108,7 @@ namespace backend.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<Event>> EndEvent(long id)
+        public async Task<ActionResult<Event>> EndEvent(long id, double volumeKwh)
         {
             var eventToUpdate = await _dbContext.Event
                 .Where(e => e.Id == id)
@@ -119,6 +119,7 @@ namespace backend.Controllers
                 return NotFound();
             }
 
+            eventToUpdate.VolumeKwh = volumeKwh;
             eventToUpdate.EndedAt = DateTime.UtcNow;
 
             if (!await UpdateChargerState(false, eventToUpdate.ChargerId))

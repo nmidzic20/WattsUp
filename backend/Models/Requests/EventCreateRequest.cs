@@ -8,7 +8,6 @@ namespace backend.Models.Requests
         public int ChargerId { get; set; }
         [Required]
         public int CardId { get; set; }
-        [Required]
-        public double VolumeKwh { get; set; }
+        
     }
 }
