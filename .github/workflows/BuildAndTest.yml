@@ -21,6 +21,9 @@ jobs:
       
       - name: Navigate to Workspace
         run: cd $GITHUB_WORKSPACE
+
+      - name: List Directories
+        run: dir
         
       - name: Restore NuGet packages for backend
         run: nuget restore backend/backend.sln
@@ -28,8 +31,8 @@ jobs:
       - name: Restore NuGet packages for unit tests
         run: nuget restore ControllerUnitTests/ControllerUnitTests.csproj
 
-      - name: Build Dockerfile
+      - name: Build Backend
         run: msbuild backend/backend.sln /p:platform="Any CPU" /p:configuration=Release
 
-      - name: Run unit tests
+      - name: Run Unit Tests
         run: dotnet test ControllerUnitTests/ControllerUnitTests.csproj --configuration Release
