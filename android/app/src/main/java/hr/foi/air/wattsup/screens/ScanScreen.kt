@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,6 +36,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import hr.foi.air.wattsup.R
+import hr.foi.air.wattsup.core.CardManager
 import hr.foi.air.wattsup.ui.component.CircleButton
 import hr.foi.air.wattsup.ui.component.TopAppBar
 import kotlinx.coroutines.launch
@@ -57,37 +57,41 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit, viewModel: Scan
 
     val scanning by viewModel.scanning.observeAsState()
     val scanSuccess by viewModel.scanSuccess.observeAsState()
-    val includeTestButton by viewModel.includeTestButton.observeAsState()
+    // val includeTestButton by viewModel.includeTestButton.observeAsState()
+
+    val cardManagers: List<CardManager> = listOf()
 
     LaunchedEffect(snackbarHostState) {
         scope.launch {
             val bleResult = snackbarHostState
                 .showSnackbar(
                     message = bluetoothStatusMessage,
-                    actionLabel = if (viewModel.bleManager.isBluetoothSupported() && !viewModel.bleManager.isBluetoothEnabled()) "Turn on Bluetooth" else "OK",
+                    actionLabel = if (viewModel.bleManager.isCardSupportAvailableOnDevice() && !viewModel.bleManager.isCardSupportEnabledOnDevice()) "Turn on Bluetooth" else "OK",
                     duration = SnackbarDuration.Indefinite,
                 )
             when (bleResult) {
                 SnackbarResult.ActionPerformed -> {
-                    if (viewModel.bleManager.isBluetoothSupported() && !viewModel.bleManager.isBluetoothEnabled()) {
-                        viewModel.bleManager.showEnableBluetoothOption(context)
+                    if (viewModel.bleManager.isCardSupportAvailableOnDevice() && !viewModel.bleManager.isCardSupportEnabledOnDevice()) {
+                        viewModel.bleManager.showEnableCardSupportOption(context)
                     }
                 }
+
                 SnackbarResult.Dismissed -> {
                 }
             }
 
             val rfidResult = snackbarHostState.showSnackbar(
                 message = rfidStatusMessage.toString(),
-                actionLabel = if (viewModel.rfidManager.isRFIDSupported() && !viewModel.rfidManager.isRFIDEnabled()) "Enable RFID/NFC" else "OK",
+                actionLabel = if (viewModel.rfidManager.isCardSupportAvailableOnDevice() && !viewModel.rfidManager.isCardSupportEnabledOnDevice()) "Enable RFID/NFC" else "OK",
                 duration = SnackbarDuration.Indefinite,
             )
             when (rfidResult) {
                 SnackbarResult.ActionPerformed -> {
-                    if (viewModel.rfidManager.isRFIDSupported() && !viewModel.rfidManager.isRFIDEnabled()) {
-                        viewModel.rfidManager.showEnableRFIDOption(context)
+                    if (viewModel.rfidManager.isCardSupportAvailableOnDevice() && !viewModel.rfidManager.isCardSupportEnabledOnDevice()) {
+                        viewModel.rfidManager.showEnableCardSupportOption(context)
                     }
                 }
+
                 SnackbarResult.Dismissed -> {
                 }
             }
@@ -126,6 +130,19 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit, viewModel: Scan
                 verticalArrangement = Arrangement.Center,
             ) {
                 if (!scanning!! && !scanSuccess!!) {
+                    /*cardManagers.forEach {
+                        CircleButton(
+                            "Scan card",
+                            {
+                                viewModel.startBLEScanning(onScan)
+                            },
+                            null,
+                            null,
+                            Modifier.size(220.dp)
+                                .padding(16.dp),
+                        )
+                    }*/
+
                     CircleButton(
                         "Scan RFID card",
                         {
@@ -149,7 +166,7 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit, viewModel: Scan
                         Modifier.size(220.dp)
                             .padding(16.dp),
                     )
-                } else {
+                } /*else {
                     // This button is only for testing purposes in place of touching the phone
                     // with a real RFID card, will be replaced with logic to detect RFID cards
                     // once we can test with them
@@ -162,7 +179,7 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit, viewModel: Scan
                             modifier = Modifier.padding(vertical = 30.dp),
                         )
                     }
-                }
+                }*/
                 Text(
                     text = if (!scanning!!) {
                         userMessage!!

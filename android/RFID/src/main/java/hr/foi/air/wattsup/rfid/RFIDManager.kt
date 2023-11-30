@@ -7,38 +7,39 @@ import android.nfc.NfcAdapter
 import android.nfc.NfcManager
 import android.provider.Settings
 import android.util.Log
+import hr.foi.air.wattsup.core.CardManager
 import hr.foi.air.wattsup.core.CardScanCallback
 
 class RFIDManager(
     private val context: Context,
-) {
+) : CardManager {
     private val nfcManager = context.getSystemService(Context.NFC_SERVICE) as NfcManager?
     private val nfcAdapter: NfcAdapter? = nfcManager?.defaultAdapter
 
     init {
-        initializeRFID()
+        initialize()
     }
 
     companion object {
         private const val REQUEST_ENABLE_RFID = 1
     }
 
-    fun isRFIDSupported(): Boolean {
+    override fun isCardSupportAvailableOnDevice(): Boolean {
         return nfcAdapter != null
     }
 
-    fun isRFIDEnabled(): Boolean {
+    override fun isCardSupportEnabledOnDevice(): Boolean {
         return nfcAdapter?.isEnabled == true
     }
 
-    private fun initializeRFID() {
-        if (!isRFIDSupported()) {
+    override fun initialize() {
+        if (!isCardSupportAvailableOnDevice()) {
             val message = "RFID not supported on this device"
             Log.i("RFID", message)
             return
         }
 
-        if (!isRFIDEnabled()) {
+        if (!isCardSupportEnabledOnDevice()) {
             val message = "Not enabled - please enable RFID/NFC in Settings on your device"
             Log.i("RFID", message)
             return
@@ -46,7 +47,7 @@ class RFIDManager(
         Log.i("RFID", "RFID supported and enabled")
     }
 
-    fun showEnableRFIDOption(context: Context) {
+    override fun showEnableCardSupportOption(context: Context) {
         val enableNfcIntent = Intent(Settings.ACTION_NFC_SETTINGS)
         (context as? Activity)?.startActivityForResult(
             enableNfcIntent,
@@ -54,7 +55,7 @@ class RFIDManager(
         )
     }
 
-    fun startScanning(rfidScanCallback: CardScanCallback?) {
+    override fun startScanningForCard(rfidScanCallback: CardScanCallback?) {
         try {
             CallbackHolder.rfidScanCallback = rfidScanCallback
 
@@ -65,5 +66,9 @@ class RFIDManager(
             Log.e("RFID", "Error: " + e.message)
             rfidScanCallback?.onScanFailed("Error starting RFID scan: ${e.message}")
         }
+    }
+
+    override fun stopScanningForCard() {
+        TODO("Not yet implemented")
     }
 }

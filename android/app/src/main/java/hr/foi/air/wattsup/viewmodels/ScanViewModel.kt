@@ -5,7 +5,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import hr.foi.air.wattsup.ble.BLEManager
-import hr.foi.air.wattsup.ble.PermissionCallback
 import hr.foi.air.wattsup.core.CardScanCallback
 import hr.foi.air.wattsup.network.CardService
 import hr.foi.air.wattsup.network.NetworkService
@@ -50,15 +49,6 @@ class ScanViewModel(
 
     val bleManager = BLEManager(
         context,
-        object : PermissionCallback {
-            override fun onPermissionGranted(permission: String) {
-                // Handle permission granted
-            }
-
-            override fun onPermissionDenied(permission: String) {
-                // Handle permission denied
-            }
-        },
     )
 
     val rfidManager = RFIDManager(context)
@@ -97,26 +87,26 @@ class ScanViewModel(
     }
 
     fun getBluetoothStatusMessage(scanning: Boolean): String =
-        if (!bleManager.isBluetoothSupported()) {
+        if (!bleManager.isCardSupportAvailableOnDevice()) {
             "Bluetooth is not supported on this device"
-        } else if (!bleManager.isBluetoothEnabled()) {
+        } else if (!bleManager.isCardSupportEnabledOnDevice()) {
             "Bluetooth is not enabled on this device"
         } else {
             if (scanning) "No registered BLE card found" else "Bluetooth is supported and enabled on this device"
         }
 
     fun getRFIDStatusMessage(scanning: Boolean): String =
-        if (!rfidManager.isRFIDSupported()) {
+        if (!rfidManager.isCardSupportAvailableOnDevice()) {
             "RFID is not supported on this device"
-        } else if (!rfidManager.isRFIDEnabled()) {
+        } else if (!rfidManager.isCardSupportEnabledOnDevice()) {
             "RFID is not enabled on this device"
         } else {
             if (scanning) "No RFID card found" else "RFID is supported and enabled on this device"
         }
 
     fun startBLEScanning(onScan: () -> Unit) {
-        if (!bleManager.isBluetoothEnabled()) {
-            bleManager.stopScanning()
+        if (!bleManager.isCardSupportEnabledOnDevice()) {
+            bleManager.stopScanningForCard()
             _scanning.value = false
             _scanSuccess.value = false
             _userMessage.value = "Bluetooth is not enabled on this device"
@@ -126,7 +116,7 @@ class ScanViewModel(
         _includeTestButton.value = false
         _scanning.value = true
 
-        bleManager.startScanning(
+        bleManager.startScanningForCard(
             object : CardScanCallback {
                 override fun onScanResult(cardAddress: Any) {
                     handleBLEScanResult(cardAddress, onScan)
@@ -150,7 +140,7 @@ class ScanViewModel(
                         // Stop scanning after 5 seconds if no device is found
                         delay(5000)
                         if (_scanning.value == true && !_scanSuccess.value!!) {
-                            bleManager.stopScanning()
+                            bleManager.stopScanningForCard()
                             _scanning.value = false
                             _scanSuccess.value = false
                             _userMessage.value = getBluetoothStatusMessage(true)
@@ -166,7 +156,7 @@ class ScanViewModel(
     }
 
     fun startRFIDScanning(onScan: () -> Unit) {
-        if (!rfidManager.isRFIDEnabled()) {
+        if (!rfidManager.isCardSupportEnabledOnDevice()) {
             _scanning.value = false
             _scanSuccess.value = false
             _userMessage.value = "RFID is not enabled on this device"
@@ -175,7 +165,7 @@ class ScanViewModel(
         _includeTestButton.value = false
         _scanning.value = true
 
-        rfidManager.startScanning(object : CardScanCallback {
+        rfidManager.startScanningForCard(object : CardScanCallback {
             override fun onScanStarted() {
                 TODO("Not yet implemented")
             }
@@ -205,24 +195,6 @@ class ScanViewModel(
                 }
             }
         })
-        /*(object : RFIDScanCallback {
-                override fun onRFIDScanResult(uid: ByteArray) {
-                    handleRFIDScanResult(uid, onScan)
-                }
-
-                override fun onRFIDScanError(errorMessage: String) {
-                    if (errorMessage == "RFID scan timed out") {
-                        _scanning.value = false
-                        _scanSuccess.value = false
-                        _userMessage.value = getRFIDStatusMessage(true)
-                    } else {
-                        _scanning.value = false
-                        _scanSuccess.value = false
-                        _userMessage.value = "Unable to scan card"
-                        Log.i("RFID", "Scanning failed, error message: $errorMessage")
-                    }
-                }
-            })*/
     }
 
     fun cancelRFIDScanAttempt(onScan: () -> Unit) {
@@ -249,7 +221,7 @@ class ScanViewModel(
         if (deviceAddressMatchesDatabaseCardValue(deviceAddress)) {
             // The target BLE device is detected
             _scanSuccess.value = true
-            bleManager.stopScanning()
+            bleManager.stopScanningForCard()
             _scanning.value = false
             _userMessage.value = "Scan successful"
             onScan()

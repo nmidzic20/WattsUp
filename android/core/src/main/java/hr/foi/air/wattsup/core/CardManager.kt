@@ -9,7 +9,7 @@ interface CardManager {
     fun showEnableCardSupportOption(context: Context)
 
     // fun checkAndRequestPermission(permission: String, requestCode: Int)
-    fun startScanningForCard(cardScanCallback: CardScanCallback)
+    fun startScanningForCard(cardScanCallback: CardScanCallback?)
     fun stopScanningForCard()
     // fun connectToCard(/**/)
     // fun disconnectFromCard()
