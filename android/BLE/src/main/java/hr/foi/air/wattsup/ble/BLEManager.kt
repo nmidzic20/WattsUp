@@ -91,16 +91,16 @@ class BLEManager(
     fun startScanning(/*scanCallback: ScanCallback,*/ bleScanCallback: CardScanCallback?) {
         // this.scanCallback = scanCallback
         this.scanCallback = object : ScanCallback() {
-            override fun onScanResult(callbackType: Int, result: ScanResult?) {
-                bleScanCallback?.onScanResult(result?.device?.address?.toByteArray())
+            override fun onScanResult(callbackType: Int, result: ScanResult) {
+                bleScanCallback?.onScanResult(result.device.address)
             }
 
-            override fun onBatchScanResults(results: List<ScanResult?>?) {
-                bleScanCallback?.onBatchScanResults(results?.map { result -> result?.device?.address?.toByteArray() })
+            override fun onBatchScanResults(results: List<ScanResult>?) {
+                bleScanCallback?.onBatchScanResults(results?.map { result -> result.device.address })
             }
 
             override fun onScanFailed(errorCode: Int) {
-                bleScanCallback?.onScanFailed(errorCode)
+                bleScanCallback?.onScanFailed(errorCode.toString())
             }
         }
 

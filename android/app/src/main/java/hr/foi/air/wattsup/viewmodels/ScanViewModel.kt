@@ -11,10 +11,9 @@ import hr.foi.air.wattsup.network.CardService
 import hr.foi.air.wattsup.network.NetworkService
 import hr.foi.air.wattsup.network.models.Card
 import hr.foi.air.wattsup.rfid.RFIDManager
-import hr.foi.air.wattsup.rfid.RFIDScanCallback
 import hr.foi.air.wattsup.utils.HexUtils
-import kotlinx.coroutines.Dispatchers
 import hr.foi.air.wattsup.utils.UserCard
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -29,7 +28,6 @@ class ScanViewModel(
 
     private val cardService: CardService = NetworkService.cardService
 
-    private val BLEtargetDeviceAddress = "AC:23:3F:AB:9B:9F"
     private val _cardList = MutableLiveData<List<Card>>(emptyList())
 
     private var RFIDscanTimeoutJob: Job? = null
@@ -77,7 +75,7 @@ class ScanViewModel(
                         val cardList: List<Card?>? = response.body()
                         if (cardList != null) {
                             _cardList.value =
-                                cardList.map { card -> card!!}
+                                cardList.map { card -> card!! }
                             Log.i("CARD", "Received cards, cards addresses: ")
                             _cardList.value!!.forEach { Log.i("CARD ADDRESS", "${it.value}") }
                         } else {
@@ -129,36 +127,18 @@ class ScanViewModel(
         _scanning.value = true
 
         bleManager.startScanning(
-            /*object : ScanCallback() {
-                override fun onScanResult(callbackType: Int, result: ScanResult?) {
-                    handleBLEScanResult(result, onScan)
-                }
-
-                override fun onBatchScanResults(results: List<ScanResult?>?) {
-                    results?.forEach { result ->
-                        handleBLEScanResult(result, onScan)
-                    }
-                }
-
-                override fun onScanFailed(errorCode: Int) {
-                    _scanning.value = false
-                    _scanSuccess.value = false
-                    _userMessage.value = "Unable to scan card"
-                    Log.i("BLUETOOTH", "Scanning failed, error code: $errorCode")
-                }
-            },*/
             object : CardScanCallback {
-                override fun onScanResult(cardAddress: ByteArray?) {
+                override fun onScanResult(cardAddress: Any) {
                     handleBLEScanResult(cardAddress, onScan)
                 }
 
-                override fun onBatchScanResults(results: List<ByteArray?>?) {
+                override fun onBatchScanResults(results: List<Any>?) {
                     results?.forEach { result ->
                         handleBLEScanResult(result, onScan)
                     }
                 }
 
-                override fun onScanFailed(errorCode: Int) {
+                override fun onScanFailed(errorCode: String) {
                     _scanning.value = false
                     _scanSuccess.value = false
                     _userMessage.value = "Unable to scan card"
@@ -195,12 +175,24 @@ class ScanViewModel(
         _includeTestButton.value = false
         _scanning.value = true
 
-        rfidManager.startScanning(object : RFIDScanCallback {
-            override fun onRFIDScanResult(uid: ByteArray) {
-                handleRFIDScanResult(uid, onScan)
+        rfidManager.startScanning(object : CardScanCallback {
+            override fun onScanStarted() {
+                TODO("Not yet implemented")
             }
 
-            override fun onRFIDScanError(errorMessage: String) {
+            override fun onScanStopped() {
+                TODO("Not yet implemented")
+            }
+
+            override fun onScanResult(cardAddress: Any) {
+                handleRFIDScanResult(cardAddress, onScan)
+            }
+
+            override fun onBatchScanResults(results: List<Any>?) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onScanFailed(errorMessage: String) {
                 if (errorMessage == "RFID scan timed out") {
                     _scanning.value = false
                     _scanSuccess.value = false
@@ -213,6 +205,24 @@ class ScanViewModel(
                 }
             }
         })
+        /*(object : RFIDScanCallback {
+                override fun onRFIDScanResult(uid: ByteArray) {
+                    handleRFIDScanResult(uid, onScan)
+                }
+
+                override fun onRFIDScanError(errorMessage: String) {
+                    if (errorMessage == "RFID scan timed out") {
+                        _scanning.value = false
+                        _scanSuccess.value = false
+                        _userMessage.value = getRFIDStatusMessage(true)
+                    } else {
+                        _scanning.value = false
+                        _scanSuccess.value = false
+                        _userMessage.value = "Unable to scan card"
+                        Log.i("RFID", "Scanning failed, error message: $errorMessage")
+                    }
+                }
+            })*/
     }
 
     fun cancelRFIDScanAttempt(onScan: () -> Unit) {
@@ -226,32 +236,41 @@ class ScanViewModel(
             false // After navigating away, reset so buttons are visible for next scanning
     }
 
-    private fun handleBLEScanResult(result: ByteArray?, onScan: () -> Unit) {
-        if (result != null) {
-            // val device = result.device
-            // val deviceAddress = HexUtils.formatHexToPrefix(device.address)
-            val deviceAddress = HexUtils.formatHexToPrefix(HexUtils.bytesToHexString(result))
-            Log.i("BLUETOOTH", "Scanned: $deviceAddress")
+    private fun handleBLEScanResult(result: Any, onScan: () -> Unit) {
+        var deviceAddress: String = ""
+        if (result is ByteArray) {
+            deviceAddress = HexUtils.formatHexToPrefix(HexUtils.bytesToHexString(result))
+        } else if (result is String) {
+            deviceAddress = HexUtils.formatHexToPrefix(result)
+        }
 
-            if (deviceAddressMatchesDatabaseCardValue(deviceAddress)) {
-                // The target BLE device is detected
-                _scanSuccess.value = true
-                bleManager.stopScanning()
-                _scanning.value = false
-                _userMessage.value = "Scan successful"
-                onScan()
-                _scanSuccess.value =
-                    false // After navigating away, reset so buttons are visible for next scanning
-            }
+        Log.i("BLUETOOTH", "Scanned: $deviceAddress")
+
+        if (deviceAddressMatchesDatabaseCardValue(deviceAddress)) {
+            // The target BLE device is detected
+            _scanSuccess.value = true
+            bleManager.stopScanning()
+            _scanning.value = false
+            _userMessage.value = "Scan successful"
+            onScan()
+            _scanSuccess.value =
+                false // After navigating away, reset so buttons are visible for next scanning
         }
     }
 
-    private fun handleRFIDScanResult(uid: ByteArray, onScan: () -> Unit) {
+    private fun handleRFIDScanResult(result: Any, onScan: () -> Unit) {
         viewModelScope.launch(Dispatchers.Main) {
-            Log.i("RFID", "UID 1: $uid")
-            val cardAddress = HexUtils.formatHexToPrefix(HexUtils.bytesToHexString(uid))
+            Log.i("RFID", "UID 1: $result")
+
+            var cardAddress: String = ""
+            if (result is ByteArray) {
+                cardAddress = HexUtils.formatHexToPrefix(HexUtils.bytesToHexString(result))
+            } else if (result is String) {
+                cardAddress = result
+            }
+
             Log.i("RFID", "UID 2: $cardAddress")
-            if(deviceAddressMatchesDatabaseCardValue(cardAddress)){
+            if (deviceAddressMatchesDatabaseCardValue(cardAddress)) {
                 _scanSuccess.value = true
                 _scanning.value = false
                 _userMessage.value = "Scan successful"
@@ -269,10 +288,12 @@ class ScanViewModel(
     private fun deviceAddressMatchesDatabaseCardValue(deviceAddress: String): Boolean {
         val cardList = _cardList.value ?: emptyList()
         val card = cardList.find { card -> HexUtils.compareHexStrings(card.value, deviceAddress) }
-        return if(card != null){
+        return if (card != null) {
             Log.i("CARD_MATCH", "ID: ${card.id} | VALUE: ${card.value}")
             UserCard.userCard.value = card
             true
-        }else false
+        } else {
+            false
+        }
     }
 }
