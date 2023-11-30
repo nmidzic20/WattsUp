@@ -83,14 +83,14 @@ namespace backend.Data
                 {
                     Id = 1,
                     OwnedById = 1,
-                    Value = "0x1A2B3C4F5D6E",
+                    Value = "0xAC233FAB9B9F",
                     Active = true,
                 },
                 new Card()
                 {
                     Id = 2,
                     OwnedById = 2,
-                    Value = "0x4F5D6E1A2B3C",
+                    Value = "0x3530A832",
                     Active = true,
                 },
                 new Card()

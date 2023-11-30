@@ -37,8 +37,8 @@ namespace backend.Data.Migrations
                 columns: new[] { "Id", "Active", "OwnedById", "Value" },
                 values: new object[,]
                 {
-                    { 1, true, 1, "0x1A2B3C4F5D6E" },
-                    { 2, true, 2, "0x4F5D6E1A2B3C" },
+                    { 1, true, 1, "0xAC233FAB9B9F" },
+                    { 2, true, 2, "0x3530A832" },
                     { 3, true, 2, "0x7F8A9D4F5D6E" },
                     { 4, true, 3, "0x7F8A9D1A2B3C" }
                 });
