@@ -4,6 +4,7 @@ import android.content.Context
 
 interface CardManager {
     fun initialize()
+    fun getName(): String
     fun isCardSupportAvailableOnDevice(): Boolean
     fun isCardSupportEnabledOnDevice(): Boolean
     fun showEnableCardSupportOption(context: Context)

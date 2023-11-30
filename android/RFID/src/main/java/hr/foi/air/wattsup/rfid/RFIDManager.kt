@@ -24,6 +24,8 @@ class RFIDManager(
         private const val REQUEST_ENABLE_RFID = 1
     }
 
+    override fun getName(): String = "RFID"
+
     override fun isCardSupportAvailableOnDevice(): Boolean {
         return nfcAdapter != null
     }
@@ -69,6 +71,6 @@ class RFIDManager(
     }
 
     override fun stopScanningForCard() {
-        TODO("Not yet implemented")
+        Log.i("RFID", "Stop scan")
     }
 }

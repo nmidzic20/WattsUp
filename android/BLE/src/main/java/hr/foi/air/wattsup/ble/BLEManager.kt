@@ -53,6 +53,8 @@ class BLEManager(
         private const val REQUEST_ENABLE_BLUETOOTH = 4
     }
 
+    override fun getName(): String = "BLE"
+
     override fun isCardSupportAvailableOnDevice(): Boolean = bluetoothAdapter != null
     override fun isCardSupportEnabledOnDevice(): Boolean = bluetoothAdapter?.isEnabled == true
 
