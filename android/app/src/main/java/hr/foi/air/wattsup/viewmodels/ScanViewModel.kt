@@ -248,23 +248,24 @@ class ScanViewModel(
     private fun handleRFIDScanResult(uid: ByteArray, onScan: () -> Unit) {
         viewModelScope.launch(Dispatchers.Main) {
             Log.i("RFID", "UID 1: $uid")
-
-            val cardAddress =
-                HexUtils.formatHexToPrefix(HexUtils.bytesToHexString(uid))
-
+            val cardAddress = HexUtils.formatHexToPrefix(HexUtils.bytesToHexString(uid))
             Log.i("RFID", "UID 2: $cardAddress")
-
-            if (deviceAddressMatchesDatabaseCardValue(cardAddress)) {
+            if(deviceAddressMatchesDatabaseCardValue(cardAddress)){
                 _scanSuccess.value = true
                 _scanning.value = false
                 _userMessage.value = "Scan successful"
                 onScan()
                 _scanSuccess.value =
                     false // After navigating away, reset so buttons are visible for the next scanning
+            } else {
+                _scanning.value = false
+                _scanSuccess.value = false
+                _userMessage.value = "Register your card before using it"
             }
         }
     }
 
     private fun deviceAddressMatchesDatabaseCardValue(deviceAddress: String): Boolean =
         _cardAddressList.value!!.any { HexUtils.compareHexStrings(it, deviceAddress) }
+
 }
