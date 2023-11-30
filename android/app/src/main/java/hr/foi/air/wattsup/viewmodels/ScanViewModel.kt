@@ -1,5 +1,4 @@
 import android.app.Application
-import android.bluetooth.le.ScanResult
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -14,7 +13,6 @@ import hr.foi.air.wattsup.network.models.Card
 import hr.foi.air.wattsup.rfid.RFIDManager
 import hr.foi.air.wattsup.rfid.RFIDScanCallback
 import hr.foi.air.wattsup.utils.HexUtils
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -148,11 +146,11 @@ class ScanViewModel(
                 }
             },*/
             object : CardScanCallback {
-                override fun onScanResult(callbackType: Int, result: ScanResult?) {
-                    handleBLEScanResult(result, onScan)
+                override fun onScanResult(cardAddress: ByteArray?) {
+                    handleBLEScanResult(cardAddress, onScan)
                 }
 
-                override fun onBatchScanResults(results: List<ScanResult?>?) {
+                override fun onBatchScanResults(results: List<ByteArray?>?) {
                     results?.forEach { result ->
                         handleBLEScanResult(result, onScan)
                     }
@@ -197,7 +195,7 @@ class ScanViewModel(
 
         rfidManager.startScanning(object : RFIDScanCallback {
             override fun onRFIDScanResult(uid: ByteArray) {
-                handleRFIDScanResult(onScan, uid)
+                handleRFIDScanResult(uid, onScan)
             }
 
             override fun onRFIDScanError(errorMessage: String) {
@@ -226,11 +224,12 @@ class ScanViewModel(
             false // After navigating away, reset so buttons are visible for next scanning
     }
 
-    private fun handleBLEScanResult(result: ScanResult?, onScan: () -> Unit) {
+    private fun handleBLEScanResult(result: ByteArray?, onScan: () -> Unit) {
         if (result != null) {
-            val device = result.device
-            val deviceAddress = HexUtils.formatHexToPrefix(device.address)
-            Log.i("BLUETOOTH", "Scanned: $device $deviceAddress")
+            // val device = result.device
+            // val deviceAddress = HexUtils.formatHexToPrefix(device.address)
+            val deviceAddress = HexUtils.formatHexToPrefix(HexUtils.bytesToHexString(result))
+            Log.i("BLUETOOTH", "Scanned: $deviceAddress")
 
             if (deviceAddressMatchesDatabaseCardValue(deviceAddress)) {
                 // The target BLE device is detected
@@ -245,9 +244,16 @@ class ScanViewModel(
         }
     }
 
-    private fun handleRFIDScanResult(onScan: () -> Unit, uid: ByteArray) {
-        viewModelScope.launch(Dispatchers.Main) {
-            Log.i("RFID", "UID: $uid")
+    private fun handleRFIDScanResult(uid: ByteArray, onScan: () -> Unit) {
+        // viewModelScope.launch(Dispatchers.Main) {
+        Log.i("RFID", "UID 1: $uid")
+
+        val cardAddress =
+            HexUtils.formatHexToPrefix(HexUtils.bytesToHexString(uid))
+
+        Log.i("RFID", "UID 2: $cardAddress")
+
+        if (deviceAddressMatchesDatabaseCardValue(cardAddress)) {
             _scanSuccess.value = true
             _scanning.value = false
             _userMessage.value = "Scan successful"
@@ -255,6 +261,7 @@ class ScanViewModel(
             _scanSuccess.value =
                 false // After navigating away, reset so buttons are visible for the next scanning
         }
+        // }
     }
 
     private fun deviceAddressMatchesDatabaseCardValue(deviceAddress: String): Boolean =
