@@ -1,6 +1,7 @@
 package hr.foi.air.wattsup.screens
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -28,9 +29,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -39,6 +42,8 @@ import hr.foi.air.wattsup.network.NetworkService
 import hr.foi.air.wattsup.network.TokenManager
 import hr.foi.air.wattsup.network.models.LoginBody
 import hr.foi.air.wattsup.network.models.LoginResponseBody
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -49,6 +54,7 @@ private val authService = NetworkService.authService
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(onRegisterClick: () -> Unit) {
+    val context = LocalContext.current
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -62,46 +68,20 @@ fun LoginScreen(onRegisterClick: () -> Unit) {
             )
         },
     ) {
-        LoginView(onRegisterClick)
+        LoginView(onRegisterClick, context)
     }
 }
 
-/*@Composable
-fun Header() {
-    ElevatedCard(
-        modifier = Modifier
-            .height(66.dp)
-            .fillMaxWidth(),
-        shape = RectangleShape,
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 10.dp
-        ),
-        colors = CardDefaults.elevatedCardColors(containerColor = Color.White)
-    ) {
-        Column(
-            Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally )
-        {
-            Text(
-                text = "Watt's up",
-                modifier = Modifier
-                    .fillMaxWidth(0.5f)
-                    .padding(5.dp),
-                fontSize = 40.sp,
-                fontWeight = FontWeight.Normal
-            )
-        }
-
-    }
-}
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginView(onRegisterClick: () -> Unit) {
+fun LoginView(onRegisterClick: () -> Unit, context: Context) {
     val interactionSource = remember { MutableInteractionSource() }
     var email: String by remember { mutableStateOf("") }
     var password: String by remember { mutableStateOf("") }
+    var statusMessage: String by remember { mutableStateOf("") }
+    var showToast by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -131,7 +111,11 @@ fun LoginView(onRegisterClick: () -> Unit) {
             onValueChange = { password = it },
             label = { Text(stringResource(R.string.passwordLabel)) },
         )
-
+        if(showToast){
+            Text(
+                text = statusMessage
+            )
+        }
         ElevatedButton(
             onClick = {
                 authService.loginUser(
@@ -145,25 +129,34 @@ fun LoginView(onRegisterClick: () -> Unit) {
                             Log.i("RES", response.toString())
                             if (response?.isSuccessful == true) {
                                 val responseBody = response.body()
-                                val tokenManager = TokenManager(
-                                    responseBody!!.jwt,
-                                    responseBody.refreshToken,
-                                    responseBody.refreshTokenExpiresAt,
-                                )
+                                val tokenManager = TokenManager.getInstance(context)
+                                tokenManager.setrefreshToken(responseBody!!.refreshToken)
+                                tokenManager.setrefreshTokenExpiresAt(responseBody.refreshToken)
+                                tokenManager.setjWTtoken(responseBody.jwt)
                                 Log.i("Response", responseBody.jwt)
-                                // TODO: make page where login goes to and implement localstorage handling of JWT token
+                                // TODO: make page where login goes to
                             } else {
                                 val responseBody = response!!.body()
-                                val message = "Invalid username or password"
-                                Log.i("Response", message)
+                                statusMessage = "Invalid username or password"
+                                showToast = true
+                                coroutineScope.launch {
+                                    delay(2000)
+                                    showToast = false
+                                }
+                                Log.i("Response", statusMessage)
                                 // TODO: make page where login goes to
                             }
                         }
 
                         override fun onFailure(call: Call<LoginResponseBody>?, t: Throwable?) {
-                            val message = "Failed to login user"
-                            Log.i("Response", message)
+                            statusMessage = "Failed to login user"
+                            Log.i("Response", statusMessage)
                             Log.i("Response", t.toString())
+                            showToast = true
+                            coroutineScope.launch {
+                                delay(2000)
+                                showToast = false
+                            }
                             // TODO: make page where login goes to
                         }
                     },
