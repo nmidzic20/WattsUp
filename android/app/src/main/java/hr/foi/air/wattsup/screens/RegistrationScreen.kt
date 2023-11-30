@@ -33,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,6 +49,8 @@ import hr.foi.air.wattsup.network.models.Card
 import hr.foi.air.wattsup.network.models.RegistrationBody
 import hr.foi.air.wattsup.network.models.RegistrationResponseBody
 import hr.foi.air.wattsup.ui.component.TopAppBar
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -69,6 +72,7 @@ fun RegistrationScreen(onArrowBackClick: () -> Unit, onLogInClick: () -> Unit) {
                 },
             )
         },
+
     ) {
         RegistrationView(onLogInClick)
     }
@@ -104,14 +108,16 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
     var card: Card? by remember { mutableStateOf(null) }
     var invalidEmail by remember { mutableStateOf(false) }
     var invalidPassword by remember { mutableStateOf(false) }
-
+    var statusMessage by remember { mutableStateOf("") }
+    var showToast by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
     val interactionSource = remember { MutableInteractionSource() }
 
     OutlinedTextField(
         modifier = modifier,
         value = firstName,
         onValueChange = { firstName = it },
-        label = { Text(stringResource(R.string.first_name_label)) },
+        label = { Text(stringResource(R.string.first_name_label)) }
     )
 
     OutlinedTextField(
@@ -126,7 +132,6 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
         value = email,
         onValueChange = {
             email = it
-            invalidEmail = !Regex("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}\$").matches(it)
         },
         colors = if(invalidEmail){
             TextFieldDefaults.outlinedTextFieldColors(
@@ -145,7 +150,6 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
         value = password,
         onValueChange = {
             password = it
-            invalidPassword = !Regex("^.{6,}\$").matches(it)
         },
         colors = if(invalidPassword){
             TextFieldDefaults.outlinedTextFieldColors(
@@ -189,10 +193,24 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
         }
     }
 
+    if(showToast){
+        Text(
+            text = statusMessage
+        )
+    }
+
+
     ElevatedButton(
         onClick = {
+            invalidEmail = !Regex("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}\$").matches(email)
+            invalidPassword = !Regex("^.{6,}\$").matches(password)
             if (invalidPassword || invalidEmail) {
-                // TODO: implement popup with notification what went wrong
+                statusMessage = "Invalid Email or password"
+                showToast = true
+                coroutineScope.launch {
+                    delay(2000)
+                    showToast = false
+                }
             } else {
                 authService.registerUser(
                     RegistrationBody(firstName, lastName, email, password, card),
@@ -221,10 +239,14 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
                             call: Call<RegistrationResponseBody>?,
                             t: Throwable?,
                         ) {
-                            val message = "Failed to register user"
-                            Log.i("Response", message)
+                            statusMessage = "Failed to register user"
+                            Log.i("Response", statusMessage)
                             Log.i("Response", t.toString())
-                            onLogInClick()
+                            showToast = true
+                            coroutineScope.launch {
+                                delay(2000)
+                                showToast = false
+                            }
                         }
                     },
                 )
@@ -255,44 +277,6 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
         }
     }
 }
-
-/*
-@Composable
-fun PopupWithMessage( isOpen: Boolean, message: String, onDismiss: () -> Unit) {
-    if(isOpen){
-        Dialog(
-            onDismissRequest = {  },
-            content = {
-                Card(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Info,
-                            contentDescription = null,
-                            tint = Color.Blue,
-                            modifier = Modifier
-                                .size(48.dp)
-                                .padding(8.dp)
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(text = message, modifier = Modifier.padding(8.dp))
-                        Spacer(modifier = Modifier.height(16.dp))
-                        ElevatedButton(onClick = { onDismiss }) {
-                            Text("OK")
-                        }
-                    }
-                }
-            }
-        )
-    }
-
-}*/
 
 @Preview(showBackground = false)
 @Composable
