@@ -10,6 +10,7 @@ import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.le.BluetoothLeScanner
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanFilter
+import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.content.Intent
@@ -87,8 +88,21 @@ class BLEManager(
         }
     }
 
-    fun startScanning(scanCallback: ScanCallback, bleScanCallback: CardScanCallback?) {
-        this.scanCallback = scanCallback
+    fun startScanning(/*scanCallback: ScanCallback,*/ bleScanCallback: CardScanCallback?) {
+        // this.scanCallback = scanCallback
+        this.scanCallback = object : ScanCallback() {
+            override fun onScanResult(callbackType: Int, result: ScanResult?) {
+                bleScanCallback?.onScanResult(callbackType, result)
+            }
+
+            override fun onBatchScanResults(results: List<ScanResult?>?) {
+                bleScanCallback?.onBatchScanResults(results)
+            }
+
+            override fun onScanFailed(errorCode: Int) {
+                bleScanCallback?.onScanFailed(errorCode)
+            }
+        }
 
         val scanFilters = mutableListOf<ScanFilter>()
         val scanSettings = ScanSettings.Builder()
@@ -99,7 +113,7 @@ class BLEManager(
             Manifest.permission.BLUETOOTH_SCAN,
             REQUEST_PERMISSIONS_SCAN,
         )
-        bluetoothLeScanner?.startScan(scanFilters, scanSettings, scanCallback)
+        bluetoothLeScanner?.startScan(scanFilters, scanSettings, this.scanCallback)
         bleScanCallback?.onScanStarted()
     }
 

@@ -1,5 +1,4 @@
 import android.app.Application
-import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
@@ -130,7 +129,7 @@ class ScanViewModel(
         _scanning.value = true
 
         bleManager.startScanning(
-            object : ScanCallback() {
+            /*object : ScanCallback() {
                 override fun onScanResult(callbackType: Int, result: ScanResult?) {
                     handleBLEScanResult(result, onScan)
                 }
@@ -147,8 +146,25 @@ class ScanViewModel(
                     _userMessage.value = "Unable to scan card"
                     Log.i("BLUETOOTH", "Scanning failed, error code: $errorCode")
                 }
-            },
+            },*/
             object : CardScanCallback {
+                override fun onScanResult(callbackType: Int, result: ScanResult?) {
+                    handleBLEScanResult(result, onScan)
+                }
+
+                override fun onBatchScanResults(results: List<ScanResult?>?) {
+                    results?.forEach { result ->
+                        handleBLEScanResult(result, onScan)
+                    }
+                }
+
+                override fun onScanFailed(errorCode: Int) {
+                    _scanning.value = false
+                    _scanSuccess.value = false
+                    _userMessage.value = "Unable to scan card"
+                    Log.i("BLUETOOTH", "Scanning failed, error code: $errorCode")
+                }
+
                 override fun onScanStarted() {
                     BLEscanTimeoutJob = viewModelScope.launch {
                         // Stop scanning after 5 seconds if no device is found
