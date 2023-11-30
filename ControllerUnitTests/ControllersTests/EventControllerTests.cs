@@ -277,7 +277,12 @@ namespace ControllerUnitTests.ControllersTests
             context.SaveChanges();
 
             // Act
-            var result = await eventController.EndEvent(1, 10.0d);
+            var result = await eventController.EndEvent(new EventEndRequest
+            {
+                Id = 1,
+                VolumeKwh = 10.0d
+            }
+            );
 
             // Assert
             Assert.IsFalse(context.Charger.Find(1).Active);
