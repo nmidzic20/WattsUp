@@ -10,11 +10,12 @@ import android.os.Handler
 import android.os.Looper
 import android.os.Parcelable
 import android.util.Log
+import hr.foi.air.wattsup.core.CardScanCallback
 
 class NfcReaderActivity : Activity(), NfcAdapter.ReaderCallback {
     private var mNfcAdapter: NfcAdapter? = null
     private var pendingIntent: PendingIntent? = null
-    private var rfidScanCallback: RFIDScanCallback? = null
+    private var rfidScanCallback: CardScanCallback? = null
     private val handler = Handler(Looper.getMainLooper())
     private val timeoutMillis = 5000L
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,16 +40,16 @@ class NfcReaderActivity : Activity(), NfcAdapter.ReaderCallback {
             this,
             this,
             NfcAdapter.FLAG_READER_NFC_A or
-                    NfcAdapter.FLAG_READER_NFC_B or
-                    NfcAdapter.FLAG_READER_NFC_F or
-                    NfcAdapter.FLAG_READER_NFC_V or
-                    NfcAdapter.FLAG_READER_NFC_BARCODE or
-                    NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK,
-            null
+                NfcAdapter.FLAG_READER_NFC_B or
+                NfcAdapter.FLAG_READER_NFC_F or
+                NfcAdapter.FLAG_READER_NFC_V or
+                NfcAdapter.FLAG_READER_NFC_BARCODE or
+                NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK,
+            null,
         )
 
         handler.postDelayed({
-            rfidScanCallback?.onRFIDScanError("RFID scan timed out")
+            rfidScanCallback?.onScanFailed("RFID scan timed out")
             finish()
         }, timeoutMillis)
     }
@@ -64,18 +65,19 @@ class NfcReaderActivity : Activity(), NfcAdapter.ReaderCallback {
         if (tag != null) {
             handleNfcTag(tag)
         } else {
-            rfidScanCallback?.onRFIDScanError("No NFC tag found")
+            rfidScanCallback?.onScanFailed("No NFC tag found")
             finish()
         }
     }
+
     private fun handleNfcTag(tag: Parcelable) {
         if (tag is Tag) {
             val uid = tag.id
             Log.d("RFID", "NFC tag UID: $uid")
-            rfidScanCallback?.onRFIDScanResult(uid)
+            rfidScanCallback?.onScanResult(uid)
         } else {
             Log.e("RFID", "Invalid tag type: ${tag.javaClass.simpleName}")
-            rfidScanCallback?.onRFIDScanError("Invalid tag type: ${tag.javaClass.simpleName}")
+            rfidScanCallback?.onScanFailed("Invalid tag type: ${tag.javaClass.simpleName}")
         }
         CallbackHolder.rfidScanCallback = null
         finish()
