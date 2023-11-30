@@ -107,11 +107,11 @@ namespace backend.Controllers
             return Ok(newEvent);
         }
 
-        [HttpPut("{id}")]
-        public async Task<ActionResult<Event>> EndEvent(long id, double volumeKwh)
+        [HttpPut]
+        public async Task<ActionResult<Event>> EndEvent(EventEndRequest eventEndRequest)
         {
             var eventToUpdate = await _dbContext.Event
-                .Where(e => e.Id == id)
+                .Where(e => e.Id == eventEndRequest.Id)
                 .FirstOrDefaultAsync();
 
             if (eventToUpdate == null)
@@ -119,7 +119,7 @@ namespace backend.Controllers
                 return NotFound();
             }
 
-            eventToUpdate.VolumeKwh = volumeKwh;
+            eventToUpdate.VolumeKwh = eventEndRequest.VolumeKwh;
             eventToUpdate.EndedAt = DateTime.UtcNow;
 
             if (!await UpdateChargerState(false, eventToUpdate.ChargerId))
@@ -128,7 +128,7 @@ namespace backend.Controllers
             }
 
             await _dbContext.SaveChangesAsync();
-            return Ok($"Ended event {eventToUpdate.Id}");
+            return Ok(eventToUpdate);
         }
 
         private async Task<bool> UpdateChargerState(bool state, long id)
