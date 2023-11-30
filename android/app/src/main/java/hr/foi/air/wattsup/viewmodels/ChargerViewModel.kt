@@ -1,12 +1,22 @@
 package hr.foi.air.wattsup.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import hr.foi.air.wattsup.network.NetworkService
+import hr.foi.air.wattsup.network.models.EventPOSTBody
+import hr.foi.air.wattsup.network.models.EventPOSTResponseBody
+import hr.foi.air.wattsup.network.models.EventPUTBody
+import hr.foi.air.wattsup.network.models.EventPUTResponseBody
+import hr.foi.air.wattsup.utils.CurrentEvent
+import hr.foi.air.wattsup.utils.UserCard
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Response
 import java.util.concurrent.TimeUnit
 
 class ChargerViewModel : ViewModel() {
@@ -26,6 +36,12 @@ class ChargerViewModel : ViewModel() {
     private val _currentChargeAmount: MutableLiveData<Float> =
         MutableLiveData(_initialChargeAmount.value)
     private val _percentageChargedUntilFull = MutableLiveData(0f)
+    private val _currentChargeVolume = MutableLiveData(0f)
+
+    private val _eventService = NetworkService.eventService
+
+    private val _toastMessage = MutableLiveData<String>()
+    private val currentChargeVolume: LiveData<Float> get() = _currentChargeVolume
 
     val charging: LiveData<Boolean> get() = _charging
     val timeElapsed: LiveData<Long> get() = _timeElapsed
@@ -33,9 +49,13 @@ class ChargerViewModel : ViewModel() {
     val percentageChargedUntilFull: LiveData<Float> get() = _percentageChargedUntilFull
     val amountNecessaryForFullCharge: LiveData<Float> get() = _amountNecessaryForFullCharge
     val currentChargeAmount: LiveData<Float> get() = _currentChargeAmount
+    // Variable used to track the amount of charge in kWh for current charging session
 
     private val _openFullChargeAlertDialog = MutableLiveData(false)
     val openFullChargeAlertDialog: LiveData<Boolean> = _openFullChargeAlertDialog
+
+
+    val toastMessage: LiveData<String> get() = _toastMessage
     fun setOpenFullChargeAlertDialog(value: Boolean) {
         _openFullChargeAlertDialog.value = value
     }
@@ -59,7 +79,13 @@ class ChargerViewModel : ViewModel() {
 
     private fun startCharging(onFullyCharged: () -> Unit) {
         _startTime.value = System.currentTimeMillis()
+        _currentChargeVolume.value = 0f
         viewModelScope.launch {
+            launch {
+                val eventPOSTBody = EventPOSTBody(1, UserCard.userCard.value!!.id)
+                // chargerID is sent as 1 since charger selection is yet to be implemented
+                startEvent(eventPOSTBody)
+            }
             while (_charging.value == true) {
                 if (_percentageChargedUntilFull.value!! < _amountNecessaryForFullCharge.value!!) {
                     // Update time every second
@@ -76,6 +102,8 @@ class ChargerViewModel : ViewModel() {
                         (_percentageChargedUntilFull.value!! + 0.01f)
                     _currentChargeAmount.value =
                         (_currentChargeAmount.value!! + 0.01f).coerceIn(0f, 1f)
+                    _currentChargeVolume.value = (_currentChargeVolume.value!! + 0.03f)
+                    // Arbitrarily selected amount of charge in kWh per second
                 } else {
                     // Stop charging automatically if the EV is fully charged
                     _charging.value = false
@@ -94,6 +122,12 @@ class ChargerViewModel : ViewModel() {
         _percentageChargedUntilFull.value = 0f
         _amountNecessaryForFullCharge.value =
             (maxChargePercentage - currentChargeAmount.value!!).coerceIn(0f, 1f)
+
+        val eventPUTBody = EventPUTBody(
+            CurrentEvent.currentEvent.value!!.id, currentChargeVolume.value!!)
+        viewModelScope.launch {
+            stopEvent(eventPUTBody)
+        }
     }
 
     fun formatTime(milliseconds: Long): String {
@@ -102,5 +136,52 @@ class ChargerViewModel : ViewModel() {
         val seconds = TimeUnit.MILLISECONDS.toSeconds(milliseconds) % 60
 
         return String.format("%02d:%02d:%02d", hours, minutes, seconds)
+    }
+
+    private fun startEvent(eventPOSTBody: EventPOSTBody){
+        _eventService.logEventStart(eventPOSTBody).enqueue(
+            object : retrofit2.Callback<EventPOSTResponseBody>{
+                override fun onResponse(
+                    call: Call<EventPOSTResponseBody>,
+                    response: Response<EventPOSTResponseBody>
+                ) {
+                    CurrentEvent.currentEvent.value = response.body()
+                    Log.i("RES_EVENT", "Event started")
+                    Log.i("RES_EVENT", response.body().toString())
+                    _toastMessage.value = "Event started successfully"
+                }
+
+                override fun onFailure(call: Call<EventPOSTResponseBody>, t: Throwable) {
+                    Log.i("Response", t.toString())
+                    _toastMessage.value = "Error starting event"
+                }
+
+            }
+        )
+    }
+
+    private fun stopEvent(eventPUTBody: EventPUTBody){
+        _eventService.logEventEnd(eventPUTBody).enqueue(
+            object : retrofit2.Callback<EventPUTResponseBody>{
+                override fun onResponse(
+                    call: Call<EventPUTResponseBody>,
+                    response: Response<EventPUTResponseBody>
+                ) {
+                    Log.i("RES_EVENT", "Event saved")
+                    Log.i("RES_EVENT", response.body().toString())
+                    _toastMessage.value = "Event saved successfully"
+                }
+
+                override fun onFailure(call: Call<EventPUTResponseBody>, t: Throwable) {
+                    Log.i("Response", t.toString())
+                    _toastMessage.value = "Error saving event"
+                }
+
+            }
+        )
+    }
+
+    fun clearToastMessage() {
+        _toastMessage.value = null
     }
 }
