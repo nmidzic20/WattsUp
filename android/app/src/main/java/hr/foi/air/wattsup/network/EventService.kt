@@ -13,6 +13,6 @@ interface EventService {
     @POST("api/Event")
     fun logEventStart(@Body eventPOSTBody: EventPOSTBody): Call<EventPOSTResponseBody>
 
-    @PUT("api/Event/{userId}")
+    @PUT("api/Event")
     fun logEventEnd(@Body eventPUTBody: EventPUTBody): Call<EventPUTResponseBody>
 }
