@@ -1,8 +1,10 @@
 package hr.foi.air.wattsup.utils
 
+import android.util.Log
+
 object HexUtils {
     fun formatHexToPrefix(hexString: String): String {
-        val parts = hexString.split(":")
+        val parts = hexString.removeSuffix(":").split(":")
         val formattedHex = parts.joinToString("") { part ->
             // Convert each part to a two-character lowercase hex string
             String.format("%02x", part.toInt(16))
@@ -10,8 +12,13 @@ object HexUtils {
         return "0x$formattedHex"
     }
 
-    fun compareHexStrings(hexString1: String, hexString2: String): Boolean =
-        hexString1.equals(hexString2, ignoreCase = true)
+    fun compareHexStrings(hexString1: String, hexString2: String): Boolean {
+        Log.i(
+            "CARD_MATCH?",
+            "$hexString1 $hexString2 ${hexString1.equals(hexString2, ignoreCase = true)}",
+        )
+        return hexString1.equals(hexString2, ignoreCase = true)
+    }
 
     fun bytesToHexString(bytes: ByteArray): String {
         val stringBuilder = StringBuilder()

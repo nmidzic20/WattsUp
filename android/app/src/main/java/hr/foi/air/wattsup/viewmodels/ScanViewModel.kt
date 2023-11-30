@@ -13,6 +13,7 @@ import hr.foi.air.wattsup.network.models.Card
 import hr.foi.air.wattsup.rfid.RFIDManager
 import hr.foi.air.wattsup.rfid.RFIDScanCallback
 import hr.foi.air.wattsup.utils.HexUtils
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -245,23 +246,23 @@ class ScanViewModel(
     }
 
     private fun handleRFIDScanResult(uid: ByteArray, onScan: () -> Unit) {
-        // viewModelScope.launch(Dispatchers.Main) {
-        Log.i("RFID", "UID 1: $uid")
+        viewModelScope.launch(Dispatchers.Main) {
+            Log.i("RFID", "UID 1: $uid")
 
-        val cardAddress =
-            HexUtils.formatHexToPrefix(HexUtils.bytesToHexString(uid))
+            val cardAddress =
+                HexUtils.formatHexToPrefix(HexUtils.bytesToHexString(uid))
 
-        Log.i("RFID", "UID 2: $cardAddress")
+            Log.i("RFID", "UID 2: $cardAddress")
 
-        if (deviceAddressMatchesDatabaseCardValue(cardAddress)) {
-            _scanSuccess.value = true
-            _scanning.value = false
-            _userMessage.value = "Scan successful"
-            onScan()
-            _scanSuccess.value =
-                false // After navigating away, reset so buttons are visible for the next scanning
+            if (deviceAddressMatchesDatabaseCardValue(cardAddress)) {
+                _scanSuccess.value = true
+                _scanning.value = false
+                _userMessage.value = "Scan successful"
+                onScan()
+                _scanSuccess.value =
+                    false // After navigating away, reset so buttons are visible for the next scanning
+            }
         }
-        // }
     }
 
     private fun deviceAddressMatchesDatabaseCardValue(deviceAddress: String): Boolean =
