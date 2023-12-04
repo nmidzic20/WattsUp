@@ -41,6 +41,7 @@ class BLEManager(
     private var bluetoothGatt: BluetoothGatt? = null
 
     private var scanCallback: ScanCallback? = null
+    private var onScanStop: () -> Unit = {}
 
     init {
         initialize()
@@ -91,7 +92,6 @@ class BLEManager(
     }
 
     override fun startScanningForCard(bleScanCallback: CardScanCallback?) {
-        // this.scanCallback = scanCallback
         this.scanCallback = object : ScanCallback() {
             override fun onScanResult(callbackType: Int, result: ScanResult) {
                 bleScanCallback?.onScanResult(result.device.address)
@@ -105,6 +105,8 @@ class BLEManager(
                 bleScanCallback?.onScanFailed(errorCode.toString())
             }
         }
+
+        this.onScanStop = { bleScanCallback?.onScanStopped() }
 
         val scanFilters = mutableListOf<ScanFilter>()
         val scanSettings = ScanSettings.Builder()
@@ -124,6 +126,7 @@ class BLEManager(
             Manifest.permission.BLUETOOTH_SCAN,
             REQUEST_PERMISSIONS_SCAN,
         )
+        this.onScanStop()
         if (scanCallback != null) {
             bluetoothLeScanner?.stopScan(scanCallback)
             scanCallback = null
