@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { UserManagerService } from './services/user-manager.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -6,5 +8,19 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'web';
+  constructor(private userManagerService: UserManagerService, private router: Router) { }
+
+  ngOnInit(): void {
+    let tokens = this.userManagerService.getTokensFromLocalStorage();
+
+    if (tokens) {
+      if (this.userManagerService.validTokens(tokens)) {
+        this.router.navigate(['/map']);
+      } else {
+        this.router.navigate(['/login']);
+      }
+    } else {
+      this.router.navigate(['/login']);
+    }
+  }
 }

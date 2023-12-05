@@ -7,7 +7,6 @@ import { StationManagementComponent } from './station-management/station-managem
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
-  { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'registration', component: RegistrationComponent },
   { path: 'station-management', component: StationManagementComponent },
   { path: '**', component: NotFoundComponent }
