@@ -3,12 +3,14 @@ import { RouterModule, Routes } from '@angular/router';
 import { RegistrationComponent } from './registration/registration.component';
 import { NotFoundComponent } from './not-found/not-found.component';
 import { LoginComponent } from './login/login.component';
+import { StationManagementComponent } from './station-management/station-management.component';
 
 const routes: Routes = [
-  {path: 'login', component: LoginComponent},
-  {path: '', redirectTo: '/login', pathMatch: 'full'},
-  {path: 'registration', component: RegistrationComponent},
-  {path: '**', component: NotFoundComponent}
+  { path: 'login', component: LoginComponent },
+  { path: '', redirectTo: '/login', pathMatch: 'full' },
+  { path: 'registration', component: RegistrationComponent },
+  { path: 'station-management', component: StationManagementComponent },
+  { path: '**', component: NotFoundComponent }
 ];
 
 @NgModule({
