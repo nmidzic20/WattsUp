@@ -35,10 +35,7 @@ export class LoginComponent implements OnInit {
         let body = await response.text();
         if(response.status == 200){
           let bodyJSON = JSON.parse(body);
-          this.userManagerService.jwt = bodyJSON.jwt;
-          this.userManagerService.refreshToken = bodyJSON.refreshToken;
-          this.userManagerService.refreshTokenExpiration = bodyJSON.refreshTokenExpiresAt;
-          this.userManagerService.saveTokensToLocalStorage();
+          this.userManagerService.saveTokensToLocalStorage(bodyJSON.jwt, bodyJSON.refreshToken, bodyJSON.refreshTokenExpiresAt);
 
           this.router.navigate(['/map']);
         }else{

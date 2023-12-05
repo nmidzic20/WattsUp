@@ -10,11 +10,11 @@ import { Router } from '@angular/router';
 export class AppComponent {
   constructor(private userManagerService: UserManagerService, private router: Router) { }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     let tokens = this.userManagerService.getTokensFromLocalStorage();
 
     if (tokens) {
-      if (this.userManagerService.validTokens(tokens)) {
+      if (await this.userManagerService.validTokens(tokens)) {
         this.router.navigate(['/map']);
       } else {
         this.router.navigate(['/login']);
