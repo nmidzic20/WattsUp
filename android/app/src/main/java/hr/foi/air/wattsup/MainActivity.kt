@@ -24,6 +24,7 @@ import hr.foi.air.wattsup.screens.LandingScreen
 import hr.foi.air.wattsup.screens.LoginScreen
 import hr.foi.air.wattsup.screens.RegistrationScreen
 import hr.foi.air.wattsup.screens.ScanScreen
+import hr.foi.air.wattsup.screens.UserModeScreen
 import hr.foi.air.wattsup.ui.theme.WattsUpTheme
 import hr.foi.air.wattsup.viewmodels.ChargerViewModel
 
@@ -80,6 +81,13 @@ class MainActivity : ComponentActivity() {
                         composable("login") {
                             val onRegisterClick = { navController.navigate("registration") }
                             LoginScreen(onRegisterClick)
+                        }
+                        composable("userMode") {
+                            val onHistoryClick = { navController.navigate("chargingHistory") }
+                            UserModeScreen(onHistoryClick)
+                        }
+                        composable("chargingHistory") {
+                            //HistoryScreen(onArrowBackClick)
                         }
                     }
                 }
