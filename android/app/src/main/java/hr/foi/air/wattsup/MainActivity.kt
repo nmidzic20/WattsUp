@@ -60,15 +60,15 @@ class MainActivity : ComponentActivity() {
 
                     NavHost(navController = navController, startDestination = "landing") {
                         composable("landing") {
-                            val onChargerModeClick = { navController.navigate("scanRFID") }
+                            val onChargerModeClick = { navController.navigate("scanCard") }
                             val onUserModeClick = { navController.navigate("login") }
 
                             LandingScreen(onChargerModeClick, onUserModeClick)
                         }
-                        composable("scanRFID") {
-                            val onScanRFID = { navController.navigate("chargerMode") }
+                        composable("scanCard") {
+                            val onScan = { navController.navigate("chargerMode") }
 
-                            ScanScreen(onArrowBackClick, onScanRFID, scanViewModel)
+                            ScanScreen(onArrowBackClick, onScan, scanViewModel)
                         }
                         composable("chargerMode") {
                             ChargerScreen(onArrowBackClick, chargerViewModel)
