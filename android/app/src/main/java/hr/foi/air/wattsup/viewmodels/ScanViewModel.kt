@@ -4,13 +4,11 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import hr.foi.air.wattsup.ble.BLEManager
 import hr.foi.air.wattsup.core.CardManager
 import hr.foi.air.wattsup.core.CardScanCallback
 import hr.foi.air.wattsup.network.CardService
 import hr.foi.air.wattsup.network.NetworkService
 import hr.foi.air.wattsup.network.models.Card
-import hr.foi.air.wattsup.rfid.RFIDManager
 import hr.foi.air.wattsup.utils.HexUtils
 import hr.foi.air.wattsup.utils.UserCard
 import kotlinx.coroutines.Dispatchers
@@ -44,13 +42,6 @@ class ScanViewModel(
     val userMessage: LiveData<String> get() = _userMessage
 
     private val _includeTestButton = MutableLiveData(true)
-
-    val cardManagers: List<CardManager> = listOf(
-        BLEManager(
-            context,
-        ),
-        RFIDManager(context),
-    )
 
     init {
         refreshCardAddressList()

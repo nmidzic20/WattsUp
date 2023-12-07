@@ -34,23 +34,29 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import hr.foi.air.wattsup.R
+import hr.foi.air.wattsup.core.CardManager
 import hr.foi.air.wattsup.ui.component.CircleButton
 import hr.foi.air.wattsup.ui.component.TopAppBar
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit, viewModel: ScanViewModel) {
+fun ScanScreen(
+    onArrowBackClick: () -> Unit,
+    onScan: () -> Unit,
+    viewModel: ScanViewModel,
+    cardManagers: List<CardManager>,
+) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
     val userMessage by viewModel.userMessage.observeAsState()
 
     var bluetoothStatusMessage by remember {
-        mutableStateOf(viewModel.getStatusMessage(false, viewModel.cardManagers.get(0)))
+        mutableStateOf(viewModel.getStatusMessage(false, cardManagers.get(0)))
     }
     var rfidStatusMessage by remember {
-        mutableStateOf(viewModel.getStatusMessage(false, viewModel.cardManagers.get(1)))
+        mutableStateOf(viewModel.getStatusMessage(false, cardManagers.get(1)))
     }
 
     val scanning by viewModel.scanning.observeAsState()
@@ -61,8 +67,8 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit, viewModel: Scan
             val bleResult = snackbarHostState
                 .showSnackbar(
                     message = bluetoothStatusMessage,
-                    actionLabel = if (viewModel.cardManagers.get(0)
-                            .isCardSupportAvailableOnDevice() && !viewModel.cardManagers.get(0)
+                    actionLabel = if (cardManagers.get(0)
+                            .isCardSupportAvailableOnDevice() && !cardManagers.get(0)
                             .isCardSupportEnabledOnDevice()
                     ) {
                         "Turn on Bluetooth"
@@ -73,11 +79,11 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit, viewModel: Scan
                 )
             when (bleResult) {
                 SnackbarResult.ActionPerformed -> {
-                    if (viewModel.cardManagers.get(0)
-                            .isCardSupportAvailableOnDevice() && !viewModel.cardManagers.get(0)
+                    if (cardManagers.get(0)
+                            .isCardSupportAvailableOnDevice() && !cardManagers.get(0)
                             .isCardSupportEnabledOnDevice()
                     ) {
-                        viewModel.cardManagers.get(0).showEnableCardSupportOption(context)
+                        cardManagers.get(0).showEnableCardSupportOption(context)
                     }
                 }
 
@@ -86,9 +92,9 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit, viewModel: Scan
             }
 
             val rfidResult = snackbarHostState.showSnackbar(
-                message = rfidStatusMessage.toString(),
-                actionLabel = if (viewModel.cardManagers.get(1)
-                        .isCardSupportAvailableOnDevice() && !viewModel.cardManagers.get(1)
+                message = rfidStatusMessage,
+                actionLabel = if (cardManagers.get(1)
+                        .isCardSupportAvailableOnDevice() && !cardManagers.get(1)
                         .isCardSupportEnabledOnDevice()
                 ) {
                     "Enable RFID/NFC"
@@ -99,11 +105,11 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit, viewModel: Scan
             )
             when (rfidResult) {
                 SnackbarResult.ActionPerformed -> {
-                    if (viewModel.cardManagers.get(1)
-                            .isCardSupportAvailableOnDevice() && !viewModel.cardManagers.get(1)
+                    if (cardManagers.get(1)
+                            .isCardSupportAvailableOnDevice() && !cardManagers.get(1)
                             .isCardSupportEnabledOnDevice()
                     ) {
-                        viewModel.cardManagers.get(1).showEnableCardSupportOption(context)
+                        cardManagers.get(1).showEnableCardSupportOption(context)
                     }
                 }
 
@@ -145,7 +151,7 @@ fun ScanScreen(onArrowBackClick: () -> Unit, onScan: () -> Unit, viewModel: Scan
                 verticalArrangement = Arrangement.Center,
             ) {
                 if (!scanning!! && !scanSuccess!!) {
-                    viewModel.cardManagers.forEach { cardManager ->
+                    cardManagers.forEach { cardManager ->
                         CircleButton(
                             "Scan ${cardManager.getName()}",
                             {

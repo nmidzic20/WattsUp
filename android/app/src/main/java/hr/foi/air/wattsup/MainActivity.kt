@@ -19,6 +19,9 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import hr.foi.air.wattsup.ble.BLEManager
+import hr.foi.air.wattsup.core.CardManager
+import hr.foi.air.wattsup.rfid.RFIDManager
 import hr.foi.air.wattsup.screens.ChargerScreen
 import hr.foi.air.wattsup.screens.LandingScreen
 import hr.foi.air.wattsup.screens.LoginScreen
@@ -57,6 +60,10 @@ class MainActivity : ComponentActivity() {
                         navController.popBackStack()
                         Unit
                     }
+                    val cardManagers: List<CardManager> = listOf(
+                        BLEManager(this),
+                        RFIDManager(this),
+                    )
 
                     NavHost(navController = navController, startDestination = "landing") {
                         composable("landing") {
@@ -68,7 +75,7 @@ class MainActivity : ComponentActivity() {
                         composable("scanCard") {
                             val onScan = { navController.navigate("chargerMode") }
 
-                            ScanScreen(onArrowBackClick, onScan, scanViewModel)
+                            ScanScreen(onArrowBackClick, onScan, scanViewModel, cardManagers)
                         }
                         composable("chargerMode") {
                             ChargerScreen(onArrowBackClick, chargerViewModel)
