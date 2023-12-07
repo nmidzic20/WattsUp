@@ -87,11 +87,11 @@ class ScanViewModel(
 
     fun getStatusMessage(scanning: Boolean, cardManager: CardManager): String =
         if (!cardManager.isCardSupportAvailableOnDevice()) {
-            "Bluetooth/RFID is not supported on this device"
+            "${cardManager.getName()} is not supported on this device"
         } else if (!cardManager.isCardSupportEnabledOnDevice()) {
-            "Bluetooth/RFID is not enabled on this device"
+            "${cardManager.getName()} is not enabled on this device"
         } else {
-            if (scanning) "No registered BLE/RFID card found" else "Bluetooth/RFID is supported and enabled on this device"
+            if (scanning) "No registered ${cardManager.getName()} card found" else "${cardManager.getName()} is supported and enabled on this device"
         }
 
     fun startScanning(cardManager: CardManager, onScan: () -> Unit) {
@@ -99,7 +99,7 @@ class ScanViewModel(
             cardManager.stopScanningForCard()
             _scanning.value = false
             _scanSuccess.value = false
-            _userMessage.value = "Bluetooth/RFID is not enabled on this device"
+            _userMessage.value = "${cardManager.getName()} is not enabled on this device"
             return
         }
 
@@ -154,10 +154,10 @@ class ScanViewModel(
     private fun handleScanResult(result: Any, onScan: () -> Unit, cardManager: CardManager) {
         if (cardManager.getName() == "RFID") {
             viewModelScope.launch(Dispatchers.Main) {
-                handleScan(result, onScan, { cardManager.stopScanningForCard() })
+                handleScan(result, onScan) { cardManager.stopScanningForCard() }
             }
         } else {
-            handleScan(result, onScan, { cardManager.stopScanningForCard() })
+            handleScan(result, onScan) { cardManager.stopScanningForCard() }
         }
     }
 
