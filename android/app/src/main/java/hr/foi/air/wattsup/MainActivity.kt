@@ -20,6 +20,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import hr.foi.air.wattsup.screens.ChargerScreen
+import hr.foi.air.wattsup.screens.HistoryScreen
 import hr.foi.air.wattsup.screens.LandingScreen
 import hr.foi.air.wattsup.screens.LoginScreen
 import hr.foi.air.wattsup.screens.RegistrationScreen
@@ -87,7 +88,7 @@ class MainActivity : ComponentActivity() {
                             UserModeScreen(onHistoryClick)
                         }
                         composable("chargingHistory") {
-                            //HistoryScreen(onArrowBackClick)
+                            HistoryScreen(onArrowBackClick)
                         }
                     }
                 }

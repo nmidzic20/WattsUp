@@ -22,11 +22,6 @@
         android:theme="@style/Theme.WattsUp"
         tools:targetApi="31">
         <activity
-            android:name=".screens.UserModeScreen"
-            android:exported="false"
-            android:label="@string/title_activity_user_mode_screen"
-            android:theme="@style/Theme.WattsUp" />
-        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.WattsUp">

@@ -13,4 +13,5 @@
     <string name="passwordLabel">Password</string>
     <string name="LoginDontHaveAccountLabel">"Don\'t have an account?"</string>
     <string name="login">Login</string>
+    <string name="history">Charging History</string>
 </resources>

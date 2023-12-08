@@ -27,10 +27,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hr.foi.air.wattsup.R
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun UserModeScreen(onHistoryClick: () -> Unit) {
-    val context = LocalContext.current
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -44,24 +44,26 @@ fun UserModeScreen(onHistoryClick: () -> Unit) {
             )
         },
     ) {
-        UserModeView(onHistoryClick, context)
+        UserModeView(onHistoryClick)
     }
 }
 
 @Composable
-fun UserModeView(onHistoryClick: () -> Unit, context: Context) {
+fun UserModeView(onHistoryClick: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
             .padding(0.dp, 15.dp)
             .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.Top,
+        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        ElevatedButton(onClick = onHistoryClick) {
+        ElevatedButton(
+            onClick = onHistoryClick
+        ) {
             Text(
-                text = "Charging History",
+                text = stringResource(R.string.history),
                 style = MaterialTheme.typography.bodyMedium,
                 color = androidx.compose.ui.graphics.Color.White,
             )
