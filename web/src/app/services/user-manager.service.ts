@@ -1,12 +1,15 @@
 import { Injectable } from '@angular/core';
 import { jwtDecode } from "jwt-decode";
 import { JwtInfo, Tokens } from '../interfaces/Tokens';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserManagerService {
   tokens: Tokens | null = null;
+  private isLoggedInSubject = new BehaviorSubject<boolean>(false);
+  isLoggedIn$ = this.isLoggedInSubject.asObservable();
 
   constructor() { }
 
@@ -21,6 +24,8 @@ export class UserManagerService {
       refreshToken: refreshToken,
       refreshTokenExpiresAt: refreshTokenExpiration
     };
+
+    this.isLoggedInSubject.next(true);
   }
 
   removeTokens() {
@@ -29,6 +34,8 @@ export class UserManagerService {
     localStorage.removeItem('refreshTokenExpiration');
 
     this.tokens = null;
+
+    this.isLoggedInSubject.next(false);
   }
 
   getTokens(): Tokens | null {

@@ -14,18 +14,27 @@ export class AppComponent {
   constructor(private userManagerService: UserManagerService, private router: Router) { }
 
   async ngOnInit(): Promise<void> {
-    let tokens = this.userManagerService.getTokens();
+    this.userManagerService.isLoggedIn$.subscribe(async (loggedIn) => {
+      if (loggedIn) {
+        let tokens = this.userManagerService.getTokens();
 
-    if (tokens) {
-      if (await this.userManagerService.validTokens(tokens)) {
-        this.isUser = tokens.jwtInfo?.role == 'User';
-        this.isAdmin = tokens.jwtInfo?.role == 'Admin';
+        if (tokens) {
+          if (await this.userManagerService.validTokens(tokens)) {
+            this.isUser = tokens.jwtInfo?.role == 'User';
+            this.isAdmin = tokens.jwtInfo?.role == 'Admin';
+          }
+        }
+
+        this.isUser = this.userManagerService.getTokens()?.jwtInfo?.role == 'User';
+        this.isAdmin = this.userManagerService.getTokens()?.jwtInfo?.role == 'Admin';
       }
-    }
+    });
   }
 
   logOut() {
     this.userManagerService.removeTokens();
+    this.isUser = false;
+    this.isAdmin = false;
     this.router.navigate(['/login']);
   }
 }
