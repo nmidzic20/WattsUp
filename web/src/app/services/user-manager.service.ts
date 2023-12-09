@@ -79,6 +79,7 @@ export class UserManagerService {
   async validTokens(tokens: Tokens): Promise<boolean> {
     if (tokens.jwtInfo) {
       if (tokens.jwtInfo.exp * 1000 > Date.now()) {
+        this.isLoggedInSubject.next(true);
         return true;
       } else {
         return await this.validRefreshToken(tokens);

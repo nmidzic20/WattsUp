@@ -3,7 +3,7 @@
 
   <a *ngIf="isAdmin" routerLink="/station-management">STATION MANAGEMENT</a>
   <a *ngIf="isUser || isAdmin" routerLink="/map">MAP</a>
-  <a *ngIf="isUser || isAdmin">STATISTICS</a>
+  <a *ngIf="isUser || isAdmin" routerLink="/statistics">STATISTICS</a>
   <a *ngIf="isUser || isAdmin" (click)="logOut()">LOGOUT</a>
 </nav>
 
