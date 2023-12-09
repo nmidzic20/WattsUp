@@ -8,19 +8,24 @@ import { Router } from '@angular/router';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
+  isUser = false;
+  isAdmin = false;
+
   constructor(private userManagerService: UserManagerService, private router: Router) { }
 
   async ngOnInit(): Promise<void> {
-    let tokens = this.userManagerService.getTokensFromLocalStorage();
+    let tokens = this.userManagerService.getTokens();
 
     if (tokens) {
       if (await this.userManagerService.validTokens(tokens)) {
-        this.router.navigate(['/map']);
-      } else {
-        this.router.navigate(['/login']);
+        this.isUser = tokens.jwtInfo?.role == 'User';
+        this.isAdmin = tokens.jwtInfo?.role == 'Admin';
       }
-    } else {
-      this.router.navigate(['/login']);
     }
+  }
+
+  logOut() {
+    this.userManagerService.removeTokens();
+    this.router.navigate(['/login']);
   }
 }

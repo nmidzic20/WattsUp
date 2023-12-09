@@ -8,7 +8,8 @@ export interface JwtInfo {
 }
 
 export interface Tokens {
-    jwt: JwtInfo | null;
+    jwtInfo: JwtInfo | null;
+    jwt: string;
     refreshToken: string;
     refreshTokenExpiresAt: string;
 }

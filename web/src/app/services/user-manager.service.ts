@@ -6,23 +6,44 @@ import { JwtInfo, Tokens } from '../interfaces/Tokens';
   providedIn: 'root'
 })
 export class UserManagerService {
+  tokens: Tokens | null = null;
 
   constructor() { }
 
-  saveTokensToLocalStorage(jwt: string, refreshToken: string, refreshTokenExpiration: string) {
+  saveTokens(jwt: string, refreshToken: string, refreshTokenExpiration: string) {
     localStorage.setItem('jwt', jwt);
     localStorage.setItem('refreshToken', refreshToken);
     localStorage.setItem('refreshTokenExpiration', refreshTokenExpiration);
+
+    this.tokens = {
+      jwtInfo: this.getJwtInfo(jwt),
+      jwt: jwt,
+      refreshToken: refreshToken,
+      refreshTokenExpiresAt: refreshTokenExpiration
+    };
   }
 
-  getTokensFromLocalStorage(): Tokens | null {
+  removeTokens() {
+    localStorage.removeItem('jwt');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('refreshTokenExpiration');
+
+    this.tokens = null;
+  }
+
+  getTokens(): Tokens | null {
+    if(this.tokens){
+      return this.tokens;
+    }
+
     let jwt = localStorage.getItem('jwt');
     let refreshToken = localStorage.getItem('refreshToken');
     let refreshTokenExpiration = localStorage.getItem('refreshTokenExpiration');
 
     if (jwt && refreshToken && refreshTokenExpiration) {
       return {
-        jwt: this.getJwtInfo(jwt),
+        jwtInfo: this.getJwtInfo(jwt),
+        jwt: jwt,
         refreshToken: refreshToken,
         refreshTokenExpiresAt: refreshTokenExpiration
       };
@@ -49,8 +70,8 @@ export class UserManagerService {
   }
 
   async validTokens(tokens: Tokens): Promise<boolean> {
-    if (tokens.jwt) {
-      if (tokens.jwt.exp * 1000 > Date.now()) {
+    if (tokens.jwtInfo) {
+      if (tokens.jwtInfo.exp * 1000 > Date.now()) {
         return true;
       } else {
         return await this.validRefreshToken(tokens);
@@ -72,7 +93,7 @@ export class UserManagerService {
     let header = new Headers();
     header.set("Content-Type", "application/json");
     header.set("accept", "text/plain");
-    header.set("Authorization", "Bearer " + localStorage.getItem('jwt'));
+    header.set("Authorization", "Bearer " + tokens.jwt);
 
     let body = { jwt: tokens.jwt, refreshToken: tokens.refreshToken }
     let parameters = { method: 'POST', headers: header, body: JSON.stringify(body) };
@@ -82,7 +103,7 @@ export class UserManagerService {
       let body = await response.text();
       if (response.status == 200) {
         let bodyJSON = JSON.parse(body);
-        this.saveTokensToLocalStorage(bodyJSON.jwt, bodyJSON.refreshToken, bodyJSON.refreshTokenExpiresAt);
+        this.saveTokens(bodyJSON.jwt, bodyJSON.refreshToken, bodyJSON.refreshTokenExpiresAt);
         return true;
       } else {
         let errorMessage = JSON.parse(body).message;
