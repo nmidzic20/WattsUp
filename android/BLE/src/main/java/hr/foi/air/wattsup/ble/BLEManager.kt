@@ -9,6 +9,7 @@ import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -23,15 +24,6 @@ class BLEManager(
     private val context: Context,
 ) : CardManager {
 
-    private val REQUIRED_PERMISSIONS = arrayOf(
-        Manifest.permission.BLUETOOTH,
-        Manifest.permission.BLUETOOTH_ADMIN,
-        Manifest.permission.ACCESS_COARSE_LOCATION,
-        Manifest.permission.ACCESS_FINE_LOCATION,
-        Manifest.permission.BLUETOOTH_CONNECT,
-        Manifest.permission.BLUETOOTH_SCAN,
-    )
-
     private var bluetoothAdapter: BluetoothAdapter? = null
     private var bluetoothLeScanner: BluetoothLeScanner? = null
     private var bluetoothGatt: BluetoothGatt? = null
@@ -41,7 +33,6 @@ class BLEManager(
 
     init {
         initialize()
-        // registerBluetoothStateReceiver()
     }
 
     companion object {
@@ -56,35 +47,28 @@ class BLEManager(
         bluetoothLeScanner = bluetoothAdapter?.bluetoothLeScanner
     }
 
-    /*private val bluetoothStateReceiver = object : BroadcastReceiver() {
+    override fun getRequiredPermissions(): List<String> =
+        listOf(
+            Manifest.permission.BLUETOOTH,
+            Manifest.permission.BLUETOOTH_ADMIN,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.BLUETOOTH_CONNECT,
+            Manifest.permission.BLUETOOTH_SCAN,
+        )
+
+    override fun getStateReceiver(): BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (BluetoothAdapter.ACTION_STATE_CHANGED == intent?.action) {
                 val state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR)
-                handleBluetoothState(state)
+                Log.i("SCAN_CARD STATE CHANGE BLE?", state.toString())
+                // Whenever BLE is turned off or on, update BLE adapter and scanner so that scanning works properly
+                initialize()
             }
         }
     }
 
-    private fun registerBluetoothStateReceiver() {
-        val filter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
-        context.registerReceiver(bluetoothStateReceiver, filter)
-    }*/
-
-    private fun handleBluetoothState(state: Int) {
-        when (state) {
-            BluetoothAdapter.STATE_ON -> {
-                Log.i("SCAN_CARD", "Bluetooth is ON")
-                initializeBluetoothComponents()
-            }
-
-            BluetoothAdapter.STATE_OFF -> {
-                Log.i("SCAN_CARD", "Bluetooth is OFF")
-                bluetoothAdapter = null
-                bluetoothLeScanner = null
-            }
-            // Handle other Bluetooth states if needed
-        }
-    }
+    override fun getAction(): String = BluetoothAdapter.ACTION_STATE_CHANGED
 
     override fun getName(): String = "BLE"
 

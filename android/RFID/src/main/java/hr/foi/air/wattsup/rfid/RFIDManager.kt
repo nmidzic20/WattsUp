@@ -1,6 +1,8 @@
 package hr.foi.air.wattsup.rfid
 
+import android.Manifest
 import android.app.Activity
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.nfc.NfcAdapter
@@ -13,8 +15,9 @@ import hr.foi.air.wattsup.core.CardScanCallback
 class RFIDManager(
     private val context: Context,
 ) : CardManager {
-    private val nfcManager = context.getSystemService(Context.NFC_SERVICE) as NfcManager?
-    private val nfcAdapter: NfcAdapter? = nfcManager?.defaultAdapter
+    private var nfcManager: NfcManager? =
+        context.getSystemService(Context.NFC_SERVICE) as NfcManager?
+    private var nfcAdapter: NfcAdapter? = nfcManager?.defaultAdapter
 
     init {
         initialize()
@@ -23,6 +26,27 @@ class RFIDManager(
     companion object {
         private const val REQUEST_ENABLE_RFID = 1
     }
+
+    override fun getRequiredPermissions(): List<String> = listOf(
+        Manifest.permission.NFC,
+    )
+
+    override fun getStateReceiver(): BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val action = intent.action
+            if (action == NfcAdapter.ACTION_ADAPTER_STATE_CHANGED) {
+                val state = intent.getIntExtra(
+                    NfcAdapter.EXTRA_ADAPTER_STATE,
+                    NfcAdapter.STATE_OFF,
+                )
+                Log.i("SCAN_CARD STATE CHANGE NFC?", state.toString())
+                // Whenever NFC is turned off or on, update NFC adapter and scanner so that scanning works properly
+                initialize()
+            }
+        }
+    }
+
+    override fun getAction(): String = NfcAdapter.ACTION_ADAPTER_STATE_CHANGED
 
     override fun getName(): String = "RFID"
 
@@ -35,6 +59,8 @@ class RFIDManager(
     }
 
     override fun initialize() {
+        initializeRFIDComponents()
+
         if (!isCardSupportAvailableOnDevice()) {
             val message = "RFID not supported on this device"
             Log.i("RFID", message)
@@ -47,6 +73,16 @@ class RFIDManager(
             return
         }
         Log.i("RFID", "RFID supported and enabled")
+    }
+
+    private fun initializeRFIDComponents() {
+        if (nfcManager == null) {
+            nfcManager = context.getSystemService(Context.NFC_SERVICE) as NfcManager?
+        }
+
+        if (nfcAdapter == null) {
+            nfcAdapter = nfcManager?.defaultAdapter
+        }
     }
 
     override fun showEnableCardSupportOption(context: Context) {

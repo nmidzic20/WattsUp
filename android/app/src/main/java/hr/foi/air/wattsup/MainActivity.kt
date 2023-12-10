@@ -1,16 +1,12 @@
 package hr.foi.air.wattsup
 
-import android.Manifest
 import android.app.Activity
-import android.bluetooth.BluetoothAdapter
 import android.content.BroadcastReceiver
 import android.content.Context
-import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -38,15 +34,7 @@ import hr.foi.air.wattsup.viewmodels.ScanViewModel
 class MainActivity : ComponentActivity() {
 
     private val REQUEST_PERMISSIONS = 1
-
-    private val REQUIRED_PERMISSIONS = arrayOf(
-        Manifest.permission.BLUETOOTH,
-        Manifest.permission.BLUETOOTH_ADMIN,
-        Manifest.permission.ACCESS_COARSE_LOCATION,
-        Manifest.permission.ACCESS_FINE_LOCATION,
-        Manifest.permission.BLUETOOTH_CONNECT,
-        Manifest.permission.BLUETOOTH_SCAN,
-    )
+    private lateinit var REQUIRED_PERMISSIONS: List<String>
 
     private val chargerViewModel: ChargerViewModel by viewModels()
     private val scanViewModel: ScanViewModel by viewModels()
@@ -54,25 +42,19 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        requestPermissions(this)
-
         val cardManagers: List<CardManager> = listOf(
             BLEManager(this),
             RFIDManager(this),
         )
 
-        val bluetoothStateReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent?) {
-                if (BluetoothAdapter.ACTION_STATE_CHANGED == intent?.action) {
-                    val state =
-                        intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR)
-                    Log.i("SCAN_CARD STATE CHANGE?", state.toString())
-                    cardManagers.get(0).initialize()
-                }
-            }
-        }
+        REQUIRED_PERMISSIONS = cardManagers.map { it.getRequiredPermissions() }.flatten()
+        requestPermissions(this)
 
-        registerBluetoothStateReceiver(bluetoothStateReceiver)
+        cardManagers.forEach { cardManager ->
+            val receiver = cardManager.getStateReceiver()
+            val action = cardManager.getAction()
+            registerCardSupportStateReceiver(receiver, action)
+        }
 
         setContent {
             WattsUpTheme {
@@ -115,9 +97,12 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun registerBluetoothStateReceiver(bluetoothStateReceiver: BroadcastReceiver) {
-        val filter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
-        this.registerReceiver(bluetoothStateReceiver, filter)
+    private fun registerCardSupportStateReceiver(
+        cardSupportStateReceiver: BroadcastReceiver,
+        action: String,
+    ) {
+        val filter = IntentFilter(action)
+        this.registerReceiver(cardSupportStateReceiver, filter)
     }
 
     private fun requestPermissions(context: Context) {
