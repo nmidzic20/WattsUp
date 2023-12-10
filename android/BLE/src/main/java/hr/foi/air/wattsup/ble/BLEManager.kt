@@ -12,7 +12,6 @@ import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Build
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ComponentActivity
@@ -33,8 +32,8 @@ class BLEManager(
         Manifest.permission.BLUETOOTH_SCAN,
     )
 
-    private var bluetoothAdapter: BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter()
-    private var bluetoothLeScanner: BluetoothLeScanner? = bluetoothAdapter?.bluetoothLeScanner
+    private var bluetoothAdapter: BluetoothAdapter? = null
+    private var bluetoothLeScanner: BluetoothLeScanner? = null
     private var bluetoothGatt: BluetoothGatt? = null
 
     private var scanCallback: ScanCallback? = null
@@ -42,6 +41,7 @@ class BLEManager(
 
     init {
         initialize()
+        // registerBluetoothStateReceiver()
     }
 
     companion object {
@@ -51,12 +51,49 @@ class BLEManager(
         private const val REQUEST_ENABLE_BLUETOOTH = 4
     }
 
+    private fun initializeBluetoothComponents() {
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+        bluetoothLeScanner = bluetoothAdapter?.bluetoothLeScanner
+    }
+
+    /*private val bluetoothStateReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (BluetoothAdapter.ACTION_STATE_CHANGED == intent?.action) {
+                val state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR)
+                handleBluetoothState(state)
+            }
+        }
+    }
+
+    private fun registerBluetoothStateReceiver() {
+        val filter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
+        context.registerReceiver(bluetoothStateReceiver, filter)
+    }*/
+
+    private fun handleBluetoothState(state: Int) {
+        when (state) {
+            BluetoothAdapter.STATE_ON -> {
+                Log.i("SCAN_CARD", "Bluetooth is ON")
+                initializeBluetoothComponents()
+            }
+
+            BluetoothAdapter.STATE_OFF -> {
+                Log.i("SCAN_CARD", "Bluetooth is OFF")
+                bluetoothAdapter = null
+                bluetoothLeScanner = null
+            }
+            // Handle other Bluetooth states if needed
+        }
+    }
+
     override fun getName(): String = "BLE"
 
     override fun isCardSupportAvailableOnDevice(): Boolean = bluetoothAdapter != null
     override fun isCardSupportEnabledOnDevice(): Boolean = bluetoothAdapter?.isEnabled == true
 
     override fun initialize() {
+        initializeBluetoothComponents()
+
         if (!isCardSupportAvailableOnDevice()) {
             val message = "Bluetooth not supported on this device"
             Log.i("BLUETOOTH", message)
@@ -64,28 +101,13 @@ class BLEManager(
         }
 
         if (!isCardSupportEnabledOnDevice()) {
-            val message = "Not enabled - please enable Bluetooth in Settings on your device"
+            val message = "Not enabled - please enable Bluetooth"
             Log.i("BLUETOOTH", message)
             return
         }
 
         Log.i("BLUETOOTH", "Supported and enabled")
         return
-    }
-
-    private fun requestBluetoothPermissions(context: Context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val permissionsToRequest = REQUIRED_PERMISSIONS.filter {
-                ContextCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED
-            }
-            if (permissionsToRequest.isNotEmpty()) {
-                ActivityCompat.requestPermissions(
-                    context as Activity,
-                    permissionsToRequest.toTypedArray(),
-                    REQUEST_PERMISSIONS,
-                )
-            }
-        }
     }
 
     override fun startScanningForCard(bleScanCallback: CardScanCallback?) {
@@ -127,6 +149,7 @@ class BLEManager(
         )
         this.onScanStop()
         if (scanCallback != null) {
+            bluetoothLeScanner?.flushPendingScanResults(scanCallback)
             bluetoothLeScanner?.stopScan(scanCallback)
             scanCallback = null
         }

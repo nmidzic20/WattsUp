@@ -2,10 +2,15 @@ package hr.foi.air.wattsup
 
 import android.Manifest
 import android.app.Activity
+import android.bluetooth.BluetoothAdapter
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -48,7 +53,27 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         requestPermissions(this)
+
+        val cardManagers: List<CardManager> = listOf(
+            BLEManager(this),
+            RFIDManager(this),
+        )
+
+        val bluetoothStateReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                if (BluetoothAdapter.ACTION_STATE_CHANGED == intent?.action) {
+                    val state =
+                        intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR)
+                    Log.i("SCAN_CARD STATE CHANGE?", state.toString())
+                    cardManagers.get(0).initialize()
+                }
+            }
+        }
+
+        registerBluetoothStateReceiver(bluetoothStateReceiver)
+
         setContent {
             WattsUpTheme {
                 Surface(
@@ -60,10 +85,6 @@ class MainActivity : ComponentActivity() {
                         navController.popBackStack()
                         Unit
                     }
-                    val cardManagers: List<CardManager> = listOf(
-                        BLEManager(this),
-                        RFIDManager(this),
-                    )
 
                     NavHost(navController = navController, startDestination = "landing") {
                         composable("landing") {
@@ -92,6 +113,11 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private fun registerBluetoothStateReceiver(bluetoothStateReceiver: BroadcastReceiver) {
+        val filter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
+        this.registerReceiver(bluetoothStateReceiver, filter)
     }
 
     private fun requestPermissions(context: Context) {
