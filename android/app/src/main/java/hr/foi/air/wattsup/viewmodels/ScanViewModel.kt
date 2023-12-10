@@ -1,10 +1,9 @@
 package hr.foi.air.wattsup.viewmodels
 
-import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hr.foi.air.wattsup.core.CardManager
 import hr.foi.air.wattsup.core.CardScanCallback
@@ -21,18 +20,13 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class ScanViewModel(
-    application: Application,
-) :
-    AndroidViewModel(application) {
+class ScanViewModel : ViewModel() {
 
     private val cardService: CardService = NetworkService.cardService
 
     private val _cardList = MutableLiveData<List<Card>>(emptyList())
 
     private var BLEscanTimeoutJob: Job? = null
-
-    private val context = application.applicationContext
 
     private val _scanning = MutableLiveData(false)
     val scanning: LiveData<Boolean> get() = _scanning
@@ -57,7 +51,7 @@ class ScanViewModel(
                             _cardList.value =
                                 cardList.map { card -> card!! }
                             Log.i("CARD", "Received cards, cards addresses: ")
-                            _cardList.value!!.forEach { Log.i("CARD ADDRESS", "${it.value}") }
+                            _cardList.value!!.forEach { Log.i("CARD_ADDRESS", "${it.value}") }
                         } else {
                             Log.i("CARD", "Received cards as null")
                         }
@@ -101,12 +95,6 @@ class ScanViewModel(
                 override fun onScanResult(cardAddress: Any) {
                     handleScanResult(cardAddress, onScan, cardManager)
                 }
-
-                /*override fun onBatchScanResults(results: List<Any>?) {
-                    results?.forEach { result ->
-                        handleScanResult(result, onScan, cardManager)
-                    }
-                }*/
 
                 override fun onScanFailed(error: String) {
                     if (error == "RFID scan timed out") {
