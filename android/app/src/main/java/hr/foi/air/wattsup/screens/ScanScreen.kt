@@ -1,7 +1,10 @@
 package hr.foi.air.wattsup.screens
 
+import android.content.Context
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -20,6 +23,7 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -28,6 +32,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -62,38 +67,17 @@ fun ScanScreen(
 
     LaunchedEffect(snackbarHostState) {
         scope.launch {
-            cardManagers.forEachIndexed { index, cardManager ->
-                val cardStatusMessage = cardStatusMessageList[index].value
-
-                val scanResult =
-                    snackbarHostState
-                        .showSnackbar(
-                            message = cardStatusMessage,
-                            actionLabel = if (cardManager
-                                    .isCardSupportAvailableOnDevice() && !cardManager
-                                    .isCardSupportEnabledOnDevice()
-                            ) {
-                                "Turn on ${cardManager.getName()}"
-                            } else {
-                                "OK"
-                            },
-                            duration = SnackbarDuration.Indefinite,
-                        )
-                when (scanResult) {
-                    SnackbarResult.ActionPerformed -> {
-                        if (cardManager.isCardSupportAvailableOnDevice() &&
-                            !cardManager.isCardSupportEnabledOnDevice()
-                        ) {
-                            cardManager.showEnableCardSupportOption(context)
-                        }
-                    }
-
-                    SnackbarResult.Dismissed -> {
-                    }
-                }
-            }
+            showSnackbarForCardManagers(
+                cardManagers,
+                cardStatusMessageList,
+                snackbarHostState,
+                context,
+            )
         }
     }
+
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     Scaffold(
         snackbarHost = {
@@ -110,45 +94,176 @@ fun ScanScreen(
             )
         },
     ) {
+        val modifier = Modifier.padding(it)
+
+        if (isLandscape) {
+            LandscapeChargerLayout(
+                scanning,
+                scanSuccess,
+                cardManagers,
+                userMessage,
+                { cardManager: CardManager, onScan: () -> Unit ->
+                    viewModel.startScanning(
+                        cardManager,
+                        onScan,
+                    )
+                },
+                onScan,
+                modifier,
+            )
+        } else {
+            PortraitChargerLayout(
+                scanning,
+                scanSuccess,
+                cardManagers,
+                userMessage,
+                { cardManager: CardManager, onScan: () -> Unit ->
+                    viewModel.startScanning(
+                        cardManager,
+                        onScan,
+                    )
+                },
+                onScan,
+                modifier,
+            )
+        }
+    }
+}
+
+private suspend fun showSnackbarForCardManagers(
+    cardManagers: List<CardManager>,
+    cardStatusMessageList: List<MutableState<String>>,
+    snackbarHostState: SnackbarHostState,
+    context: Context,
+) {
+    cardManagers.forEachIndexed { index, cardManager ->
+        val cardStatusMessage = cardStatusMessageList[index].value
+
+        val scanResult = snackbarHostState.showSnackbar(
+            message = cardStatusMessage,
+            actionLabel = if (cardManager.isCardSupportAvailableOnDevice() && !cardManager.isCardSupportEnabledOnDevice()) {
+                "Turn on ${cardManager.getName()}"
+            } else {
+                "OK"
+            },
+            duration = SnackbarDuration.Indefinite,
+        )
+        when (scanResult) {
+            SnackbarResult.ActionPerformed -> {
+                if (cardManager.isCardSupportAvailableOnDevice() && !cardManager.isCardSupportEnabledOnDevice()) {
+                    cardManager.showEnableCardSupportOption(context)
+                }
+            }
+
+            SnackbarResult.Dismissed -> {
+            }
+        }
+    }
+}
+
+@Composable
+private fun LandscapeChargerLayout(
+    scanning: Boolean?,
+    scanSuccess: Boolean?,
+    cardManagers: List<CardManager>,
+    userMessage: String?,
+    startScanning: (cardManager: CardManager, onScan: () -> Unit) -> Unit,
+    onScan: () -> Unit,
+    modifier: Modifier,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .fillMaxHeight(),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+                .padding(10.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            CardOptions(
+                scanning,
+                scanSuccess,
+                cardManagers,
+                userMessage,
+                startScanning,
+                onScan,
+            )
+        }
+    }
+}
+
+@Composable
+private fun PortraitChargerLayout(
+    scanning: Boolean?,
+    scanSuccess: Boolean?,
+    cardManagers: List<CardManager>,
+    userMessage: String?,
+    startScanning: (cardManager: CardManager, onScan: () -> Unit) -> Unit,
+    onScan: () -> Unit,
+    modifier: Modifier,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .fillMaxHeight(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceEvenly,
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight()
-                .padding(it),
+                .padding(10.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceEvenly,
+            verticalArrangement = Arrangement.Center,
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-                    .padding(10.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-            ) {
-                if (!scanning!! && !scanSuccess!!) {
-                    cardManagers.forEach { cardManager ->
-                        CircleButton(
-                            "Scan ${cardManager.getName()}",
-                            {
-                                viewModel.startScanning(cardManager, onScan)
-                            },
-                            null,
-                            null,
-                            Modifier.size(220.dp)
-                                .padding(16.dp),
-                        )
-                    }
-                }
-                Text(
-                    text = if (!scanning!!) {
-                        userMessage!!
-                    } else {
-                        "Scanning for card..."
-                    },
-                    style = MaterialTheme.typography.titleLarge,
-                )
-            }
+            CardOptions(
+                scanning,
+                scanSuccess,
+                cardManagers,
+                userMessage,
+                startScanning,
+                onScan,
+            )
         }
     }
+}
+
+@Composable
+fun CardOptions(
+    scanning: Boolean?,
+    scanSuccess: Boolean?,
+    cardManagers: List<CardManager>,
+    userMessage: String?,
+    startScanning: (cardManager: CardManager, onScan: () -> Unit) -> Unit,
+    onScan: () -> Unit,
+) {
+    if (!scanning!! && !scanSuccess!!) {
+        cardManagers.forEach { cardManager ->
+            CircleButton(
+                "Scan ${cardManager.getName()}",
+                {
+                    startScanning(cardManager, onScan)
+                },
+                null,
+                null,
+                Modifier.size(220.dp)
+                    .padding(16.dp),
+            )
+        }
+    }
+    Text(
+        text = if (!scanning) {
+            userMessage!!
+        } else {
+            "Scanning for card..."
+        },
+        style = MaterialTheme.typography.titleLarge,
+    )
 }
