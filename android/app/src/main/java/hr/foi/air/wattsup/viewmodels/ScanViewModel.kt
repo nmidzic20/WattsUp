@@ -1,3 +1,5 @@
+package hr.foi.air.wattsup.viewmodels
+
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
@@ -40,8 +42,6 @@ class ScanViewModel(
 
     private val _userMessage = MutableLiveData("")
     val userMessage: LiveData<String> get() = _userMessage
-
-    private val _includeTestButton = MutableLiveData(true)
 
     init {
         refreshCardAddressList()
@@ -94,7 +94,6 @@ class ScanViewModel(
             return
         }
 
-        _includeTestButton.value = false
         _scanning.value = true
 
         cardManager.startScanningForCard(
@@ -103,11 +102,11 @@ class ScanViewModel(
                     handleScanResult(cardAddress, onScan, cardManager)
                 }
 
-                override fun onBatchScanResults(results: List<Any>?) {
+                /*override fun onBatchScanResults(results: List<Any>?) {
                     results?.forEach { result ->
                         handleScanResult(result, onScan, cardManager)
                     }
-                }
+                }*/
 
                 override fun onScanFailed(error: String) {
                     if (error == "RFID scan timed out") {

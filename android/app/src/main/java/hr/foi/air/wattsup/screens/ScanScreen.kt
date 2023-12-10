@@ -1,6 +1,5 @@
 package hr.foi.air.wattsup.screens
 
-import ScanViewModel
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -26,7 +25,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,6 +35,7 @@ import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.core.CardManager
 import hr.foi.air.wattsup.ui.component.CircleButton
 import hr.foi.air.wattsup.ui.component.TopAppBar
+import hr.foi.air.wattsup.viewmodels.ScanViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -52,11 +51,10 @@ fun ScanScreen(
     val context = LocalContext.current
     val userMessage by viewModel.userMessage.observeAsState()
 
-    var bluetoothStatusMessage by remember {
-        mutableStateOf(viewModel.getStatusMessage(false, cardManagers.get(0)))
-    }
-    var rfidStatusMessage by remember {
-        mutableStateOf(viewModel.getStatusMessage(false, cardManagers.get(1)))
+    val cardStatusMessageList = remember {
+        cardManagers.map { cardManager ->
+            mutableStateOf(viewModel.getStatusMessage(false, cardManager))
+        }.toMutableList()
     }
 
     val scanning by viewModel.scanning.observeAsState()
@@ -64,56 +62,34 @@ fun ScanScreen(
 
     LaunchedEffect(snackbarHostState) {
         scope.launch {
-            val bleResult = snackbarHostState
-                .showSnackbar(
-                    message = bluetoothStatusMessage,
-                    actionLabel = if (cardManagers.get(0)
-                            .isCardSupportAvailableOnDevice() && !cardManagers.get(0)
-                            .isCardSupportEnabledOnDevice()
-                    ) {
-                        "Turn on Bluetooth"
-                    } else {
-                        "OK"
-                    },
-                    duration = SnackbarDuration.Indefinite,
-                )
-            when (bleResult) {
-                SnackbarResult.ActionPerformed -> {
-                    if (cardManagers.get(0)
-                            .isCardSupportAvailableOnDevice() && !cardManagers.get(0)
-                            .isCardSupportEnabledOnDevice()
-                    ) {
-                        cardManagers.get(0).showEnableCardSupportOption(context)
+            cardManagers.forEachIndexed { index, cardManager ->
+                val cardStatusMessage = cardStatusMessageList[index].value
+
+                val scanResult =
+                    snackbarHostState
+                        .showSnackbar(
+                            message = cardStatusMessage,
+                            actionLabel = if (cardManager
+                                    .isCardSupportAvailableOnDevice() && !cardManager
+                                    .isCardSupportEnabledOnDevice()
+                            ) {
+                                "Turn on ${cardManager.getName()}"
+                            } else {
+                                "OK"
+                            },
+                            duration = SnackbarDuration.Indefinite,
+                        )
+                when (scanResult) {
+                    SnackbarResult.ActionPerformed -> {
+                        if (cardManager.isCardSupportAvailableOnDevice() &&
+                            !cardManager.isCardSupportEnabledOnDevice()
+                        ) {
+                            cardManager.showEnableCardSupportOption(context)
+                        }
                     }
-                }
 
-                SnackbarResult.Dismissed -> {
-                }
-            }
-
-            val rfidResult = snackbarHostState.showSnackbar(
-                message = rfidStatusMessage,
-                actionLabel = if (cardManagers.get(1)
-                        .isCardSupportAvailableOnDevice() && !cardManagers.get(1)
-                        .isCardSupportEnabledOnDevice()
-                ) {
-                    "Enable RFID/NFC"
-                } else {
-                    "OK"
-                },
-                duration = SnackbarDuration.Indefinite,
-            )
-            when (rfidResult) {
-                SnackbarResult.ActionPerformed -> {
-                    if (cardManagers.get(1)
-                            .isCardSupportAvailableOnDevice() && !cardManagers.get(1)
-                            .isCardSupportEnabledOnDevice()
-                    ) {
-                        cardManagers.get(1).showEnableCardSupportOption(context)
+                    SnackbarResult.Dismissed -> {
                     }
-                }
-
-                SnackbarResult.Dismissed -> {
                 }
             }
         }
