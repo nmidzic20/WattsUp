@@ -41,7 +41,7 @@ class ScanViewModel : ViewModel() {
         refreshCardAddressList()
     }
 
-    fun refreshCardAddressList() {
+    private fun refreshCardAddressList() {
         viewModelScope.launch {
             cardService.getCards().enqueue(object : Callback<List<Card?>> {
                 override fun onResponse(call: Call<List<Card?>>, response: Response<List<Card?>>) {

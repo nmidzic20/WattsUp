@@ -3,10 +3,7 @@ package hr.foi.air.wattsup.ble
 import android.Manifest
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
-import android.bluetooth.BluetoothGattCallback
-import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.le.BluetoothLeScanner
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanFilter
@@ -92,22 +89,23 @@ class BLEManager(
     }
 
     override fun startScanningForCard(bleScanCallback: CardScanCallback?) {
-        Log.i("SCAN", "Ble startscan")
+        Log.i("SCAN_CARD", "Ble startscan")
         this.scanCallback = object : ScanCallback() {
             override fun onScanResult(callbackType: Int, result: ScanResult) {
+                Log.i("SCAN_CARD", result.device.address)
                 bleScanCallback?.onScanResult(result.device.address)
             }
 
-            /*override fun onBatchScanResults(results: List<ScanResult>?) {
-                bleScanCallback?.onBatchScanResults(results?.map { result -> result.device.address })
-            }*/
-
             override fun onScanFailed(errorCode: Int) {
+                Log.i("SCAN_CARD", "Error $errorCode")
                 bleScanCallback?.onScanFailed(errorCode.toString())
             }
         }
 
-        this.onScanStop = { bleScanCallback?.onScanStopped() }
+        this.onScanStop = {
+            Log.i("SCAN_CARD", "Stopped")
+            bleScanCallback?.onScanStopped()
+        }
 
         val scanFilters = mutableListOf<ScanFilter>()
         val scanSettings = ScanSettings.Builder()
@@ -132,32 +130,6 @@ class BLEManager(
             bluetoothLeScanner?.stopScan(scanCallback)
             scanCallback = null
         }
-    }
-
-    fun connectToDevice(device: BluetoothDevice, gattCallback: BluetoothGattCallback) {
-        checkAndRequestPermission(
-            Manifest.permission.BLUETOOTH_CONNECT,
-            REQUEST_PERMISSIONS_CONNECT,
-        )
-        bluetoothGatt = device.connectGatt(context, false, gattCallback)
-    }
-
-    fun disconnectDevice() {
-        checkAndRequestPermission(
-            Manifest.permission.BLUETOOTH_CONNECT,
-            REQUEST_PERMISSIONS_CONNECT,
-        )
-        bluetoothGatt?.disconnect()
-        bluetoothGatt?.close()
-    }
-
-    fun sendData(characteristic: BluetoothGattCharacteristic, data: ByteArray) {
-        characteristic.value = data
-        checkAndRequestPermission(
-            Manifest.permission.BLUETOOTH_CONNECT,
-            REQUEST_PERMISSIONS_CONNECT,
-        )
-        bluetoothGatt?.writeCharacteristic(characteristic)
     }
 
     override fun showEnableCardSupportOption(context: Context) {

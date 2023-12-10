@@ -39,9 +39,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.network.NetworkService
-import hr.foi.air.wattsup.network.TokenManager
 import hr.foi.air.wattsup.network.models.LoginBody
 import hr.foi.air.wattsup.network.models.LoginResponseBody
+import hr.foi.air.wattsup.network.models.TokenManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import retrofit2.Call
@@ -111,9 +111,9 @@ fun LoginView(onRegisterClick: () -> Unit, context: Context) {
             onValueChange = { password = it },
             label = { Text(stringResource(R.string.passwordLabel)) },
         )
-        if(showToast){
+        if (showToast) {
             Text(
-                text = statusMessage
+                text = statusMessage,
             )
         }
         ElevatedButton(
