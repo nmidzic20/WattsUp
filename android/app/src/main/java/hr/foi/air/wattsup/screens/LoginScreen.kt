@@ -147,7 +147,6 @@ fun LoginView(onRegisterClick: () -> Unit, onLogin: () -> Unit, context: Context
                                     showToast = false
                                 }
                                 Log.i("Response", statusMessage)
-                                // TODO: make page where login goes to
                             }
                         }
 
@@ -160,7 +159,6 @@ fun LoginView(onRegisterClick: () -> Unit, onLogin: () -> Unit, context: Context
                                 delay(2000)
                                 showToast = false
                             }
-                            // TODO: make page where login goes to
                         }
                     },
                 )
