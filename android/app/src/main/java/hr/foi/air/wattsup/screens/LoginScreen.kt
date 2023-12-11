@@ -45,6 +45,7 @@ import hr.foi.air.wattsup.network.NetworkService
 import hr.foi.air.wattsup.network.TokenManager
 import hr.foi.air.wattsup.network.models.LoginBody
 import hr.foi.air.wattsup.network.models.LoginResponseBody
+import hr.foi.air.wattsup.utils.UserCard
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import retrofit2.Call
