@@ -4,6 +4,7 @@ package hr.foi.air.wattsup.screens
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -32,7 +33,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hr.foi.air.wattsup.R
+import hr.foi.air.wattsup.network.NetworkService
+import hr.foi.air.wattsup.network.models.EventGETBody
+import hr.foi.air.wattsup.network.models.EventGETResponseBody
+import hr.foi.air.wattsup.network.models.EventPUTResponseBody
 import hr.foi.air.wattsup.ui.component.TopAppBar
+import hr.foi.air.wattsup.utils.UserCard
+import retrofit2.Call
+import retrofit2.Response
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -60,63 +68,44 @@ fun HistoryView() {
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
-            .padding(0.dp, 15.dp)
-            .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
+            .padding(0.dp, 15.dp),
+        verticalArrangement = Arrangement.spacedBy(15.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // add mock items
+        // make mock item
         item {
             Text(
                 text = "Item 1",
-                style = MaterialTheme.typography.bodyMedium,
-                color = androidx.compose.ui.graphics.Color.White,
-            )
-        }
-        item {
-            Text(
-                text = "Item 2",
-                style = MaterialTheme.typography.bodyMedium,
-                color = androidx.compose.ui.graphics.Color.White,
-            )
-        }
-        item {
-            Text(
-                text = "Item 3",
-                style = MaterialTheme.typography.bodyMedium,
-                color = androidx.compose.ui.graphics.Color.White,
-            )
-        }
-        item {
-            Text(
-                text = "Item 4",
-                style = MaterialTheme.typography.bodyMedium,
-                color = androidx.compose.ui.graphics.Color.White,
-            )
-        }
-        item {
-            Text(
-                text = "Item 5",
-                style = MaterialTheme.typography.bodyMedium,
-                color = androidx.compose.ui.graphics.Color.White,
-            )
-        }
-        item {
-            Text(
-                text = "Item 6",
-                style = MaterialTheme.typography.bodyMedium,
-                color = androidx.compose.ui.graphics.Color.White,
-            )
-        }
-        item {
-            Text(
-                text = "Item 7",
-                style = MaterialTheme.typography.bodyMedium,
-                color = androidx.compose.ui.graphics.Color.White,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 0.dp)
             )
         }
 
     }
+}
+
+private fun getEventItems(eventGETBody: EventGETBody) {
+    val _eventService = NetworkService.eventService
+
+    _eventService.getEvents(eventGETBody).enqueue(object : retrofit2.Callback<EventGETResponseBody> {
+        override fun onResponse(
+            call: Call<EventGETResponseBody>,
+            response: Response<EventGETResponseBody>,
+        ) {
+            if (response.isSuccessful) {
+                val responseBody = response.body()
+                if (responseBody != null) {
+                    Log.d("HistoryScreen", "Response: ${responseBody.events}")
+                }
+            } else {
+                Log.d("HistoryScreen", "Response: ${response.errorBody()}")
+            }
+        }
+
+        override fun onFailure(call: Call<EventGETResponseBody>, t: Throwable) {
+            Log.d("HistoryScreen", "Response: ${t.message}")
+        }
+    })
 }
 
 @Preview(showBackground = false)

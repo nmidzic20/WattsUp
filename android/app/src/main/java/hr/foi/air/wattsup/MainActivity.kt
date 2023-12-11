@@ -61,6 +61,8 @@ class MainActivity : ComponentActivity() {
                     }
 
                     NavHost(navController = navController, startDestination = "landing") {
+                        // TODO: disable back button on user mode screen
+
                         composable("landing") {
                             val onChargerModeClick = { navController.navigate("scanRFID") }
                             val onUserModeClick = { navController.navigate("login") }
@@ -81,7 +83,8 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("login") {
                             val onRegisterClick = { navController.navigate("registration") }
-                            LoginScreen(onRegisterClick)
+                            val onLogin = { navController.navigate("userMode") }
+                            LoginScreen(onRegisterClick, onLogin)
                         }
                         composable("userMode") {
                             val onHistoryClick = { navController.navigate("chargingHistory") }

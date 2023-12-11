@@ -37,6 +37,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.navArgument
 import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.network.NetworkService
 import hr.foi.air.wattsup.network.TokenManager
@@ -53,7 +56,7 @@ private val authService = NetworkService.authService
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(onRegisterClick: () -> Unit) {
+fun LoginScreen(onRegisterClick: () -> Unit, onLogin: () -> Unit) {
     val context = LocalContext.current
     Scaffold(
         topBar = {
@@ -68,13 +71,13 @@ fun LoginScreen(onRegisterClick: () -> Unit) {
             )
         },
     ) {
-        LoginView(onRegisterClick, context)
+        LoginView(onRegisterClick, onLogin, context)
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginView(onRegisterClick: () -> Unit, context: Context) {
+fun LoginView(onRegisterClick: () -> Unit, onLogin: () -> Unit, context: Context) {
     val interactionSource = remember { MutableInteractionSource() }
     var email: String by remember { mutableStateOf("") }
     var password: String by remember { mutableStateOf("") }
@@ -134,7 +137,7 @@ fun LoginView(onRegisterClick: () -> Unit, context: Context) {
                                 tokenManager.setrefreshTokenExpiresAt(responseBody.refreshToken)
                                 tokenManager.setjWTtoken(responseBody.jwt)
                                 Log.i("Response", responseBody.jwt)
-                                // TODO: make page where login goes to
+                                onLogin()
                             } else {
                                 val responseBody = response!!.body()
                                 statusMessage = "Invalid username or password"
@@ -179,7 +182,9 @@ fun LoginView(onRegisterClick: () -> Unit, context: Context) {
             )
             Spacer(modifier = Modifier.width(2.dp))
             TextButton(
-                modifier = Modifier.padding(0.dp).wrapContentWidth(Alignment.CenterHorizontally),
+                modifier = Modifier
+                    .padding(0.dp)
+                    .wrapContentWidth(Alignment.CenterHorizontally),
                 contentPadding = PaddingValues(0.dp),
                 onClick = onRegisterClick,
             ) {
@@ -192,8 +197,8 @@ fun LoginView(onRegisterClick: () -> Unit, context: Context) {
     }
 }
 
-@Preview(showBackground = false)
+/*@Preview(showBackground = false)
 @Composable
 fun LoginPreview() {
     LoginScreen {}
-}
+}*/
