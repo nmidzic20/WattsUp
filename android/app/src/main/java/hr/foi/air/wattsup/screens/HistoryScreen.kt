@@ -32,6 +32,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,6 +47,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.network.NetworkService
 import hr.foi.air.wattsup.network.models.Event
@@ -48,11 +57,18 @@ import hr.foi.air.wattsup.network.models.EventGETResponseBody
 import hr.foi.air.wattsup.network.models.EventPUTResponseBody
 import hr.foi.air.wattsup.ui.component.TopAppBar
 import hr.foi.air.wattsup.utils.UserCard
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response
 import java.time.LocalDate
 import java.util.Calendar
 import java.util.Date
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -76,79 +92,15 @@ fun HistoryScreen(onArrowBackClick: () -> Unit) {
 
 @Composable
 fun HistoryView(topPadding: Dp) {
-    val data = listOf(
-        Event(
-            cardId = 1,
-            chargerId = 1,
-            startedAt = Date(),
-            endedAt = Date(),
-            volumeKwh = 10.0f
-        ),
-        Event(
-            cardId = 1,
-            chargerId = 1,
-            startedAt = Date(),
-            endedAt = Date(),
-            volumeKwh = 10.0f
-        ),
-        Event(
-            cardId = 1,
-            chargerId = 1,
-            startedAt = Date(),
-            endedAt = Date(),
-            volumeKwh = 10.0f
-        ),
-        Event(
-            cardId = 1,
-            chargerId = 1,
-            startedAt = Date(),
-            endedAt = Date(),
-            volumeKwh = 10.0f
-        ),
-        Event(
-            cardId = 1,
-            chargerId = 1,
-            startedAt = Date(),
-            endedAt = Date(),
-            volumeKwh = 10.0f
-        ),
-        Event(
-            cardId = 1,
-            chargerId = 1,
-            startedAt = Date(),
-            endedAt = Date(),
-            volumeKwh = 10.0f
-        ),
-        Event(
-            cardId = 1,
-            chargerId = 1,
-            startedAt = Date(),
-            endedAt = Date(),
-            volumeKwh = 10.0f
-        ),
-        Event(
-            cardId = 1,
-            chargerId = 1,
-            startedAt = Date(),
-            endedAt = Date(),
-            volumeKwh = 10.0f
-        ),
-        Event(
-            cardId = 1,
-            chargerId = 1,
-            startedAt = Date(),
-            endedAt = Date(),
-            volumeKwh = 10.0f
-        ),
-        Event(
-            cardId = 1,
-            chargerId = 1,
-            startedAt = Date(),
-            endedAt = Date(),
-            volumeKwh = 10.0f
-        ),
-    )
-    getEventItems(1)
+    val coroutineScope = rememberCoroutineScope()
+    val data = remember { mutableStateOf(listOf<Event?>()) }
+
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            data.value = getEventItems(1)
+        }
+    }
+
     Column (
         modifier = Modifier
             .padding(10.dp)
@@ -156,41 +108,28 @@ fun HistoryView(topPadding: Dp) {
             .fillMaxWidth()
     ) {
         LazyColumn(
-            modifier = Modifier
-                .padding(top = topPadding),
+            modifier = Modifier.padding(top = topPadding),
             verticalArrangement = Arrangement.spacedBy(15.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            itemsIndexed(data) { index, item ->
-                EventCard(index)
+            if (data.value.isEmpty()) {
+                item {
+                    Text(
+                        text = "No events to show",
+                        style = MaterialTheme.typography.headlineMedium,
+                    )
+                }
+            } else {
+                itemsIndexed(data.value) { index, item ->
+                    EventCard(index, item!!)
+                }
             }
         }
     }
 }
 
-private fun getEventItems(cardId: Long) {
-    val _eventService = NetworkService.eventService
-
-    _eventService.getEvents(cardId).enqueue(object : retrofit2.Callback<List<Event?>> {
-        override fun onResponse(call: Call<List<Event?>>, response: Response<List<Event?>>) {
-            if (response.isSuccessful) {
-                val events: List<Event?>? = response.body()
-                if (events != null) {
-                    Log.d("HistoryScreen", "Response: ${response.body()}")
-                }
-            } else {
-                Log.d("HistoryScreen", "Response: ${response.errorBody()}")
-            }
-        }
-
-        override fun onFailure(call: Call<List<Event?>>, t: Throwable) {
-            Log.d("HistoryScreen", "Response: ${t.message}")
-        }
-    })
-}
-
 @Composable
-fun EventCard(index: Int) {
+fun EventCard(index: Int, event: Event) {
     Card(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -203,8 +142,31 @@ fun EventCard(index: Int) {
             .fillMaxWidth()
     ) {
         Column {
-            Text(text = "example")
+            Text(text = event.startedAt.toString())
         }
+    }
+}
+
+private suspend fun getEventItems(cardId: Long) : List<Event?> {
+    val _eventService = NetworkService.eventService
+
+    return suspendCoroutine { continuation ->
+        _eventService.getEvents(cardId).enqueue(object : retrofit2.Callback<List<Event?>> {
+            override fun onResponse(call: Call<List<Event?>>, response: Response<List<Event?>>) {
+                if (response.isSuccessful) {
+                    continuation.resume(response.body() ?: emptyList())
+                    Log.d("HistoryScreen", "Events: ${response.body()}")
+                } else {
+                    Log.d("HistoryScreen", "Error: ${response.errorBody()}")
+                    continuation.resume(emptyList())
+                }
+            }
+
+            override fun onFailure(call: Call<List<Event?>>, t: Throwable) {
+                Log.d("HistoryScreen", "Failure: ${t.message}")
+                continuation.resume(emptyList())
+            }
+        })
     }
 }
 
