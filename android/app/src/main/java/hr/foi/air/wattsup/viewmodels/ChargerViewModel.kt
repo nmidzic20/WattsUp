@@ -54,7 +54,6 @@ class ChargerViewModel : ViewModel() {
     private val _openFullChargeAlertDialog = MutableLiveData(false)
     val openFullChargeAlertDialog: LiveData<Boolean> = _openFullChargeAlertDialog
 
-
     val toastMessage: LiveData<String> get() = _toastMessage
     fun setOpenFullChargeAlertDialog(value: Boolean) {
         _openFullChargeAlertDialog.value = value
@@ -124,7 +123,9 @@ class ChargerViewModel : ViewModel() {
             (maxChargePercentage - currentChargeAmount.value!!).coerceIn(0f, 1f)
 
         val eventPUTBody = EventPUTBody(
-            CurrentEvent.currentEvent.value!!.id, currentChargeVolume.value!!)
+            CurrentEvent.currentEvent.value!!.id,
+            currentChargeVolume.value!!,
+        )
         viewModelScope.launch {
             stopEvent(eventPUTBody)
         }
@@ -138,12 +139,12 @@ class ChargerViewModel : ViewModel() {
         return String.format("%02d:%02d:%02d", hours, minutes, seconds)
     }
 
-    private fun startEvent(eventPOSTBody: EventPOSTBody){
+    private fun startEvent(eventPOSTBody: EventPOSTBody) {
         _eventService.logEventStart(eventPOSTBody).enqueue(
-            object : retrofit2.Callback<EventPOSTResponseBody>{
+            object : retrofit2.Callback<EventPOSTResponseBody> {
                 override fun onResponse(
                     call: Call<EventPOSTResponseBody>,
-                    response: Response<EventPOSTResponseBody>
+                    response: Response<EventPOSTResponseBody>,
                 ) {
                     CurrentEvent.currentEvent.value = response.body()
                     Log.i("RES_EVENT", "Event started")
@@ -155,17 +156,16 @@ class ChargerViewModel : ViewModel() {
                     Log.i("Response", t.toString())
                     _toastMessage.value = "Error starting event"
                 }
-
-            }
+            },
         )
     }
 
-    private fun stopEvent(eventPUTBody: EventPUTBody){
+    private fun stopEvent(eventPUTBody: EventPUTBody) {
         _eventService.logEventEnd(eventPUTBody).enqueue(
-            object : retrofit2.Callback<EventPUTResponseBody>{
+            object : retrofit2.Callback<EventPUTResponseBody> {
                 override fun onResponse(
                     call: Call<EventPUTResponseBody>,
-                    response: Response<EventPUTResponseBody>
+                    response: Response<EventPUTResponseBody>,
                 ) {
                     Log.i("RES_EVENT", "Event saved")
                     Log.i("RES_EVENT", response.body().toString())
@@ -176,8 +176,7 @@ class ChargerViewModel : ViewModel() {
                     Log.i("Response", t.toString())
                     _toastMessage.value = "Error saving event"
                 }
-
-            }
+            },
         )
     }
 
