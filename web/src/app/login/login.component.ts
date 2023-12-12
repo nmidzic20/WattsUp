@@ -15,8 +15,15 @@ export class LoginComponent implements OnInit {
 
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.errorMessageBox = document.getElementById("message") as HTMLElement;
+    let tokens = this.userManagerService.getTokens();
+
+    if (tokens) {
+      if (await this.userManagerService.validTokens(tokens)) {
+        this.router.navigate(['/map']);
+      }
+    }
   }
 
   async submitLogin(form: NgForm){
@@ -35,10 +42,7 @@ export class LoginComponent implements OnInit {
         let body = await response.text();
         if(response.status == 200){
           let bodyJSON = JSON.parse(body);
-          this.userManagerService.jwt = bodyJSON.jwt;
-          this.userManagerService.refreshToken = bodyJSON.refreshToken;
-          this.userManagerService.refreshTokenExpiration = bodyJSON.refreshTokenExpiresAt;
-          this.userManagerService.saveTokensToLocalStorage();
+          this.userManagerService.saveTokens(bodyJSON.jwt, bodyJSON.refreshToken, bodyJSON.refreshTokenExpiresAt);
 
           this.router.navigate(['/map']);
         }else{
