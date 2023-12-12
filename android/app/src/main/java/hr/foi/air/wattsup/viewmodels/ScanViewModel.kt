@@ -26,7 +26,7 @@ class ScanViewModel : ViewModel() {
 
     private val _cardList = MutableLiveData<List<Card>>(emptyList())
 
-    private var BLEscanTimeoutJob: Job? = null
+    private var scanTimeoutJob: Job? = null
 
     private val _scanning = MutableLiveData(false)
     val scanning: LiveData<Boolean> get() = _scanning
@@ -39,6 +39,59 @@ class ScanViewModel : ViewModel() {
 
     init {
         refreshCardAddressList()
+    }
+
+    fun getStatusMessage(scanning: Boolean, cardManager: CardManager): String =
+        if (!cardManager.isCardSupportAvailableOnDevice()) {
+            "${cardManager.getName()} is not supported on this device"
+        } else if (!cardManager.isCardSupportEnabledOnDevice()) {
+            "${cardManager.getName()} is not enabled on this device"
+        } else {
+            if (scanning) "No registered ${cardManager.getName()} card found" else "${cardManager.getName()} is supported and enabled on this device"
+        }
+
+    fun startScanning(cardManager: CardManager, onScan: () -> Unit) {
+        if (!cardManager.isCardSupportEnabledOnDevice()) {
+            cardManager.stopScanningForCard()
+            _scanning.value = false
+            _scanSuccess.value = false
+            _userMessage.value = "${cardManager.getName()} is not enabled on this device"
+            return
+        }
+
+        _scanning.value = true
+
+        cardManager.startScanningForCard(
+            object : CardScanCallback {
+                override fun onScanResult(cardAddress: Any) {
+                    handleScanResult(cardAddress, onScan, cardManager)
+                }
+
+                override fun onScanFailed(error: String) {
+                    _scanning.value = false
+                    _scanSuccess.value = false
+                    _userMessage.value = getStatusMessage(true, cardManager)
+                    Log.i("SCAN", "Scanning failed, error message: $error")
+                }
+
+                override fun onScanStarted() {
+                    scanTimeoutJob = viewModelScope.launch {
+                        // Stop scanning after 5 seconds if no device is found
+                        delay(5000)
+                        if (_scanning.value == true && !_scanSuccess.value!!) {
+                            cardManager.stopScanningForCard()
+                            _scanning.value = false
+                            _scanSuccess.value = false
+                            _userMessage.value = getStatusMessage(true, cardManager)
+                        }
+                    }
+                }
+
+                override fun onScanStopped() {
+                    scanTimeoutJob?.cancel()
+                }
+            },
+        )
     }
 
     private fun refreshCardAddressList() {
@@ -70,65 +123,6 @@ class ScanViewModel : ViewModel() {
         }
     }
 
-    fun getStatusMessage(scanning: Boolean, cardManager: CardManager): String =
-        if (!cardManager.isCardSupportAvailableOnDevice()) {
-            "${cardManager.getName()} is not supported on this device"
-        } else if (!cardManager.isCardSupportEnabledOnDevice()) {
-            "${cardManager.getName()} is not enabled on this device"
-        } else {
-            if (scanning) "No registered ${cardManager.getName()} card found" else "${cardManager.getName()} is supported and enabled on this device"
-        }
-
-    fun startScanning(cardManager: CardManager, onScan: () -> Unit) {
-        if (!cardManager.isCardSupportEnabledOnDevice()) {
-            cardManager.stopScanningForCard()
-            _scanning.value = false
-            _scanSuccess.value = false
-            _userMessage.value = "${cardManager.getName()} is not enabled on this device"
-            return
-        }
-
-        _scanning.value = true
-
-        cardManager.startScanningForCard(
-            object : CardScanCallback {
-                override fun onScanResult(cardAddress: Any) {
-                    handleScanResult(cardAddress, onScan, cardManager)
-                }
-
-                override fun onScanFailed(error: String) {
-                    if (error == "RFID scan timed out") {
-                        _scanning.value = false
-                        _scanSuccess.value = false
-                        _userMessage.value = getStatusMessage(true, cardManager)
-                    } else {
-                        _scanning.value = false
-                        _scanSuccess.value = false
-                        _userMessage.value = "Unable to scan card"
-                        Log.i("SCAN", "Scanning failed, error message: $error")
-                    }
-                }
-
-                override fun onScanStarted() {
-                    BLEscanTimeoutJob = viewModelScope.launch {
-                        // Stop scanning after 5 seconds if no device is found
-                        delay(5000)
-                        if (_scanning.value == true && !_scanSuccess.value!!) {
-                            cardManager.stopScanningForCard()
-                            _scanning.value = false
-                            _scanSuccess.value = false
-                            _userMessage.value = getStatusMessage(true, cardManager)
-                        }
-                    }
-                }
-
-                override fun onScanStopped() {
-                    BLEscanTimeoutJob?.cancel()
-                }
-            },
-        )
-    }
-
     private fun handleScanResult(result: Any, onScan: () -> Unit, cardManager: CardManager) {
         if (cardManager.scanResultRequiresAsyncHandling()) {
             viewModelScope.launch(Dispatchers.Main) {
@@ -157,6 +151,7 @@ class ScanViewModel : ViewModel() {
             onScan()
             _scanSuccess.value =
                 false // After navigating away, reset so buttons are visible for next scanning
+            _userMessage.value = "" // Reset user message
         }
     }
 
