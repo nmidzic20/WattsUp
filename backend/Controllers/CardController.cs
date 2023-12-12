@@ -27,7 +27,7 @@ namespace backend.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Card>> PostCard(CardCreateRequest _card)
+        public async Task<ActionResult<Card>> CreateCard(CardCreateRequest _card)
         {
             try {
                 var res = await _dbContext.Card
@@ -55,7 +55,7 @@ namespace backend.Controllers
         }
 
         [HttpPut("cardId")]
-        public async Task<ActionResult<Card>> PutCard(long cardID, Card _card)
+        public async Task<ActionResult<Card>> UpdateCard(long cardID, Card _card)
         {
             try {
                 var card = await _dbContext.Card
@@ -66,8 +66,6 @@ namespace backend.Controllers
                     return NotFound("Specified card doesn't exist.");
                 }
 
-                card.OwnedById = _card.OwnedById;
-                card.Value = _card.Value;
                 card.Active = _card.Active;
 
                 await _dbContext.SaveChangesAsync();
