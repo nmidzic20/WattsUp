@@ -111,7 +111,7 @@ namespace backend.Controllers
             }
             await _context.SaveChangesAsync();
 
-            return Ok(new { message = $"User {newUser.FirstName} is added to database!" });
+            return Ok(newUser);
         }
     }
 }

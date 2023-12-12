@@ -101,7 +101,7 @@ namespace backend.Controllers
 
             await _dbContext.SaveChangesAsync();
             
-            return Ok($"Updated charger {charger.Id}");
+            return Ok(charger);
         }
 
         [HttpDelete("{id}")]
@@ -119,7 +119,7 @@ namespace backend.Controllers
             _dbContext.Charger.Remove(charger);
             await _dbContext.SaveChangesAsync();
 
-            return Ok($"Deleted charger {charger.Id}");
+            return Ok(charger);
         }
     }
 }
