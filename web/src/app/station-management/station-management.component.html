@@ -1,1 +1,20 @@
-<p>station-management works!</p>
+<div class="stat">
+    <div class="stat-item">
+        <div class="stat-item-title">Total</div>
+        <div class="stat-item-value">{{ totalStations }}</div>
+    </div>
+    <div class="stat-item green">
+        <div class="stat-item-title">Available</div>
+        <div class="stat-item-value">{{ availableStations }}</div>
+    </div>
+    <div class="stat-item red">
+        <div class="stat-item-title">In use</div>
+        <div class="stat-item-value">{{ unavailableStations }}</div>
+    </div>
+    <div class="stat-item yellow">
+        <div class="stat-item-title">Offline</div>
+        <div class="stat-item-value">{{ offlineStations }}</div>
+    </div>
+</div>
+
+<button class="floating-button">Add station</button>
