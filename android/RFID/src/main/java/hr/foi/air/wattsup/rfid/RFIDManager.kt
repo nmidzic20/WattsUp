@@ -109,4 +109,6 @@ class RFIDManager(
     override fun stopScanningForCard() {
         Log.i("RFID", "Stop scan")
     }
+
+    override fun scanResultRequiresAsyncHandling(): Boolean = true
 }

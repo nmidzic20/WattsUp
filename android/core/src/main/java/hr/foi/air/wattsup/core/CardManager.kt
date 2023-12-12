@@ -14,4 +14,5 @@ interface CardManager {
     fun showEnableCardSupportOption(context: Context)
     fun startScanningForCard(cardScanCallback: CardScanCallback?)
     fun stopScanningForCard()
+    fun scanResultRequiresAsyncHandling(): Boolean
 }

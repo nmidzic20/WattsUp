@@ -130,7 +130,7 @@ class ScanViewModel : ViewModel() {
     }
 
     private fun handleScanResult(result: Any, onScan: () -> Unit, cardManager: CardManager) {
-        if (cardManager.getName() == "RFID") {
+        if (cardManager.scanResultRequiresAsyncHandling()) {
             viewModelScope.launch(Dispatchers.Main) {
                 handleScan(result, onScan) { cardManager.stopScanningForCard() }
             }

@@ -170,4 +170,6 @@ class BLEManager(
             return
         }
     }
+
+    override fun scanResultRequiresAsyncHandling(): Boolean = false
 }
