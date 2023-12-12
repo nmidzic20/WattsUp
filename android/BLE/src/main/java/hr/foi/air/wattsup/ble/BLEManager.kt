@@ -3,19 +3,16 @@ package hr.foi.air.wattsup.ble
 import android.Manifest
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
-import android.bluetooth.BluetoothGattCallback
-import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.le.BluetoothLeScanner
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Build
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ComponentActivity
@@ -27,20 +24,12 @@ class BLEManager(
     private val context: Context,
 ) : CardManager {
 
-    private val REQUIRED_PERMISSIONS = arrayOf(
-        Manifest.permission.BLUETOOTH,
-        Manifest.permission.BLUETOOTH_ADMIN,
-        Manifest.permission.ACCESS_COARSE_LOCATION,
-        Manifest.permission.ACCESS_FINE_LOCATION,
-        Manifest.permission.BLUETOOTH_CONNECT,
-        Manifest.permission.BLUETOOTH_SCAN,
-    )
-
-    private var bluetoothAdapter: BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter()
-    private var bluetoothLeScanner: BluetoothLeScanner? = bluetoothAdapter?.bluetoothLeScanner
+    private var bluetoothAdapter: BluetoothAdapter? = null
+    private var bluetoothLeScanner: BluetoothLeScanner? = null
     private var bluetoothGatt: BluetoothGatt? = null
 
     private var scanCallback: ScanCallback? = null
+    private var onScanStop: () -> Unit = {}
 
     init {
         initialize()
@@ -53,12 +42,42 @@ class BLEManager(
         private const val REQUEST_ENABLE_BLUETOOTH = 4
     }
 
+    private fun initializeBluetoothComponents() {
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+        bluetoothLeScanner = bluetoothAdapter?.bluetoothLeScanner
+    }
+
+    override fun getRequiredPermissions(): List<String> =
+        listOf(
+            Manifest.permission.BLUETOOTH,
+            Manifest.permission.BLUETOOTH_ADMIN,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.BLUETOOTH_CONNECT,
+            Manifest.permission.BLUETOOTH_SCAN,
+        )
+
+    override fun getStateReceiver(): BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (BluetoothAdapter.ACTION_STATE_CHANGED == intent?.action) {
+                val state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR)
+                Log.i("SCAN_CARD STATE CHANGE BLE?", state.toString())
+                // Whenever BLE is turned off or on, update BLE adapter and scanner so that scanning works properly
+                initialize()
+            }
+        }
+    }
+
+    override fun getAction(): String = BluetoothAdapter.ACTION_STATE_CHANGED
+
     override fun getName(): String = "BLE"
 
     override fun isCardSupportAvailableOnDevice(): Boolean = bluetoothAdapter != null
     override fun isCardSupportEnabledOnDevice(): Boolean = bluetoothAdapter?.isEnabled == true
 
     override fun initialize() {
+        initializeBluetoothComponents()
+
         if (!isCardSupportAvailableOnDevice()) {
             val message = "Bluetooth not supported on this device"
             Log.i("BLUETOOTH", message)
@@ -66,7 +85,7 @@ class BLEManager(
         }
 
         if (!isCardSupportEnabledOnDevice()) {
-            val message = "Not enabled - please enable Bluetooth in Settings on your device"
+            val message = "Not enabled - please enable Bluetooth"
             Log.i("BLUETOOTH", message)
             return
         }
@@ -75,35 +94,23 @@ class BLEManager(
         return
     }
 
-    private fun requestBluetoothPermissions(context: Context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val permissionsToRequest = REQUIRED_PERMISSIONS.filter {
-                ContextCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED
-            }
-            if (permissionsToRequest.isNotEmpty()) {
-                ActivityCompat.requestPermissions(
-                    context as Activity,
-                    permissionsToRequest.toTypedArray(),
-                    REQUEST_PERMISSIONS,
-                )
-            }
-        }
-    }
-
     override fun startScanningForCard(bleScanCallback: CardScanCallback?) {
-        // this.scanCallback = scanCallback
+        Log.i("SCAN_CARD", "Ble startscan")
         this.scanCallback = object : ScanCallback() {
             override fun onScanResult(callbackType: Int, result: ScanResult) {
+                Log.i("SCAN_CARD", result.device.address)
                 bleScanCallback?.onScanResult(result.device.address)
             }
 
-            override fun onBatchScanResults(results: List<ScanResult>?) {
-                bleScanCallback?.onBatchScanResults(results?.map { result -> result.device.address })
-            }
-
             override fun onScanFailed(errorCode: Int) {
+                Log.i("SCAN_CARD", "Error $errorCode")
                 bleScanCallback?.onScanFailed(errorCode.toString())
             }
+        }
+
+        this.onScanStop = {
+            Log.i("SCAN_CARD", "Stopped")
+            bleScanCallback?.onScanStopped()
         }
 
         val scanFilters = mutableListOf<ScanFilter>()
@@ -124,36 +131,12 @@ class BLEManager(
             Manifest.permission.BLUETOOTH_SCAN,
             REQUEST_PERMISSIONS_SCAN,
         )
+        this.onScanStop()
         if (scanCallback != null) {
+            bluetoothLeScanner?.flushPendingScanResults(scanCallback)
             bluetoothLeScanner?.stopScan(scanCallback)
             scanCallback = null
         }
-    }
-
-    fun connectToDevice(device: BluetoothDevice, gattCallback: BluetoothGattCallback) {
-        checkAndRequestPermission(
-            Manifest.permission.BLUETOOTH_CONNECT,
-            REQUEST_PERMISSIONS_CONNECT,
-        )
-        bluetoothGatt = device.connectGatt(context, false, gattCallback)
-    }
-
-    fun disconnectDevice() {
-        checkAndRequestPermission(
-            Manifest.permission.BLUETOOTH_CONNECT,
-            REQUEST_PERMISSIONS_CONNECT,
-        )
-        bluetoothGatt?.disconnect()
-        bluetoothGatt?.close()
-    }
-
-    fun sendData(characteristic: BluetoothGattCharacteristic, data: ByteArray) {
-        characteristic.value = data
-        checkAndRequestPermission(
-            Manifest.permission.BLUETOOTH_CONNECT,
-            REQUEST_PERMISSIONS_CONNECT,
-        )
-        bluetoothGatt?.writeCharacteristic(characteristic)
     }
 
     override fun showEnableCardSupportOption(context: Context) {

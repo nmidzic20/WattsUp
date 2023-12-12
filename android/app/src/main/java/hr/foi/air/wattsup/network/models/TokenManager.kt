@@ -1,43 +1,51 @@
-package hr.foi.air.wattsup.network
+package hr.foi.air.wattsup.network.models
 
 import android.content.Context
 import android.content.SharedPreferences
 
-class TokenManager private constructor(context: Context){
+class TokenManager private constructor(context: Context) {
 
-    private val sharedPreferences: SharedPreferences = context.getSharedPreferences("TokenStorage", Context.MODE_PRIVATE)
-    fun setjWTtoken(_jWTtoken: String){
+    private val sharedPreferences: SharedPreferences =
+        context.getSharedPreferences("TokenStorage", Context.MODE_PRIVATE)
+
+    fun setjWTtoken(_jWTtoken: String) {
         with(sharedPreferences.edit()) {
             putString("jwtToken", _jWTtoken)
             apply()
         }
     }
-    fun getjWTtoken(): String?{
+
+    fun getjWTtoken(): String? {
         return sharedPreferences.getString("jwtToken", null)
     }
-    fun setrefreshToken(_refreshToken: String){
+
+    fun setrefreshToken(_refreshToken: String) {
         with(sharedPreferences.edit()) {
             putString("refreshToken", _refreshToken)
             apply()
         }
     }
-    fun getrefreshToken(): String?{
+
+    fun getrefreshToken(): String? {
         return sharedPreferences.getString("refreshToken", null)
     }
-    fun setrefreshTokenExpiresAt(_refreshTokenExpiresAt: String){
+
+    fun setrefreshTokenExpiresAt(_refreshTokenExpiresAt: String) {
         with(sharedPreferences.edit()) {
             putString("refreshTokenExpiresAt", _refreshTokenExpiresAt)
             apply()
         }
     }
-    fun getrefreshTokenExpiresAt(): String?{
+
+    fun getrefreshTokenExpiresAt(): String? {
         return sharedPreferences.getString("refreshTokenExpiresAt", null)
     }
-    companion object{
+
+    companion object {
         @Volatile
         private var instance: TokenManager? = null
 
-        fun getInstance(context: Context): TokenManager{
+        fun getInstance(context: Context): TokenManager {
             return instance ?: synchronized(this) {
                 instance ?: TokenManager(context).also { instance = it }
             }
