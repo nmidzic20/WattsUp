@@ -72,7 +72,7 @@ namespace backend.Controllers
 
                 await _dbContext.SaveChangesAsync();
 
-                return Ok($"Updated card {card.Id}");
+                return Ok(card);
 
             } catch (Exception ex) {
                 return StatusCode(500, $"An error occured: {ex.Message}");
@@ -93,7 +93,7 @@ namespace backend.Controllers
                 _dbContext.Card.Remove(card);
                 await _dbContext.SaveChangesAsync();
 
-                return Ok($"Deleted card {card.Id}");
+                return Ok(card);
 
             } catch (Exception ex) {
                 return StatusCode(500, $"An error occured: {ex.Message}");
