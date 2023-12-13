@@ -8,10 +8,45 @@
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-  
-  .dialogue-content {
+}
+
+.dialogue-content {
     background: #fff;
-    padding: 20px;
-    border-radius: 5px;
-  }
+    width: 40vw;
+    height: 60vh;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+h2{
+    display: flex;
+    justify-content: center;
+    background-color: #11CB54;
+    padding: 10px;
+}
+
+button{
+    background-color: #11CB54;
+    color: white;
+    font-weight: bold;
+    width: 100px;
+    height: 40px;
+    border-radius: 6px;
+    box-shadow: 2px 2px 4px #000000;
+    align-self: center;
+}
+
+#close-button{
+    color: #b81c1c;
+    background-color: #ffccc9;
+}
+
+.dialogue-buttons{
+    margin-top: auto;
+    margin-bottom: 30px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+}
