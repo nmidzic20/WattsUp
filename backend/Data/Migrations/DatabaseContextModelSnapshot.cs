@@ -133,7 +133,7 @@ namespace backend.Data.Migrations
                         new
                         {
                             Id = 1,
-                            Active = true,
+                            Active = false,
                             CreatedAt = new DateTime(2023, 11, 8, 14, 41, 33, 861, DateTimeKind.Utc).AddTicks(7596),
                             CreatedById = 1,
                             LastSyncAt = new DateTime(2023, 11, 8, 15, 41, 33, 861, DateTimeKind.Utc).AddTicks(7600),
@@ -144,7 +144,7 @@ namespace backend.Data.Migrations
                         new
                         {
                             Id = 2,
-                            Active = true,
+                            Active = false,
                             CreatedAt = new DateTime(2023, 11, 8, 14, 41, 33, 861, DateTimeKind.Utc).AddTicks(7609),
                             CreatedById = 1,
                             LastSyncAt = new DateTime(2023, 11, 8, 16, 41, 33, 861, DateTimeKind.Utc).AddTicks(7610),
@@ -155,7 +155,7 @@ namespace backend.Data.Migrations
                         new
                         {
                             Id = 3,
-                            Active = true,
+                            Active = false,
                             CreatedAt = new DateTime(2023, 11, 8, 14, 41, 33, 861, DateTimeKind.Utc).AddTicks(7612),
                             CreatedById = 1,
                             LastSyncAt = new DateTime(2023, 11, 8, 17, 41, 33, 861, DateTimeKind.Utc).AddTicks(7613),
