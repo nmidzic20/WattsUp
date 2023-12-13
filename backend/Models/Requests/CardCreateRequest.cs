@@ -6,5 +6,6 @@ namespace backend.Models.Requests
     {
         [Required]
         public string Value { get; set; }
+        public int OwnedById { get; set; }
     }
 }
