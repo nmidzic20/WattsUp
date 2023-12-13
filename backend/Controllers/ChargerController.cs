@@ -1,6 +1,8 @@
 ﻿using backend.Data;
 using backend.Models.Entities;
 using backend.Models.Requests;
+using backend.Models.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,15 +19,27 @@ namespace backend.Controllers
             _dbContext = dbContext;
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<List<Charger>>> GetChargers()
         {
-            var chargers = await _dbContext.Charger
-                .ToListAsync();
+            var chargers = await _dbContext.Charger.Include(c => c.CreatedBy).ToListAsync();
 
-            return Ok(chargers);
+            var response = chargers.Select(charger => new ChargersResponse
+            {
+                Name = charger.Name,
+                Latitude = charger.Latitude,
+                Longitude = charger.Longitude,
+                CreatedAt = charger.CreatedAt,
+                CreatedBy = charger.CreatedBy.Email,
+                LastSyncAt = charger.LastSyncAt,
+                Active = charger.Active
+            }).ToList();
+
+            return Ok(response);
         }
 
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<Charger>> GetChargerByID(long id)
         {
@@ -41,6 +55,7 @@ namespace backend.Controllers
             return Ok(charger);
         }
 
+        [Authorize]
         [HttpGet("byState/{active}")]
         public async Task<ActionResult<List<Charger>>> GetChargersByState(bool active)
         {
@@ -51,6 +66,7 @@ namespace backend.Controllers
             return Ok(chargers);
         }
 
+        [Authorize(Policy = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Charger>> AddCharger(ChargerCreateRequest _charger)
         {
@@ -81,6 +97,7 @@ namespace backend.Controllers
             return Ok(charger);
         }
 
+        [Authorize(Policy = "Admin")]
         [HttpPut("{id}")]
         public async Task<ActionResult<Charger>> UpdateChargerByID(long id, Charger _charger)
         {
@@ -104,6 +121,7 @@ namespace backend.Controllers
             return Ok(charger);
         }
 
+        [Authorize(Policy = "Admin")]
         [HttpDelete("{id}")]
         public async Task<ActionResult<Charger>> DeleteChargerByID(long id)
         {
