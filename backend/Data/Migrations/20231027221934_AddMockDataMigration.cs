@@ -39,8 +39,10 @@ namespace backend.Data.Migrations
                 {
                     { 1, true, 1, "0xAC233FAB9B9F" },
                     { 2, true, 2, "0x3530A832" },
-                    { 3, true, 2, "0x7F8A9D4F5D6E" },
-                    { 4, true, 3, "0x7F8A9D1A2B3C" }
+                    { 3, true, 2, "0xE5B2B932" },
+                    { 4, true, 3, "0x5541A832" },
+                    { 5, true, 3, "0xB5E2A732" },
+                    { 6, true, 3, "0x15B4B932" },
                 });
 
             migrationBuilder.InsertData(

@@ -97,14 +97,28 @@ namespace backend.Data
                 {
                     Id = 3,
                     OwnedById = 2,
-                    Value = "0x7F8A9D4F5D6E",
+                    Value = "0xE5B2B932",
                     Active = true,
                 },
                 new Card()
                 {
                     Id = 4,
                     OwnedById = 3,
-                    Value = "0x7F8A9D1A2B3C",
+                    Value = "0x5541A832",
+                    Active = true,
+                },
+                new Card()
+                {
+                    Id = 5,
+                    OwnedById = 3,
+                    Value = "0xB5E2A732",
+                    Active = true,
+                },
+                new Card()
+                {
+                    Id = 6,
+                    OwnedById = 3,
+                    Value = "0x15B4B932",
                     Active = true,
                 }
             );

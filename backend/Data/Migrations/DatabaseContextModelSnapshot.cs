@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using backend.Data;
+using backend.Models.Entities;
 
 #nullable disable
 
@@ -66,15 +67,30 @@ namespace backend.Data.Migrations
                             Id = 3,
                             Active = true,
                             OwnedById = 2,
-                            Value = "0x7F8A9D4F5D6E"
+                            Value = "0xE5B2B932"
                         },
                         new
                         {
                             Id = 4,
                             Active = true,
                             OwnedById = 3,
-                            Value = "0x7F8A9D1A2B3C"
-                        });
+                            Value = "0x5541A832"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            OwnedById = 3,
+                            Value = "0xB5E2A732",
+                            Active = true,
+                        },
+                        new
+                        {
+                            Id = 6,
+                            OwnedById = 3,
+                            Value = "0x15B4B932",
+                            Active = true,
+                        }
+                    );
                 });
 
             modelBuilder.Entity("backend.Models.Entities.Charger", b =>
