@@ -14,10 +14,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4.1.1
 
-      - name: Fetch secrets
-        env: 
-          CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING}}
-          run: echo $CONNECTION_STRING
+      - name: Replace secret placeholder in appsettings.json
+        run: |
+            sed -i "s/#{DB_CONNECTION_STRING}/${{ secrets.DB_CONNECTION_STRING }}/g" appsettings.json
           
       - name: Set up NuGet
         uses: NuGet/setup-nuget@v1.2.0
