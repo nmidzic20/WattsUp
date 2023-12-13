@@ -17,4 +17,33 @@
     </div>
 </div>
 
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Latitude</th>
+            <th>Longitude</th>
+            <th>Data added</th>
+            <th>Added by</th>
+            <th>Last sync</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let station of stations">
+            <td>{{ station.name }}</td>
+            <td>{{ station.latitude }}</td>
+            <td>{{ station.longitude }}</td>
+            <td>{{ station.dateAddedFormated }}</td>
+            <td>{{ station.addedBy }}</td>
+            <td>{{ station.lastSyncFormated }}</td>
+            <td>
+                <span [ngClass]="getStatusClass(station.status)">
+                  {{ station.status }}
+                </span>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
 <button class="floating-button">Add station</button>

@@ -1,3 +1,10 @@
+$green-background: #c9ffdc;
+$green-text: #016b56;
+$red-background: #ffccc9;
+$red-text: #b81c1c;
+$yellow-background: #feffc9;
+$yellow-text: #b68730;
+
 .stat {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
@@ -22,25 +29,26 @@
     }
 
     .green {
-        color: #016b56;
-        background-color: #c9ffdc;
+        color: $green-text;
+        background-color: $green-background;
     }
 
     .red {
-        color: #b81c1c;
-        background-color: #ffccc9;
+        color: $red-text;
+        background-color: $red-background;
     }
 
     .yellow {
-        color: #b68730;
-        background-color: #feffc9;
+        color: $yellow-text;
+        background-color: $yellow-background;
     }
 }
+
 
 .floating-button {
     position: fixed;
     bottom: 40px;
-    right: 40px;
+    right: 50px;
     background-color: #11cb54;
     color: #ffffff;
     padding: 15px 30px;
@@ -49,9 +57,69 @@
     font-size: large;
     font-weight: bold;
     cursor: pointer;
-    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    transition: all 100ms ease;
 
     &:hover {
-        background-color: #0db149;
+        background-color: #26d667;
     }
-  }
+
+    &:active {
+        background-color: #11cb54;
+        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.2), 0 2px 4px -2px rgb(0 0 0 / 0.2);
+        transform: translateY(1px);
+    }
+}
+
+
+table {
+    width: calc(100% - 100px);;
+    border-collapse: collapse;
+    margin: 50px;
+    margin-bottom: 120px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    overflow: hidden;
+
+    th,
+    td {
+        font-size: large;
+        padding: 15px 20px;
+        text-align: left;
+        border-bottom: 1px solid $green-background;
+    }
+
+    th {
+        background-color: $green-background;
+        color: $green-text;
+    }
+
+    td {
+        background-color: #ffffff;
+    }
+
+    tr:last-child td {
+        border-bottom: none;
+    }
+
+    td span {
+        display: inline-block;
+        padding: 8px 15px;
+        border-radius: 50px;
+    }
+    
+    .green {
+    background-color: $green-background;
+    color: $green-text;
+    }
+
+    .red {
+    background-color: $red-background;
+    color: $red-text;
+    }
+
+    .yellow {
+    background-color: $yellow-background;
+    color: $yellow-text;
+    }
+}
