@@ -28,7 +28,7 @@ jobs:
 
       - name: Replace secret placeholder in appsettings.json
         run: |
-            sed -i "s/#{DB_CONNECTION_STRING}/${{ secrets.DB_CONNECTION_STRING }}/g" appsettings.json
+            sed -i "s/#{DB_CONNECTION_STRING}/${{ secrets.DB_CONNECTION_STRING }}/g" backend/appsettings.json
         
       - name: Restore NuGet packages for backend
         run: nuget restore backend/backend.sln
