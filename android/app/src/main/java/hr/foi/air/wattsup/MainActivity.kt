@@ -1,9 +1,9 @@
 package hr.foi.air.wattsup
 
-import ScanViewModel
-import android.Manifest
 import android.app.Activity
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -19,6 +19,9 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import hr.foi.air.wattsup.ble.BLEManager
+import hr.foi.air.wattsup.core.CardManager
+import hr.foi.air.wattsup.rfid.RFIDManager
 import hr.foi.air.wattsup.screens.ChargerScreen
 import hr.foi.air.wattsup.screens.HistoryScreen
 import hr.foi.air.wattsup.screens.LandingScreen
@@ -28,26 +31,33 @@ import hr.foi.air.wattsup.screens.ScanScreen
 import hr.foi.air.wattsup.screens.UserModeScreen
 import hr.foi.air.wattsup.ui.theme.WattsUpTheme
 import hr.foi.air.wattsup.viewmodels.ChargerViewModel
+import hr.foi.air.wattsup.viewmodels.ScanViewModel
 
 class MainActivity : ComponentActivity() {
 
     private val REQUEST_PERMISSIONS = 1
-
-    private val REQUIRED_PERMISSIONS = arrayOf(
-        Manifest.permission.BLUETOOTH,
-        Manifest.permission.BLUETOOTH_ADMIN,
-        Manifest.permission.ACCESS_COARSE_LOCATION,
-        Manifest.permission.ACCESS_FINE_LOCATION,
-        Manifest.permission.BLUETOOTH_CONNECT,
-        Manifest.permission.BLUETOOTH_SCAN,
-    )
+    private lateinit var REQUIRED_PERMISSIONS: List<String>
 
     private val chargerViewModel: ChargerViewModel by viewModels()
     private val scanViewModel: ScanViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val cardManagers: List<CardManager> = listOf(
+            BLEManager(this),
+            RFIDManager(this),
+        )
+
+        REQUIRED_PERMISSIONS = cardManagers.map { it.getRequiredPermissions() }.flatten()
         requestPermissions(this)
+
+        cardManagers.forEach { cardManager ->
+            val receiver = cardManager.getStateReceiver()
+            val action = cardManager.getAction()
+            registerCardSupportStateReceiver(receiver, action)
+        }
+
         setContent {
             WattsUpTheme {
                 Surface(
@@ -64,15 +74,15 @@ class MainActivity : ComponentActivity() {
                         // TODO: disable back button on user mode screen
 
                         composable("landing") {
-                            val onChargerModeClick = { navController.navigate("scanRFID") }
+                            val onChargerModeClick = { navController.navigate("scanCard") }
                             val onUserModeClick = { navController.navigate("login") }
 
                             LandingScreen(onChargerModeClick, onUserModeClick)
                         }
-                        composable("scanRFID") {
-                            val onScanRFID = { navController.navigate("chargerMode") }
+                        composable("scanCard") {
+                            val onScan = { navController.navigate("chargerMode") }
 
-                            ScanScreen(onArrowBackClick, onScanRFID, scanViewModel)
+                            ScanScreen(onArrowBackClick, onScan, scanViewModel, cardManagers)
                         }
                         composable("chargerMode") {
                             ChargerScreen(onArrowBackClick, chargerViewModel)
@@ -97,6 +107,14 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private fun registerCardSupportStateReceiver(
+        cardSupportStateReceiver: BroadcastReceiver,
+        action: String,
+    ) {
+        val filter = IntentFilter(action)
+        this.registerReceiver(cardSupportStateReceiver, filter)
     }
 
     private fun requestPermissions(context: Context) {

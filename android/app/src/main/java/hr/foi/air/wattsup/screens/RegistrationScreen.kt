@@ -117,7 +117,7 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
         modifier = modifier,
         value = firstName,
         onValueChange = { firstName = it },
-        label = { Text(stringResource(R.string.first_name_label)) }
+        label = { Text(stringResource(R.string.first_name_label)) },
     )
 
     OutlinedTextField(
@@ -133,13 +133,14 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
         onValueChange = {
             email = it
         },
-        colors = if(invalidEmail){
+        colors = if (invalidEmail) {
             TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = Color.Red,
                 unfocusedBorderColor = Color.Red,
                 cursorColor = Color.Red,
-                textColor = Color.Red)
-        }else{
+                textColor = Color.Red,
+            )
+        } else {
             TextFieldDefaults.outlinedTextFieldColors()
         },
         label = { Text(stringResource(R.string.e_mail_label)) },
@@ -151,13 +152,14 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
         onValueChange = {
             password = it
         },
-        colors = if(invalidPassword){
+        colors = if (invalidPassword) {
             TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = Color.Red,
                 unfocusedBorderColor = Color.Red,
                 cursorColor = Color.Red,
-                textColor = Color.Red)
-        }else{
+                textColor = Color.Red,
+            )
+        } else {
             TextFieldDefaults.outlinedTextFieldColors()
         },
         visualTransformation = PasswordVisualTransformation(),
@@ -176,7 +178,6 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
         Spacer(modifier = Modifier.width(4.dp))
         ElevatedButton(
             onClick = {
-
             },
             modifier = Modifier
                 .padding(10.dp)
@@ -193,12 +194,11 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
         }
     }
 
-    if(showToast){
+    if (showToast) {
         Text(
-            text = statusMessage
+            text = statusMessage,
         )
     }
-
 
     ElevatedButton(
         onClick = {
@@ -224,13 +224,13 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
 
                             if (response?.isSuccessful == true) {
                                 val responseBody = response.body()
-                                val message = responseBody?.message
-                                Log.i("Response", (message ?: response).toString())
+                                val message =
+                                    "Registered new user under ID ${responseBody?.id}, first name: ${responseBody?.firstName}, last name: ${responseBody?.lastName}, email: ${responseBody?.email}"
+                                Log.i("Response", message.toString())
                                 onLogInClick()
                             } else {
                                 val responseBody = response?.body()
-                                val message = responseBody?.message
-                                Log.i("Response", (message ?: response).toString())
+                                Log.i("Response", (responseBody ?: response).toString())
                                 onLogInClick()
                             }
                         }

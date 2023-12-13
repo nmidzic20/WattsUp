@@ -1,19 +1,18 @@
 package hr.foi.air.wattsup.core
 
+import android.content.BroadcastReceiver
 import android.content.Context
 
 interface CardManager {
     fun initialize()
+    fun getRequiredPermissions(): List<String>
+    fun getStateReceiver(): BroadcastReceiver
+    fun getAction(): String
     fun getName(): String
     fun isCardSupportAvailableOnDevice(): Boolean
     fun isCardSupportEnabledOnDevice(): Boolean
     fun showEnableCardSupportOption(context: Context)
-
-    // fun checkAndRequestPermission(permission: String, requestCode: Int)
     fun startScanningForCard(cardScanCallback: CardScanCallback?)
     fun stopScanningForCard()
-    // fun connectToCard(/**/)
-    // fun disconnectFromCard()
-    // fun sendDataToCard(/)
-    // fun readDataFromCard()
+    fun scanResultRequiresAsyncHandling(): Boolean
 }
