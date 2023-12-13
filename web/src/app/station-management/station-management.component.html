@@ -1,1 +1,3 @@
 <p>station-management works!</p>
+<button class="floating-button" (click)="openAddStationDialogue()">Add station</button>
+<app-add-station-dialogue [isVisible]="isAddStationDialogueVisible" (closeDialogue)="isAddStationDialogueVisible=false"></app-add-station-dialogue>

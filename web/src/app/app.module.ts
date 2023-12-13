@@ -7,6 +7,7 @@ import { RegistrationComponent } from './registration/registration.component';
 import { NotFoundComponent } from './not-found/not-found.component';
 import { LoginComponent } from './login/login.component';
 import { StationManagementComponent } from './station-management/station-management.component';
+import { AddStationDialogueComponent } from './add-station-dialogue/add-station-dialogue.component';
 
 @NgModule({
   declarations: [
@@ -14,7 +15,8 @@ import { StationManagementComponent } from './station-management/station-managem
     RegistrationComponent,
     NotFoundComponent,
     LoginComponent,
-    StationManagementComponent
+    StationManagementComponent,
+    AddStationDialogueComponent
   ],
   imports: [
     BrowserModule,
