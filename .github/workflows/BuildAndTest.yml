@@ -36,3 +36,6 @@ jobs:
 
       - name: Run Unit Tests
         run: dotnet test ControllerUnitTests/ControllerUnitTests.csproj --configuration Release
+
+      - name: Build Docker image
+        run: docker build -t Dockerfile -f backend/ .
