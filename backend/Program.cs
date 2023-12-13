@@ -2,6 +2,7 @@ using backend.Data;
 using backend.Services;
 using backend.Swagger;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -9,7 +10,17 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Text;
 using System.Text.Json.Serialization;
 
+string GetEnvironmentName() {
+    var isGitHubActions = Environment.GetEnvironmentVariable("GITHUB_ACTIONS") == "true";
+    return isGitHubActions ? "production" : "development";
+}
+
+var environment = GetEnvironmentName();
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile(environment == "production" ? "appsettings.json" : "appsettings.Development.json", optional: false);
+
 builder.Services.AddHttpClient();
 
 builder.Services.AddDbContext<DatabaseContext>(options =>
@@ -85,7 +96,6 @@ builder.Services.AddScoped<CardService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
-
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
