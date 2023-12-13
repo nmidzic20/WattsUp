@@ -21,7 +21,7 @@ namespace backend.Controllers
 
         [Authorize]
         [HttpGet]
-        public async Task<ActionResult<List<Charger>>> GetChargers()
+        public async Task<ActionResult<List<ChargersResponse>>> GetChargers()
         {
             var chargers = await _dbContext.Charger.Include(c => c.CreatedBy).ToListAsync();
 
