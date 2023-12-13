@@ -5,12 +5,16 @@ package hr.foi.air.wattsup.screens
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -21,6 +25,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CardElevation
@@ -51,6 +56,7 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hr.foi.air.wattsup.R
@@ -135,7 +141,16 @@ fun HistoryView(topPadding: Dp) {
 
 @Composable
 fun EventCard(index: Int, event: Event) {
+    val showDetails = remember { mutableStateOf(false) }
+
+    if (showDetails.value) {
+        DetailBox(event)
+    }
+
     Card(
+        onClick = {
+            showDetails.value = true
+        },
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
             contentColor = MaterialTheme.colorScheme.onSurface,
@@ -188,6 +203,53 @@ fun EventCard(index: Int, event: Event) {
                     fontWeight = FontWeight.Bold
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun DetailBox(event: Event) {
+    val show = remember { mutableStateOf(true) }
+
+    if (!show.value) {
+        return
+    }
+
+    Dialog(onDismissRequest = { show.value = false }) {
+        Column(
+            modifier = Modifier
+                .height(300.dp)
+                .width(300.dp)
+                .padding(10.dp)
+                .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(12.dp)),
+            verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Started at ${SimpleDateFormat("hh:mm:ss dd.mm.yyyy.").format(event.startedAt)}",
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = "Ended at ${SimpleDateFormat("hh:mm:ss dd.mm.yyyy.").format(event.endedAt)}",
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = "Card ${event.cardId}",
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = "Location ${event.chargerId}",
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = "${event.volumeKwh} kWh",
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 }

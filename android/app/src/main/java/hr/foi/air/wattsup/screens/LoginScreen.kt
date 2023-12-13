@@ -42,7 +42,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.navArgument
 import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.network.NetworkService
-import hr.foi.air.wattsup.network.TokenManager
+import hr.foi.air.wattsup.network.models.TokenManager
 import hr.foi.air.wattsup.network.models.LoginBody
 import hr.foi.air.wattsup.network.models.LoginResponseBody
 import hr.foi.air.wattsup.utils.UserCard
