@@ -1,6 +1,7 @@
 ﻿using backend.Data;
 using backend.Models.Entities;
 using backend.Models.Requests;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,6 +18,7 @@ namespace backend.Controllers
             _dbContext = dbContext;
         }
 
+        [Authorize(Policy = "Admin")]
         [HttpGet]
         public async Task<ActionResult<List<Card>>> GetCards()
         {
@@ -26,6 +28,21 @@ namespace backend.Controllers
             return Ok(res);
         }
 
+        [HttpGet("CardAuthentication/{address}")]
+        public async Task<ActionResult<Card>> AuthenticateCard(string address)
+        {
+            var res = await _dbContext.Card
+                .Where(c => c.Value == address)
+                .FirstOrDefaultAsync();
+
+            if (res == null)
+            {
+                return NotFound();
+            }
+            return Ok(res);
+        }
+
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<Card>> CreateCard(CardCreateRequest _card)
         {
@@ -54,6 +71,7 @@ namespace backend.Controllers
             
         }
 
+        [Authorize]
         [HttpPut("cardId")]
         public async Task<ActionResult<Card>> UpdateCard(long cardID, Card _card)
         {
@@ -77,6 +95,7 @@ namespace backend.Controllers
             }
         }
 
+        [Authorize]
         [HttpDelete("cardId")]
         public async Task<ActionResult<Card>> DeleteCard(long cardID) {
             try {
@@ -98,6 +117,7 @@ namespace backend.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet("{userId}")]
         public async Task<ActionResult<List<Card>>> GetCardsForUser(long userId)
         {

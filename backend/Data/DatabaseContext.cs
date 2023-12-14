@@ -133,7 +133,7 @@ namespace backend.Data
                     CreatedAt = DateTime.UtcNow,
                     CreatedById = 1,
                     LastSyncAt = DateTime.UtcNow.AddHours(1),
-                    Active = true,
+                    Active = false,
                 },
                 new Charger()
                 {
@@ -144,7 +144,7 @@ namespace backend.Data
                     CreatedAt = DateTime.UtcNow,
                     CreatedById = 1,
                     LastSyncAt = DateTime.UtcNow.AddHours(2),
-                    Active = true,
+                    Active = false,
                 },
                 new Charger()
                 {
@@ -155,7 +155,7 @@ namespace backend.Data
                     CreatedAt = DateTime.UtcNow,
                     CreatedById = 1,
                     LastSyncAt = DateTime.UtcNow.AddHours(3),
-                    Active = true,
+                    Active = false,
                 }
             );
 

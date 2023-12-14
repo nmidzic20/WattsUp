@@ -1,6 +1,7 @@
 ﻿using backend.Data;
 using backend.Models.Entities;
 using backend.Models.Requests;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
@@ -20,6 +21,7 @@ namespace backend.Controllers
             _client = httpClient;
         }
 
+        [Authorize(Policy = "Admin")]
         [HttpGet]
         public async Task<ActionResult<List<Event>>> GetEvents()
         {
@@ -29,6 +31,7 @@ namespace backend.Controllers
             return Ok(res);
         }
 
+        [Authorize]
         [HttpGet("forCard/{cardId}")]
         public async Task<ActionResult<List<Event>>> GetEventsForCard(long cardId)
         {
@@ -44,6 +47,7 @@ namespace backend.Controllers
             return Ok(res);
         }
 
+        [Authorize(Policy = "Admin")]
         [HttpGet("forCharger/{chargerId}")]
         public async Task<ActionResult<List<Event>>> GetEventsForCharger(long chargerId)
         {

@@ -50,9 +50,9 @@ namespace backend.Data.Migrations
                 columns: new[] { "Id", "Active", "CreatedAt", "CreatedById", "LastSyncAt", "Latitude", "Longitude", "Name" },
                 values: new object[,]
                 {
-                    { 1, true, new DateTime(2023, 10, 28, 0, 19, 33, 945, DateTimeKind.Utc).AddTicks(4795), 1, new DateTime(2023, 10, 28, 1, 19, 33, 945, DateTimeKind.Utc).AddTicks(4799), 46.309735000000003, 16.348593000000001, "Charger Dorm" },
-                    { 2, true, new DateTime(2023, 10, 28, 0, 19, 33, 945, DateTimeKind.Utc).AddTicks(4804), 1, new DateTime(2023, 10, 28, 2, 19, 33, 945, DateTimeKind.Utc).AddTicks(4807), 46.287309, 16.321732999999998, "Charger Mobilisis" },
-                    { 3, true, new DateTime(2023, 10, 28, 0, 19, 33, 945, DateTimeKind.Utc).AddTicks(4811), 1, new DateTime(2023, 10, 28, 3, 19, 33, 945, DateTimeKind.Utc).AddTicks(4814), 46.307789999999997, 16.338061, "Charger FOI" }
+                    { 1, false, new DateTime(2023, 10, 28, 0, 19, 33, 945, DateTimeKind.Utc).AddTicks(4795), 1, new DateTime(2023, 10, 28, 1, 19, 33, 945, DateTimeKind.Utc).AddTicks(4799), 46.309735000000003, 16.348593000000001, "Charger Dorm" },
+                    { 2, false, new DateTime(2023, 10, 28, 0, 19, 33, 945, DateTimeKind.Utc).AddTicks(4804), 1, new DateTime(2023, 10, 28, 2, 19, 33, 945, DateTimeKind.Utc).AddTicks(4807), 46.287309, 16.321732999999998, "Charger Mobilisis" },
+                    { 3, false, new DateTime(2023, 10, 28, 0, 19, 33, 945, DateTimeKind.Utc).AddTicks(4811), 1, new DateTime(2023, 10, 28, 3, 19, 33, 945, DateTimeKind.Utc).AddTicks(4814), 46.307789999999997, 16.338061, "Charger FOI" }
                 });
 
             migrationBuilder.InsertData(

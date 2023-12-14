@@ -2,6 +2,7 @@ using backend.Controllers;
 using backend.Data;
 using backend.Models.Entities;
 using backend.Models.Requests;
+using backend.Models.Responses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -38,7 +39,7 @@ namespace ControllerUnitTests.ControllersTests
             var result = (await chargerController.GetChargers()).Result as ObjectResult;
 
             // Assert
-            Assert.IsFalse((result.Value as List<Charger>).Any());
+            Assert.IsFalse((result.Value as List<ChargersResponse>).Any());
         }
 
         [TestMethod]
@@ -54,7 +55,18 @@ namespace ControllerUnitTests.ControllersTests
                 Name = "Test Charger 1",
                 Active = true,
                 Latitude = 1.1,
-                Longitude = 1.1
+                Longitude = 1.1,
+                CreatedBy = new User
+                {
+                    Id = 1,
+                    FirstName = "Test",
+                    LastName = "Test",
+                    Email = "test@test.com",
+                    Password = "test",
+                    RoleId = 1,
+                    Active = true,
+                    CreatedAt = DateTime.Now,
+                }
             });
             context.Charger.Add(new Charger
             {
@@ -63,7 +75,18 @@ namespace ControllerUnitTests.ControllersTests
                 Name = "Test Charger 2",
                 Active = true,
                 Latitude = 1.1,
-                Longitude = 1.1
+                Longitude = 1.1,
+                CreatedBy = new User
+                {
+                    Id = 2,
+                    FirstName = "Test",
+                    LastName = "Test",
+                    Email = "test@test.com",
+                    Password = "test",
+                    RoleId = 1,
+                    Active = true,
+                    CreatedAt = DateTime.Now,
+                }
             });
             context.SaveChanges();
 
@@ -71,7 +94,7 @@ namespace ControllerUnitTests.ControllersTests
             var result = (await chargerController.GetChargers()).Result as ObjectResult;
 
             // Assert
-            Assert.AreEqual(2, (result.Value as List<Charger>).Count);
+            Assert.AreEqual(2, (result.Value as List<ChargersResponse>).Count);
         }
 
         [TestMethod]
