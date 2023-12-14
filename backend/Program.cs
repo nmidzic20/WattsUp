@@ -25,7 +25,12 @@ builder.Services.AddHttpClient();
 
 builder.Services.AddDbContext<DatabaseContext>(options =>
 {
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+    if(environment== "production") {
+        options.UseNpgsql(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING"));
+    } else {
+        options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+    }
+    
 });
 
 builder.Services.AddAuthentication(options =>
