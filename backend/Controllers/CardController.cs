@@ -29,16 +29,17 @@ namespace backend.Controllers
         }
 
         [HttpGet("CardAuthentication/{address}")]
-        public async Task<ActionResult<Boolean>> AuthenticateCardAddress(string address)
+        public async Task<ActionResult<Card>> AuthenticateCard(string address)
         {
             var res = await _dbContext.Card
                 .Where(c => c.Value == address)
                 .FirstOrDefaultAsync();
-            if(res == null)
+
+            if (res == null)
             {
-                return NotFound(new { message = false });
+                return NotFound();
             }
-            return Ok(new { message = true });
+            return Ok(res);
         }
 
         [Authorize]
