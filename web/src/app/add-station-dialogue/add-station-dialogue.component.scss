@@ -19,6 +19,26 @@
     flex-direction: column;
 }
 
+.dialogue-input{
+    display: flex;
+    margin: 20px auto 0;
+    justify-content: center;
+    flex-direction: column;
+    width: 100%;
+}
+
+.longitude-latitude-container{
+    display: flex;
+    flex-direction: row;
+}
+
+.dialogue-input-container{
+    display: flex;
+    margin: 20px auto 0;
+    justify-content: center;
+    flex-direction: column;
+}
+
 h2{
     display: flex;
     justify-content: center;
@@ -49,4 +69,23 @@ button{
     flex-direction: row;
     justify-content: space-evenly;
     align-items: center;
+}
+
+label{
+    align-self:flex-start;
+    font-weight: bold;
+}
+
+input{
+    background-color: #C9FFDC;
+    height: 30px;
+    border-radius: 6px;
+    box-shadow: 2px 2px 4px #000000;
+    border: none;
+}
+
+#map-button{
+    margin-top: 30px;
+    margin-left: 30px;
+    height: 80%;
 }
