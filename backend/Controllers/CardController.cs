@@ -28,6 +28,19 @@ namespace backend.Controllers
             return Ok(res);
         }
 
+        [HttpGet("CardAuthentication/{address}")]
+        public async Task<ActionResult<Boolean>> AuthenticateCardAddress(string address)
+        {
+            var res = await _dbContext.Card
+                .Where(c => c.Value == address)
+                .FirstOrDefaultAsync();
+            if(res == null)
+            {
+                return NotFound(new { message = false });
+            }
+            return Ok(new { message = true });
+        }
+
         [Authorize]
         [HttpPost]
         public async Task<ActionResult<Card>> CreateCard(CardCreateRequest _card)
