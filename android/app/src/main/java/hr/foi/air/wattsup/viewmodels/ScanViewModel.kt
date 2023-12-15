@@ -126,14 +126,22 @@ class ScanViewModel : ViewModel() {
     private fun handleScanResult(result: Any, onScan: () -> Unit, cardManager: CardManager) {
         if (cardManager.scanResultRequiresAsyncHandling()) {
             viewModelScope.launch(Dispatchers.Main) {
-                handleScan(result, onScan) { cardManager.stopScanningForCard() }
+                checkedCardAddresses.clear()
+                handleScan(result, onScan, cardManager) { cardManager.stopScanningForCard() }
             }
         } else {
-            handleScan(result, onScan) { cardManager.stopScanningForCard() }
+            handleScan(result, onScan, cardManager) { cardManager.stopScanningForCard() }
         }
     }
 
-    private fun handleScan(result: Any, onScan: () -> Unit, onCardFound: () -> Unit) {
+    private val checkedCardAddresses = mutableSetOf<String>()
+
+    private fun handleScan(
+        result: Any,
+        onScan: () -> Unit,
+        cardManager: CardManager,
+        onCardFound: () -> Unit,
+    ) {
         var deviceAddress: String = ""
         if (result is ByteArray) {
             deviceAddress = HexUtils.formatHexToPrefix(HexUtils.bytesToHexString(result))
@@ -145,6 +153,7 @@ class ScanViewModel : ViewModel() {
 
         val onCardAuthenticated: (card: Card) -> Unit = { card ->
             onCardFound()
+            scanTimeoutJob?.cancel()
             UserCard.userCard.value = card
 
             _scanSuccess.value = true
@@ -153,18 +162,25 @@ class ScanViewModel : ViewModel() {
 
             onScan()
 
-            // After navigating away, reset so buttons are visible for next scanning and remove user message
+            // After navigating away, reset so buttons are visible for next scanning,
+            // remove past user messages and clear checkedCardAddresses set
             _scanSuccess.value = false
             _userMessage.value = ""
+            checkedCardAddresses.clear()
         }
 
         val onCardInvalid: () -> Unit = {
-            onCardFound()
-            scanTimeoutJob?.cancel()
+            if (cardManager.scanResultRequiresAsyncHandling()) {
+                onCardFound()
 
-            _scanSuccess.value = false
-            _scanning.value = false
-            _userMessage.value = "Card is not registered"
+                _scanSuccess.value = false
+                _scanning.value = false
+                _userMessage.value = "Card is not registered"
+
+                Log.i("CARD_STOP", " RFID stopped scanning")
+            } else {
+                Log.i("CARD_CONTINUE", "Continue scanning until BLE scantimeoutjob")
+            }
         }
 
         val cardAddress = "0" +
@@ -174,6 +190,7 @@ class ScanViewModel : ViewModel() {
             "CARD_BEFORE_RES",
             cardAddress,
         )
+
         deviceAddressMatchesDatabaseCardValue(cardAddress, onCardAuthenticated, onCardInvalid)
 
         /*if (deviceAddressMatchesDatabaseCardValue(deviceAddress)) {
@@ -205,15 +222,25 @@ class ScanViewModel : ViewModel() {
         onCardAuthenticated: (card: Card) -> Unit,
         onCardInvalid: () -> Unit,
     ) {
-        Log.i("CARD_BEFORE", deviceAddress)
+        // prevent double checking of already scanned cards
+        if (deviceAddress in checkedCardAddresses) {
+            Log.i("CARD_", "$deviceAddress is in $checkedCardAddresses")
+            return
+        } else {
+            Log.i(
+                "CARD_",
+                "$deviceAddress $checkedCardAddresses",
+            )
+        }
+
         cardService.authenticateCard(deviceAddress).enqueue(object : Callback<Card?> {
             override fun onResponse(call: Call<Card?>, response: Response<Card?>) {
-                Log.i("CARD_RES", "${response.body()}")
-                Log.i("CARD_RES", "$response")
+                checkedCardAddresses.add(deviceAddress)
 
                 if (response.isSuccessful && response.body() != null) {
                     Log.i("CARD_RES", "Success")
                     onCardAuthenticated(response.body()!!)
+                    // put onCardInvalid() instead of onCardAuthenticated to test scanning with invalid card
                 } else {
                     Log.i("CARD_RES", "Fail")
                     onCardInvalid()
