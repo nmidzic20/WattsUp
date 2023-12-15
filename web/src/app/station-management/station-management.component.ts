@@ -31,4 +31,8 @@ export class StationManagementComponent implements OnInit {
   openAddStationDialogue() {
     this.isAddStationDialogueVisible = true;
   }
+
+  async getStations(jwt: string){
+    console.log("Refreshing...");
+  }
 }

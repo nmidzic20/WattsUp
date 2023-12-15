@@ -10,6 +10,7 @@ import { Router } from '@angular/router';
 export class AddStationDialogueComponent {
   @Input() isVisible: boolean = false;
   @Output() closeDialogue: EventEmitter<void> = new EventEmitter<void>();
+  @Output() refreshChargerView = new EventEmitter<string>();
   stationNameInput?: HTMLInputElement;
   longitudeInput?: HTMLInputElement;
   latitudeInput?: HTMLInputElement;
@@ -63,6 +64,7 @@ export class AddStationDialogueComponent {
       let response = await fetch("https://localhost:32770/api/Charger", parameters);
       let body = await response.text();
       if (response.status == 200) {
+        this.refreshChargerView.emit(this.userManagerService.getTokens()?.jwt);
         this.close();
       } else {
         let errorMessage = JSON.parse(body).message;
