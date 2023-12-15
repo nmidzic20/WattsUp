@@ -1,21 +1,20 @@
 <div *ngIf="isVisible" class="dialogue-container">
     <div class="dialogue-content">
         <h2>ADD NEW CHARGING STATION</h2>
-
         <div class="dialogue-input-container">
             <div class="dialogue-input">
                 <label for="name">Station name:</label>
-                <input type="text" name="name">
+                <input type="text" name="name" id="stationName">
             </div>
             <div class="longitude-latitude-container">
                 <div>
                     <div class="dialogue-input">
                         <label for="longitude">Longitude:</label>
-                        <input type="text" name="longitude">
+                        <input type="text" name="longitude" id="longitude">
                     </div>
                     <div class="dialogue-input">
                         <label for="latitude">Latitude:</label>
-                        <input type="text" name="latitude">
+                        <input type="text" name="latitude" id="latitude">
                     </div>
                 </div>
                 <button id="map-button"><img src="../../assets/map_location_icon.png" alt="Map Location"></button>
@@ -24,7 +23,7 @@
 
         <div class="dialogue-buttons">
             <button id="close-button" (click)="close()">Close</button>
-            <button>Add</button>
+            <button (click)="addStation()">Add</button>
         </div>
     </div>
 </div>
