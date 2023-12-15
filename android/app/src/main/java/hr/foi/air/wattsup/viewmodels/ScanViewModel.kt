@@ -24,7 +24,7 @@ class ScanViewModel : ViewModel() {
 
     private val cardService: CardService = NetworkService.cardService
 
-    private val _cardList = MutableLiveData<List<Card>>(emptyList())
+    // private val _cardList = MutableLiveData<List<Card>>(emptyList())
 
     private var scanTimeoutJob: Job? = null
 
@@ -37,9 +37,9 @@ class ScanViewModel : ViewModel() {
     private val _userMessage = MutableLiveData("")
     val userMessage: LiveData<String> get() = _userMessage
 
-    init {
+    /*init {
         refreshCardAddressList()
-    }
+    }*/
 
     fun getStatusMessage(scanning: Boolean, cardManager: CardManager): String =
         if (!cardManager.isCardSupportAvailableOnDevice()) {
@@ -94,7 +94,7 @@ class ScanViewModel : ViewModel() {
         )
     }
 
-    private fun refreshCardAddressList() {
+    /*private fun refreshCardAddressList() {
         viewModelScope.launch {
             cardService.getCards().enqueue(object : Callback<List<Card?>> {
                 override fun onResponse(call: Call<List<Card?>>, response: Response<List<Card?>>) {
@@ -121,7 +121,7 @@ class ScanViewModel : ViewModel() {
                 }
             })
         }
-    }
+    }*/
 
     private fun handleScanResult(result: Any, onScan: () -> Unit, cardManager: CardManager) {
         if (cardManager.scanResultRequiresAsyncHandling()) {
@@ -143,7 +143,40 @@ class ScanViewModel : ViewModel() {
 
         Log.i("SCAN", "Scanned: $deviceAddress")
 
-        if (deviceAddressMatchesDatabaseCardValue(deviceAddress)) {
+        val onCardAuthenticated: (card: Card) -> Unit = { card ->
+            onCardFound()
+            UserCard.userCard.value = card
+
+            _scanSuccess.value = true
+            _scanning.value = false
+            _userMessage.value = "Scan successful"
+
+            onScan()
+
+            // After navigating away, reset so buttons are visible for next scanning and remove user message
+            _scanSuccess.value = false
+            _userMessage.value = ""
+        }
+
+        val onCardInvalid: () -> Unit = {
+            onCardFound()
+            scanTimeoutJob?.cancel()
+
+            _scanSuccess.value = false
+            _scanning.value = false
+            _userMessage.value = "Card is not registered"
+        }
+
+        val cardAddress = "0" +
+            deviceAddress.substring(1, 2).lowercase() + deviceAddress.uppercase()
+                .substring(2)
+        Log.i(
+            "CARD_BEFORE_RES",
+            cardAddress,
+        )
+        deviceAddressMatchesDatabaseCardValue(cardAddress, onCardAuthenticated, onCardInvalid)
+
+        /*if (deviceAddressMatchesDatabaseCardValue(deviceAddress)) {
             _scanSuccess.value = true
             onCardFound()
             _scanning.value = false
@@ -153,9 +186,10 @@ class ScanViewModel : ViewModel() {
                 false // After navigating away, reset so buttons are visible for next scanning
             _userMessage.value = "" // Reset user message
         }
+         */
     }
 
-    private fun deviceAddressMatchesDatabaseCardValue(deviceAddress: String): Boolean {
+    /*private fun deviceAddressMatchesDatabaseCardValue(deviceAddress: String): Boolean {
         val cardList = _cardList.value ?: emptyList()
         val card = cardList.find { card -> HexUtils.compareHexStrings(card.value, deviceAddress) }
         return if (card != null) {
@@ -165,5 +199,31 @@ class ScanViewModel : ViewModel() {
         } else {
             false
         }
+    }*/
+    private fun deviceAddressMatchesDatabaseCardValue(
+        deviceAddress: String,
+        onCardAuthenticated: (card: Card) -> Unit,
+        onCardInvalid: () -> Unit,
+    ) {
+        Log.i("CARD_BEFORE", deviceAddress)
+        cardService.authenticateCard(deviceAddress).enqueue(object : Callback<Card?> {
+            override fun onResponse(call: Call<Card?>, response: Response<Card?>) {
+                Log.i("CARD_RES", "${response.body()}")
+                Log.i("CARD_RES", "$response")
+
+                if (response.isSuccessful && response.body() != null) {
+                    Log.i("CARD_RES", "Success")
+                    onCardAuthenticated(response.body()!!)
+                } else {
+                    Log.i("CARD_RES", "Fail")
+                    onCardInvalid()
+                }
+            }
+
+            override fun onFailure(call: Call<Card?>, t: Throwable) {
+                Log.i("CARD_RES", "Network error")
+                onCardInvalid()
+            }
+        })
     }
 }

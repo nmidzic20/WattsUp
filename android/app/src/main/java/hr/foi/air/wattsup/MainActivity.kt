@@ -81,7 +81,9 @@ class MainActivity : ComponentActivity() {
                             ScanScreen(onArrowBackClick, onScan, scanViewModel, cardManagers)
                         }
                         composable("chargerMode") {
-                            ChargerScreen(onArrowBackClick, chargerViewModel)
+                            ChargerScreen({
+                                navController.navigate("scanCard")
+                            }, chargerViewModel)
                         }
                         composable("registration") {
                             val onLogInClick = { navController.navigate("login") }

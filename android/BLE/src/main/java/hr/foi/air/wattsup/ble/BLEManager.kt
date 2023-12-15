@@ -96,6 +96,12 @@ class BLEManager(
 
     override fun startScanningForCard(bleScanCallback: CardScanCallback?) {
         Log.i("SCAN_CARD", "Ble startscan")
+
+        this.onScanStop = {
+            Log.i("SCAN_CARD", "Stopped")
+            bleScanCallback?.onScanStopped()
+        }
+
         this.scanCallback = object : ScanCallback() {
             override fun onScanResult(callbackType: Int, result: ScanResult) {
                 Log.i("SCAN_CARD", result.device.address)
@@ -106,11 +112,6 @@ class BLEManager(
                 Log.i("SCAN_CARD", "Error $errorCode")
                 bleScanCallback?.onScanFailed(errorCode.toString())
             }
-        }
-
-        this.onScanStop = {
-            Log.i("SCAN_CARD", "Stopped")
-            bleScanCallback?.onScanStopped()
         }
 
         val scanFilters = mutableListOf<ScanFilter>()
