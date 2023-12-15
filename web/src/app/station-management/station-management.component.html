@@ -1,1 +1,49 @@
-<p>station-management works!</p>
+<div class="stat">
+    <div class="stat-item">
+        <div class="stat-item-title">Total</div>
+        <div class="stat-item-value">{{ totalStations }}</div>
+    </div>
+    <div class="stat-item green">
+        <div class="stat-item-title">Available</div>
+        <div class="stat-item-value">{{ availableStations }}</div>
+    </div>
+    <div class="stat-item red">
+        <div class="stat-item-title">In use</div>
+        <div class="stat-item-value">{{ unavailableStations }}</div>
+    </div>
+    <div class="stat-item yellow">
+        <div class="stat-item-title">Offline</div>
+        <div class="stat-item-value">{{ offlineStations }}</div>
+    </div>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Latitude</th>
+            <th>Longitude</th>
+            <th>Data added</th>
+            <th>Added by</th>
+            <th>Last sync</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let station of stations">
+            <td>{{ station.name }}</td>
+            <td>{{ station.latitude }}</td>
+            <td>{{ station.longitude }}</td>
+            <td>{{ station.dateAddedFormated }}</td>
+            <td>{{ station.addedBy }}</td>
+            <td>{{ station.lastSyncFormated }}</td>
+            <td>
+                <span [ngClass]="getStatusClass(station.status)">
+                  {{ station.status }}
+                </span>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<button class="floating-button">Add station</button>

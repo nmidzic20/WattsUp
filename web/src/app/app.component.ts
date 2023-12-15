@@ -19,10 +19,8 @@ export class AppComponent {
         let tokens = this.userManagerService.getTokens();
 
         if (tokens) {
-          if (await this.userManagerService.validTokens(tokens)) {
-            this.isUser = tokens.jwtInfo?.role == 'User';
-            this.isAdmin = tokens.jwtInfo?.role == 'Admin';
-          }
+          this.isUser = tokens.jwtInfo?.role == 'User';
+          this.isAdmin = tokens.jwtInfo?.role == 'Admin';
         }
 
         this.isUser = this.userManagerService.getTokens()?.jwtInfo?.role == 'User';
