@@ -158,7 +158,7 @@ export class AddStationDialogueComponent {
 
       const markerStyle = new Style({
         image: new Icon({
-          src: '../../assets/MapMarker.png',
+          src: '../../assets/map_marker.png',
           scale: 0.2,
         }),
       });
