@@ -3,8 +3,6 @@ package hr.foi.air.wattsup.network
 import hr.foi.air.wattsup.network.models.Event
 import hr.foi.air.wattsup.network.models.EventPOSTBody
 import hr.foi.air.wattsup.network.models.EventPOSTResponseBody
-import hr.foi.air.wattsup.network.models.EventGETBody
-import hr.foi.air.wattsup.network.models.EventGETResponseBody
 import hr.foi.air.wattsup.network.models.EventPUTBody
 import hr.foi.air.wattsup.network.models.EventPUTResponseBody
 import retrofit2.Call

@@ -41,6 +41,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -91,7 +92,12 @@ fun HistoryView(topPadding: Dp, context: Context = LocalContext.current) {
         coroutineScope.launch {
             cards.value += getCards(context, userId)
             for (card in cards.value) {
-                events.value += getEvents(context, card!!.id)
+                val data = getEvents(context, card!!.id)
+                for (event in data) {
+                    event!!.cardValue = card.value
+                    event.chargerLocation = "Varaždin"
+                }
+                events.value += data
             }
             events.value = events.value.sortedByDescending { it!!.startedAt }
         }
@@ -121,8 +127,8 @@ fun HistoryView(topPadding: Dp, context: Context = LocalContext.current) {
                     )
                 }
             } else {
-                itemsIndexed(events.value) { index, item ->
-                    EventCard(index, item!!)
+                itemsIndexed(events.value) { _, item ->
+                    EventCard(item!!)
                 }
             }
         }
@@ -130,7 +136,7 @@ fun HistoryView(topPadding: Dp, context: Context = LocalContext.current) {
 }
 
 @Composable
-fun EventCard(index: Int, event: Event) {
+fun EventCard(event: Event) {
     val showDetails = remember { mutableStateOf(false) }
     val df = DecimalFormat("#.##")
 
@@ -170,9 +176,9 @@ fun EventCard(index: Int, event: Event) {
             ) {
                 Text(
                     // display full day of week
-                    text = "${SimpleDateFormat("EEEE").format(event.startedAt)}, " +
+                    text = "${SimpleDateFormat("EEEE").format(event.startedAt).uppercase()}, " +
                            "${SimpleDateFormat("dd.MM.yyyy.").format(event.startedAt)}",
-                    style = MaterialTheme.typography.headlineSmall,
+                    fontSize = 20.sp,
                 )
             }
             Row(
@@ -183,7 +189,7 @@ fun EventCard(index: Int, event: Event) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Station ${event.chargerId}",
+                    text = event.chargerLocation,
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -208,7 +214,7 @@ private fun DetailDialog(event: Event, show: MutableState<Boolean>) {
     Dialog(onDismissRequest = { show.value = !show.value }) {
         Column(
             modifier = Modifier
-                .width(350.dp)
+                .width(450.dp)
                 .height(200.dp)
                 .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(12.dp)),
             verticalArrangement = Arrangement.SpaceAround,
@@ -244,25 +250,29 @@ private fun DetailDialog(event: Event, show: MutableState<Boolean>) {
                     horizontalAlignment = Alignment.Start
                 ) {
                     Text(
-                        text = "Card ${event.cardId}",
+                        text = event.chargerLocation,
                         style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Start
                     )
                     Text(
-                        text = "Location ${event.chargerId}",
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold,
+                        text = "CV: ${event.cardValue}",
+                        style = MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Start
                     )
                 }
-                Column(
-                    verticalArrangement = Arrangement.SpaceEvenly,
-                    horizontalAlignment = Alignment.End
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     Text(
-                        text = "${df.format(event.volumeKwh)} kWh",
+                        text = df.format(event.volumeKwh),
                         style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.End
+                    )
+                    Text(
+                        text = " kWh",
+                        style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.End
                     )

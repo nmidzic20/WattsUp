@@ -64,7 +64,7 @@ fun UserModeView(onHistoryClick: () -> Unit) {
         ) {
             Text(
                 text = stringResource(R.string.history),
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyLarge,
                 color = androidx.compose.ui.graphics.Color.White,
             )
         }
