@@ -85,11 +85,11 @@ fun HistoryView(topPadding: Dp, context: Context = LocalContext.current) {
     val coroutineScope = rememberCoroutineScope()
     val cards = remember { mutableStateOf(listOf<Card?>()) }
     val events = remember { mutableStateOf(listOf<Event?>()) }
+    val userId = TokenManager.getInstance(context).getId()
 
     LaunchedEffect(Unit) {
         coroutineScope.launch {
-            cards.value += getCards(context, 1)
-
+            cards.value += getCards(context, userId)
             for (card in cards.value) {
                 events.value += getEvents(context, card!!.id)
             }
