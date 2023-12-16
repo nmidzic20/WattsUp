@@ -2,24 +2,24 @@ name: Build and test
 
 on:
   push:
-    branches: [ "dev_backend**", "dev-backend" ]
+    branches: ["dev-backend"]
   pull_request:
-    branches: [ "dev_backend**", "dev-backend" ]
+    branches: ["dev-backend"]
   workflow_dispatch:
-  
+
 jobs:
   build:
     runs-on: windows-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4.1.1
-          
+
       - name: Set up NuGet
         uses: NuGet/setup-nuget@v1.2.0
 
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1.3.1
-      
+
       - name: Navigate to Workspace
         run: cd $GITHUB_WORKSPACE
 
@@ -28,8 +28,8 @@ jobs:
 
       - name: Replace secret placeholder in appsettings.json
         run: |
-            sed -i "s/#{DB_CONNECTION_STRING}/${{ secrets.DB_CONNECTION_STRING }}/g" backend/appsettings.json
-        
+          sed -i "s/#{DB_CONNECTION_STRING}/${{ secrets.DB_CONNECTION_STRING }}/g" backend/appsettings.json
+
       - name: Restore NuGet packages for backend
         run: nuget restore backend/backend.sln
 
@@ -44,3 +44,20 @@ jobs:
 
       - name: Build Docker image
         run: docker build -t dockerfile -f backend/Dockerfile ./backend
+
+      - name: Login to Docker Hub
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Tag Docker image
+        run: docker tag dockerfile:latest ${{ secrets.DOCKER_USERNAME }}/wattsup-backend:latest
+
+      - name: Push Docker image to Docker Hub
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/wattsup-backend:latest
+
+      - name: Trigger Render.com Deploy
+        # Only run this step if the branch is dev-backend
+        if: github.ref == 'refs/heads/dev-backend'
+        env:
+          deploy_url: ${{ secrets.RENDER_DEPLOY_URL }}
+        run: |
+          curl "$deploy_url"
