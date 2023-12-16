@@ -83,7 +83,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: ProductionPolicy,
         policy =>
         {
-            policy.WithOrigins("https://wattsup.onrender.com")
+            policy.WithOrigins("http://localhost:4200", "https://wattsup.onrender.com")
                 .AllowAnyHeader()
                 .AllowAnyMethod();
         });
