@@ -8,7 +8,7 @@ import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
 
 object NetworkService {
-    private const val BASE_URL = "https://192.168.56.1:32770/"
+    private const val BASE_URL = "https://wattsup-backend.onrender.com/"
 
     private val instance: Retrofit by lazy {
         val trustManager: X509TrustManager = object : X509TrustManager {

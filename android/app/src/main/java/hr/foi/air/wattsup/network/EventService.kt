@@ -10,6 +10,7 @@ import hr.foi.air.wattsup.network.models.EventPUTResponseBody
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
@@ -23,5 +24,5 @@ interface EventService {
     fun logEventEnd(@Body eventPUTBody: EventPUTBody): Call<EventPUTResponseBody>
 
     @GET("api/Event/forCard/{cardId}")
-    fun getEvents(@Path("cardId") cardId: Long): Call<List<Event?>>
+    fun getEvents(@Path("cardId") cardId: Long, @Header("Authorization") jwt: String): Call<List<Event?>>
 }
