@@ -24,5 +24,5 @@ interface EventService {
     fun logEventEnd(@Body eventPUTBody: EventPUTBody): Call<EventPUTResponseBody>
 
     @GET("api/Event/forCard/{cardId}")
-    fun getEvents(@Path("cardId") cardId: Long, @Header("Authorization") jwt: String): Call<List<Event?>>
+    fun getEvents(@Path("cardId") cardId: Int, @Header("Authorization") jwt: String): Call<List<Event?>>
 }

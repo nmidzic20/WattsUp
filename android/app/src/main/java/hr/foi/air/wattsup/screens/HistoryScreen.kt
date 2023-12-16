@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -49,6 +48,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.network.NetworkService
+import hr.foi.air.wattsup.network.models.Card
 import hr.foi.air.wattsup.network.models.Event
 import hr.foi.air.wattsup.network.models.TokenManager
 import hr.foi.air.wattsup.ui.component.TopAppBar
@@ -59,7 +59,6 @@ import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
-import kotlin.math.roundToLong
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -84,11 +83,17 @@ fun HistoryScreen(onArrowBackClick: () -> Unit) {
 @Composable
 fun HistoryView(topPadding: Dp, context: Context = LocalContext.current) {
     val coroutineScope = rememberCoroutineScope()
-    val data = remember { mutableStateOf(listOf<Event?>()) }
+    val cards = remember { mutableStateOf(listOf<Card?>()) }
+    val events = remember { mutableStateOf(listOf<Event?>()) }
 
     LaunchedEffect(Unit) {
         coroutineScope.launch {
-            data.value = getEventItems(/*UserCard.userCard.value?.id!!.toLong()*/1, context)
+            cards.value += getCards(context, 1)
+
+            for (card in cards.value) {
+                events.value += getEvents(context, card!!.id)
+            }
+            events.value = events.value.sortedByDescending { it!!.startedAt }
         }
     }
 
@@ -103,7 +108,7 @@ fun HistoryView(topPadding: Dp, context: Context = LocalContext.current) {
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (data.value.isEmpty()) {
+            if (events.value.isEmpty()) {
                 item {
                     Text(
                         text = "No events to show",
@@ -111,10 +116,12 @@ fun HistoryView(topPadding: Dp, context: Context = LocalContext.current) {
                         textAlign = TextAlign.Center,
                         modifier = Modifier
                             .fillMaxWidth()
+                            .height(500.dp)
+                            .wrapContentHeight(Alignment.CenterVertically)
                     )
                 }
             } else {
-                itemsIndexed(data.value) { index, item ->
+                itemsIndexed(events.value) { index, item ->
                     EventCard(index, item!!)
                 }
             }
@@ -128,7 +135,7 @@ fun EventCard(index: Int, event: Event) {
     val df = DecimalFormat("#.##")
 
     if (showDetails.value) {
-        DetailBox(event, showDetails)
+        DetailDialog(event, showDetails)
     }
 
     Card(
@@ -191,7 +198,7 @@ fun EventCard(index: Int, event: Event) {
 }
 
 @Composable
-private fun DetailBox(event: Event, show: MutableState<Boolean>) {
+private fun DetailDialog(event: Event, show: MutableState<Boolean>) {
     val df = DecimalFormat("#.###")
 
     if (!show.value) {
@@ -265,10 +272,9 @@ private fun DetailBox(event: Event, show: MutableState<Boolean>) {
     }
 }
 
-private suspend fun getEventItems(cardId: Long, context: Context) : List<Event?> {
+private suspend fun getEvents(context: Context, cardId: Int) : List<Event?> {
     val eventService = NetworkService.eventService
-    val tokenManager = TokenManager.getInstance(context)
-    val auth = "Bearer " + tokenManager.getjWTtoken()
+    val auth = "Bearer " + TokenManager.getInstance(context).getjWTtoken()
 
     return suspendCoroutine { continuation ->
         eventService.getEvents(cardId, auth).enqueue(object : retrofit2.Callback<List<Event?>> {
@@ -283,6 +289,30 @@ private suspend fun getEventItems(cardId: Long, context: Context) : List<Event?>
             }
 
             override fun onFailure(call: Call<List<Event?>>, t: Throwable) {
+                Log.d("HistoryScreen", "Failure: ${t.message}")
+                continuation.resume(emptyList())
+            }
+        })
+    }
+}
+
+private suspend fun getCards(context: Context, userId: Int): List<Card?> {
+    val cardService = NetworkService.cardService
+    val auth = "Bearer " + TokenManager.getInstance(context).getjWTtoken()
+
+    return suspendCoroutine { continuation ->
+        cardService.getCardsForUser(userId, auth).enqueue(object : retrofit2.Callback<List<Card?>> {
+            override fun onResponse(call: Call<List<Card?>>, response: Response<List<Card?>>) {
+                if (response.isSuccessful) {
+                    continuation.resume(response.body() ?: emptyList())
+                    Log.d("HistoryScreen", "Cards: ${response.body()}")
+                } else {
+                    Log.d("HistoryScreen", "Error: ${response.errorBody()}")
+                    continuation.resume(emptyList())
+                }
+            }
+
+            override fun onFailure(call: Call<List<Card?>>, t: Throwable) {
                 Log.d("HistoryScreen", "Failure: ${t.message}")
                 continuation.resume(emptyList())
             }

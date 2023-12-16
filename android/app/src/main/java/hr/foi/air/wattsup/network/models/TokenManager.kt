@@ -41,6 +41,17 @@ class TokenManager private constructor(context: Context) {
         return sharedPreferences.getString("refreshTokenExpiresAt", null)
     }
 
+    fun setId(_id: Int) {
+        with(sharedPreferences.edit()) {
+            putInt("id", _id)
+            apply()
+        }
+    }
+
+    fun getId(): Int? {
+        return sharedPreferences.getInt("id", -1)
+    }
+
     companion object {
         @Volatile
         private var instance: TokenManager? = null

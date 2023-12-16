@@ -8,4 +8,6 @@ data class Event(
     val startedAt: Date,
     val endedAt: Date,
     val volumeKwh: Float,
+    val cardValue: String,
+    val chargerLocation: String
 )
