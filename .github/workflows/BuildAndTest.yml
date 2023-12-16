@@ -43,7 +43,7 @@ jobs:
         run: dotnet test ControllerUnitTests/ControllerUnitTests.csproj --configuration Release
 
       - name: Build Docker image
-        run: docker build -t dockerfile -f backend/Dockerfile ./backend
+        run: docker build -t wattsup-backend ./backend
 
       - name: Login to Docker Hub
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
