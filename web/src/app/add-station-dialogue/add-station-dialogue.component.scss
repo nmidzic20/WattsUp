@@ -63,8 +63,7 @@ button{
 }
 
 .dialogue-buttons{
-    margin-top: auto;
-    margin-bottom: 30px;
+    margin-top: 50px;
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
@@ -88,4 +87,26 @@ input{
     margin-top: 30px;
     margin-left: 30px;
     height: 80%;
+}
+
+.dialogue-map-container {
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    justify-items: center;
+  }
+
+.map {
+    width: 100%;
+    height: 300px;
+    display: flex;
+    justify-self: center;
+    margin-left: 40px;
+  }
+
+.map-buttons{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
 }
