@@ -42,11 +42,11 @@ jobs:
       - name: Run Unit Tests
         run: dotnet test ControllerUnitTests/ControllerUnitTests.csproj --configuration Release
 
-      - name: Build Docker image
-        run: docker build -t wattsup-backend -f backend/Dockerfile ./backend
-
       - name: Login to Docker Hub
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build Docker image
+        run: docker build -t wattsup-backend -f backend/Dockerfile ./backend
 
       - name: Tag Docker image
         run: docker tag wattsup-backend:latest ${{ secrets.DOCKER_USERNAME }}/wattsup-backend:latest
