@@ -60,4 +60,4 @@ jobs:
         env:
           deploy_url: ${{ secrets.RENDER_DEPLOY_URL }}
         run: |
-          Invoke-WebRequest -Uri $deployUrl -Method Get
+          Invoke-WebRequest -Uri $env:deploy_url -Method Get
