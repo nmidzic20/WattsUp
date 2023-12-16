@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { UserManagerService } from '../services/user-manager.service';
 import { Station, StationResponse } from '../interfaces/Station';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-station-management',
@@ -41,7 +42,7 @@ export class StationManagementComponent implements OnInit {
     let parameters = { method: 'GET', headers: header};
 
     try {
-      let response = await fetch("https://localhost:32770/api/Charger", parameters);
+      let response = await fetch(environment.apiUrl + "/Charger", parameters);
       let body = await response.json();
       if (response.status == 200) {
         this.stations = body.map((station: StationResponse) => this.mapStationResponseToStation(station));

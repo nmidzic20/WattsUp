@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { jwtDecode } from "jwt-decode";
 import { JwtInfo, Tokens } from '../interfaces/Tokens';
 import { BehaviorSubject } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -107,7 +108,7 @@ export class UserManagerService {
     let parameters = { method: 'POST', headers: header, body: JSON.stringify(body) };
 
     try {
-      let response = await fetch("https://localhost:32770/api/Users/TokenRefresh", parameters);
+      let response = await fetch(environment.apiUrl + "/Users/TokenRefresh", parameters);
       let body = await response.text();
       if (response.status == 200) {
         let bodyJSON = JSON.parse(body);

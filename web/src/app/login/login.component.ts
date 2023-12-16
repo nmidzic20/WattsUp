@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserManagerService } from '../services/user-manager.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -38,7 +39,7 @@ export class LoginComponent implements OnInit {
       let parameters = {method: 'POST', headers: header, body: JSON.stringify(body)};
 
       try{
-        let response = await fetch("https://localhost:32770/api/Users/Login", parameters);
+        let response = await fetch(environment.apiUrl + "/Users/Login", parameters);
         let body = await response.text();
         if(response.status == 200){
           let bodyJSON = JSON.parse(body);
