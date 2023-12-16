@@ -47,17 +47,3 @@ jobs:
 
       - name: Build Docker image
         run: docker build -t wattsup-backend -f backend/Dockerfile ./backend
-
-      - name: Tag Docker image
-        run: docker tag wattsup-backend:latest ${{ secrets.DOCKER_USERNAME }}/wattsup-backend:latest
-
-      - name: Push Docker image to Docker Hub
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/wattsup-backend:latest
-
-      - name: Trigger Render.com Deploy
-        # Only run this step if the branch is dev-backend
-        if: github.ref == 'refs/heads/dev-backend'
-        env:
-          deploy_url: ${{ secrets.RENDER_DEPLOY_URL }}
-        run: |
-          Invoke-WebRequest -Uri $env:deploy_url -Method Get
