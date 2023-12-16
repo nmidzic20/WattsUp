@@ -9,14 +9,11 @@ import { fromLonLat, toLonLat, transform } from 'ol/proj';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import { Feature } from 'ol';
-import { Circle, Point } from 'ol/geom';
-import Fill from 'ol/style/Fill';
-import Stroke from 'ol/style/Stroke';
+import { Point } from 'ol/geom';
 import Style from 'ol/style/Style';
-import { map } from 'rxjs';
 import Icon from 'ol/style/Icon';
 import { Coordinate } from 'ol/coordinate';
-import { TemplateBindingParseResult } from '@angular/compiler';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-add-station-dialogue',
@@ -84,7 +81,7 @@ export class AddStationDialogueComponent {
       let parameters = { method: 'POST', headers: header, body: JSON.stringify(body) };
 
       try {
-        let response = await fetch("https://localhost:32770/api/Charger", parameters);
+        let response = await fetch(environment.apiUrl + "/Charger", parameters);
         let body = await response.text();
         if (response.status == 200) {
           this.refreshChargerView.emit(this.userManagerService.getTokens()?.jwt);
