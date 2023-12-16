@@ -16,6 +16,7 @@ import Style from 'ol/style/Style';
 import { map } from 'rxjs';
 import Icon from 'ol/style/Icon';
 import { Coordinate } from 'ol/coordinate';
+import { TemplateBindingParseResult } from '@angular/compiler';
 
 @Component({
   selector: 'app-add-station-dialogue',
@@ -33,6 +34,9 @@ export class AddStationDialogueComponent {
   dialogueMapIsVisible: boolean = false;
   map!: Map | null;
   markerCoordinates?: Coordinate;
+  tempName?: string;
+  tempLongitude?: string;
+  tempLatitude?: string;
 
   constructor(private router: Router, private userManagerService: UserManagerService) { }
 
@@ -76,7 +80,6 @@ export class AddStationDialogueComponent {
     header.set("accept", "text/plain");
     header.set("Authorization", "Bearer " + this.userManagerService.getTokens()?.jwt);
     let body = { name: stationName, latitude: latitude, longitude: longitude, createdById: createdById };
-    console.log(body)
     let parameters = { method: 'POST', headers: header, body: JSON.stringify(body) };
 
     try {
@@ -95,11 +98,21 @@ export class AddStationDialogueComponent {
   }
 
   openMap() {
+    this.saveInputValues()
     this.dialogueInputContainerIsVisible = false;
     this.dialogueMapIsVisible = true;
     setTimeout(() => {
       this.drawMap();
     }, 200);
+  }
+
+  saveInputValues() {
+    this.stationNameInput = document.getElementById("stationName") as HTMLInputElement;
+    this.longitudeInput = document.getElementById("longitude") as HTMLInputElement;
+    this.latitudeInput = document.getElementById("latitude") as HTMLInputElement;
+    if (this.stationNameInput.value != "") this.tempName = this.stationNameInput.value
+    if (this.longitudeInput.value != "") this.tempLongitude = this.longitudeInput.value
+    if (this.latitudeInput.value != "") this.tempLatitude = this.latitudeInput.value
   }
 
   closeMap() {
@@ -110,34 +123,33 @@ export class AddStationDialogueComponent {
       this.map.setTarget(undefined);
       this.map = null;
     }
+
+    this.loadTempValues()
+  }
+
+  loadTempValues(){
+    setTimeout(() => {
+      this.stationNameInput = document.getElementById("stationName") as HTMLInputElement;
+      this.longitudeInput = document.getElementById("longitude") as HTMLInputElement;
+      this.latitudeInput = document.getElementById("latitude") as HTMLInputElement;
+      if (this.tempName != undefined) this.stationNameInput.value = this.tempName!!;
+      if (this.tempLongitude != undefined) this.longitudeInput.value = this.tempLongitude!!;
+      if (this.tempLatitude != undefined) this.latitudeInput.value = this.tempLatitude!!;
+      console.log(this.tempLongitude)
+    }, 100)
   }
 
   drawMap() {
-    const varazdinCoordinates = [16.33778, 46.30444] //longitude, latitude
-
     if (this.map == null) {
-      this.map = new Map({
-        layers: [
-          new TileLayer({
-            source: new OSM(),
-          }),
-        ],
-        target: 'map',
-        controls: [],
-        view: new View({
-          center: fromLonLat(varazdinCoordinates),
-          zoom: 14, maxZoom: 18,
-        }),
-      });
-
+      this.createMap()
       const vectorSource = new VectorSource();
       const vectorLayer = new VectorLayer({
         source: vectorSource,
       });
-      this.map.addLayer(vectorLayer);
+      this.map!!.addLayer(vectorLayer);
 
       const marker = new Feature({
-        geometry: new Point(this.map.getView().getCenter()!!),
+        geometry: new Point(this.map!!.getView().getCenter()!!),
       });
 
       const markerStyle = new Style({
@@ -150,7 +162,7 @@ export class AddStationDialogueComponent {
       marker.setStyle(markerStyle);
       vectorSource.addFeature(marker);
 
-      this.map.on('moveend', () => {
+      this.map!!.on('moveend', () => {
         marker.getGeometry()!!.setCoordinates(this.map!!.getView().getCenter()!!);
         this.markerCoordinates = marker.getGeometry()!!.getCoordinates();
       });
@@ -159,9 +171,27 @@ export class AddStationDialogueComponent {
     }
   }
 
-  loadMarkerCoordinatesToInputFields(){
+  createMap() {
+    const varazdinCoordinates = [16.33778, 46.30444] //longitude, latitude
+
+    this.map = new Map({
+      layers: [
+        new TileLayer({
+          source: new OSM(),
+        }),
+      ],
+      target: 'map',
+      controls: [],
+      view: new View({
+        center: fromLonLat(varazdinCoordinates),
+        zoom: 14, maxZoom: 18,
+      }),
+    });
+  }
+
+  loadMarkerCoordinatesToInputFields() {
     this.closeMap()
-    setTimeout(()=>{
+    setTimeout(() => {
       this.longitudeInput = document.getElementById("longitude") as HTMLInputElement;
       this.latitudeInput = document.getElementById("latitude") as HTMLInputElement;
       let coordinates = toLonLat(this.markerCoordinates!!)
