@@ -12,8 +12,10 @@ using System.Text;
 using System.Text.Json.Serialization;
 
 string GetEnvironmentName() {
-    var isGitHubActions = Environment.GetEnvironmentVariable("GITHUB_ACTIONS") == "true";
-    return isGitHubActions ? "production" : "development";
+    //var isGitHubActions = Environment.GetEnvironmentVariable("GITHUB_ACTIONS") == "true";
+    //return isGitHubActions ? "production" : "development";
+    var isRender = Environment.GetEnvironmentVariable("RENDER") == "true";
+    return isRender ? "production" : "development";
 }
 
 var environment = GetEnvironmentName();
@@ -26,10 +28,11 @@ builder.Services.AddHttpClient();
 
 builder.Services.AddDbContext<DatabaseContext>(options =>
 {
-    if(environment== "production") {
+    if (environment== "production") {
         options.UseNpgsql(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING"));
     } else {
         options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+        //options.UseNpgsql(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING"));
     }
     
 });
@@ -107,15 +110,17 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 var app = builder.Build();
 
+app.UseSwagger();
+app.UseSwaggerUI();
+
+using var scope = app.Services.CreateScope();
+await using var dbContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
+await dbContext.Database.MigrateAsync();
+
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
     app.UseCors(DevelopmentPolicy);
 
-    using var scope = app.Services.CreateScope();
-    await using var dbContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
-    await dbContext.Database.MigrateAsync();
 }
 else
 {
