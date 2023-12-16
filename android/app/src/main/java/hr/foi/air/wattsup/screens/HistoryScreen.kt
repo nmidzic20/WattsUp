@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -30,6 +31,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -43,6 +45,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.network.NetworkService
@@ -52,9 +55,11 @@ import hr.foi.air.wattsup.ui.component.TopAppBar
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response
+import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import kotlin.math.roundToLong
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -120,14 +125,15 @@ fun HistoryView(topPadding: Dp, context: Context = LocalContext.current) {
 @Composable
 fun EventCard(index: Int, event: Event) {
     val showDetails = remember { mutableStateOf(false) }
+    val df = DecimalFormat("#.##")
 
     if (showDetails.value) {
-        DetailBox(event)
+        DetailBox(event, showDetails)
     }
 
     Card(
         onClick = {
-            showDetails.value = true
+            showDetails.value = !showDetails.value
         },
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -159,8 +165,7 @@ fun EventCard(index: Int, event: Event) {
                     // display full day of week
                     text = "${SimpleDateFormat("EEEE").format(event.startedAt)}, " +
                            "${SimpleDateFormat("dd.MM.yyyy.").format(event.startedAt)}",
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold
+                    style = MaterialTheme.typography.headlineSmall,
                 )
             }
             Row(
@@ -176,7 +181,7 @@ fun EventCard(index: Int, event: Event) {
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "${event.volumeKwh} kWh",
+                    text = "${df.format(event.volumeKwh)} kWh",
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -186,48 +191,76 @@ fun EventCard(index: Int, event: Event) {
 }
 
 @Composable
-private fun DetailBox(event: Event) {
-    val show = remember { mutableStateOf(true) }
+private fun DetailBox(event: Event, show: MutableState<Boolean>) {
+    val df = DecimalFormat("#.###")
 
     if (!show.value) {
         return
     }
 
-    Dialog(onDismissRequest = { show.value = false }) {
+    Dialog(onDismissRequest = { show.value = !show.value }) {
         Column(
             modifier = Modifier
-                .height(300.dp)
-                .width(300.dp)
-                .padding(10.dp)
+                .width(350.dp)
+                .height(200.dp)
                 .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(12.dp)),
-            verticalArrangement = Arrangement.SpaceBetween,
+            verticalArrangement = Arrangement.SpaceAround,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "Started at ${SimpleDateFormat("hh:mm:ss dd.mm.yyyy.").format(event.startedAt)}",
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = "Ended at ${SimpleDateFormat("hh:mm:ss dd.mm.yyyy.").format(event.endedAt)}",
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = "Card ${event.cardId}",
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = "Location ${event.chargerId}",
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = "${event.volumeKwh} kWh",
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold
-            )
+            Column (
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .padding(20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Started: ${SimpleDateFormat("dd.MM.yyyy. hh:mm:ss").format(event.startedAt)}",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = " Ended:  ${SimpleDateFormat("dd.MM.yyyy. hh:mm:ss").format(event.endedAt)}",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            Row (
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .padding(20.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.SpaceEvenly,
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Text(
+                        text = "Card ${event.cardId}",
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Start
+                    )
+                    Text(
+                        text = "Location ${event.chargerId}",
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Start
+                    )
+                }
+                Column(
+                    verticalArrangement = Arrangement.SpaceEvenly,
+                    horizontalAlignment = Alignment.End
+                ) {
+                    Text(
+                        text = "${df.format(event.volumeKwh)} kWh",
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.End
+                    )
+                }
+            }
         }
     }
 }
