@@ -65,35 +65,39 @@ export class AddStationDialogueComponent {
   async addStation() {
     await this.checkTokenValidity();
 
-    this.stationNameInput = document.getElementById("stationName") as HTMLInputElement;
-    this.longitudeInput = document.getElementById("longitude") as HTMLInputElement;
-    this.latitudeInput = document.getElementById("latitude") as HTMLInputElement;
-    let stationName = this.stationNameInput?.value;
-    let longitude = this.longitudeInput?.value;
-    let latitude = this.latitudeInput?.value;
+    if (this.checkFields()) {
+      this.stationNameInput = document.getElementById("stationName") as HTMLInputElement;
+      this.longitudeInput = document.getElementById("longitude") as HTMLInputElement;
+      this.latitudeInput = document.getElementById("latitude") as HTMLInputElement;
+      let stationName = this.stationNameInput?.value;
+      let longitude = this.longitudeInput?.value;
+      let latitude = this.latitudeInput?.value;
 
-    let tokens = this.userManagerService.getTokens();
-    let createdById = tokens?.jwtInfo?.id;
+      let tokens = this.userManagerService.getTokens();
+      let createdById = tokens?.jwtInfo?.id;
 
-    let header = new Headers();
-    header.set("Content-Type", "application/json");
-    header.set("accept", "text/plain");
-    header.set("Authorization", "Bearer " + this.userManagerService.getTokens()?.jwt);
-    let body = { name: stationName, latitude: latitude, longitude: longitude, createdById: createdById };
-    let parameters = { method: 'POST', headers: header, body: JSON.stringify(body) };
+      let header = new Headers();
+      header.set("Content-Type", "application/json");
+      header.set("accept", "text/plain");
+      header.set("Authorization", "Bearer " + this.userManagerService.getTokens()?.jwt);
+      let body = { name: stationName, latitude: latitude, longitude: longitude, createdById: createdById };
+      let parameters = { method: 'POST', headers: header, body: JSON.stringify(body) };
 
-    try {
-      let response = await fetch("https://localhost:32770/api/Charger", parameters);
-      let body = await response.text();
-      if (response.status == 200) {
-        this.refreshChargerView.emit(this.userManagerService.getTokens()?.jwt);
-        this.close();
-      } else {
-        let errorMessage = JSON.parse(body).message;
-        window.alert(response.status.toString() + ": " + errorMessage);
+      try {
+        let response = await fetch("https://localhost:32770/api/Charger", parameters);
+        let body = await response.text();
+        if (response.status == 200) {
+          this.refreshChargerView.emit(this.userManagerService.getTokens()?.jwt);
+          this.close();
+        } else {
+          let errorMessage = JSON.parse(body).message;
+          window.alert(response.status.toString() + ": " + errorMessage);
+        }
+      } catch (error) {
+        window.alert((error as Error).message);
       }
-    } catch (error) {
-      window.alert((error as Error).message);
+    } else {
+      window.alert("Check field values!");
     }
   }
 
@@ -127,7 +131,7 @@ export class AddStationDialogueComponent {
     this.loadTempValues()
   }
 
-  loadTempValues(){
+  loadTempValues() {
     setTimeout(() => {
       this.stationNameInput = document.getElementById("stationName") as HTMLInputElement;
       this.longitudeInput = document.getElementById("longitude") as HTMLInputElement;
@@ -198,5 +202,16 @@ export class AddStationDialogueComponent {
       this.longitudeInput.value = coordinates[0].toString();
       this.latitudeInput.value = coordinates[1].toString();
     }, 100)
+  }
+
+  checkFields(): boolean {
+    let isValid = true;
+
+    this.stationNameInput = document.getElementById("stationName") as HTMLInputElement;
+    this.longitudeInput = document.getElementById("longitude") as HTMLInputElement;
+    this.latitudeInput = document.getElementById("latitude") as HTMLInputElement;
+    if (this.stationNameInput.value == "" || this.longitudeInput.value == "" || this.latitudeInput.value == "") isValid = false;
+
+    return isValid;
   }
 }
