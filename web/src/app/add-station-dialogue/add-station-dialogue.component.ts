@@ -5,7 +5,7 @@ import Map from 'ol/Map';
 import TileLayer from 'ol/layer/Tile';
 import View from 'ol/View';
 import { OSM } from 'ol/source';
-import { fromLonLat, transform } from 'ol/proj';
+import { fromLonLat, toLonLat, transform } from 'ol/proj';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import { Feature } from 'ol';
@@ -15,6 +15,7 @@ import Stroke from 'ol/style/Stroke';
 import Style from 'ol/style/Style';
 import { map } from 'rxjs';
 import Icon from 'ol/style/Icon';
+import { Coordinate } from 'ol/coordinate';
 
 @Component({
   selector: 'app-add-station-dialogue',
@@ -31,6 +32,7 @@ export class AddStationDialogueComponent {
   dialogueInputContainerIsVisible: boolean = true;
   dialogueMapIsVisible: boolean = false;
   map!: Map | null;
+  markerCoordinates?: Coordinate;
 
   constructor(private router: Router, private userManagerService: UserManagerService) { }
 
@@ -133,36 +135,38 @@ export class AddStationDialogueComponent {
         source: vectorSource,
       });
       this.map.addLayer(vectorLayer);
-  
-      // Create a marker at the center of the map
+
       const marker = new Feature({
         geometry: new Point(this.map.getView().getCenter()!!),
       });
-  
-      // Style for the marker with a PNG image
+
       const markerStyle = new Style({
         image: new Icon({
-          src: '../../assets/MapMarker.png', // Replace with the actual path to your PNG image
-          scale: 0.2, // Adjust the scale as needed
+          src: '../../assets/MapMarker.png',
+          scale: 0.2,
         }),
       });
-  
-      
+
       marker.setStyle(markerStyle);
-  
-      // Add the marker to the vector layer
       vectorSource.addFeature(marker);
 
-          // Listen for the map's moveend event
-    this.map.on('postrender', () => {
-      // Update the marker's position to the center of the new map view
-      marker.getGeometry()!!.setCoordinates(this.map!!.getView().getCenter()!!);
-    });
+      this.map.on('moveend', () => {
+        marker.getGeometry()!!.setCoordinates(this.map!!.getView().getCenter()!!);
+        this.markerCoordinates = marker.getGeometry()!!.getCoordinates();
+      });
     } else {
       this.map.updateSize();
     }
+  }
 
-    
-    
+  loadMarkerCoordinatesToInputFields(){
+    this.closeMap()
+    setTimeout(()=>{
+      this.longitudeInput = document.getElementById("longitude") as HTMLInputElement;
+      this.latitudeInput = document.getElementById("latitude") as HTMLInputElement;
+      let coordinates = toLonLat(this.markerCoordinates!!)
+      this.longitudeInput.value = coordinates[0].toString();
+      this.latitudeInput.value = coordinates[1].toString();
+    }, 100)
   }
 }

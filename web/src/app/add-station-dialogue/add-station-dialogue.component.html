@@ -28,7 +28,7 @@
         <div *ngIf="dialogueMapIsVisible" class="dialogue-map-container">
             <div id="map" class="map"></div>
             <div class="map-buttons">
-                <button >Pick</button>
+                <button (click)="loadMarkerCoordinatesToInputFields()">Pick</button>
                 <button (click)="closeMap()">Cancel</button>
             </div>
         </div>
