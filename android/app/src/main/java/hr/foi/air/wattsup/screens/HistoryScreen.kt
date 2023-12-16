@@ -41,7 +41,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -50,6 +49,7 @@ import androidx.compose.ui.window.Dialog
 import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.network.NetworkService
 import hr.foi.air.wattsup.network.models.Card
+import hr.foi.air.wattsup.network.models.Charger
 import hr.foi.air.wattsup.network.models.Event
 import hr.foi.air.wattsup.network.models.TokenManager
 import hr.foi.air.wattsup.ui.component.TopAppBar
@@ -95,7 +95,7 @@ fun HistoryView(topPadding: Dp, context: Context = LocalContext.current) {
                 val data = getEvents(context, card!!.id)
                 for (event in data) {
                     event!!.cardValue = card.value
-                    event.chargerLocation = "Varaždin"
+                    event.chargerLocation = getChargerName(context, event.chargerId) ?: ""
                 }
                 events.value += data
             }
@@ -250,7 +250,9 @@ private fun DetailDialog(event: Event, show: MutableState<Boolean>) {
                     horizontalAlignment = Alignment.Start
                 ) {
                     Text(
-                        text = event.chargerLocation,
+                        text =
+                            if (event.chargerLocation.isNullOrEmpty()) "Unnamed Charger"
+                            else event.chargerLocation,
                         style = MaterialTheme.typography.bodyLarge,
                         textAlign = TextAlign.Start
                     )
@@ -325,6 +327,30 @@ private suspend fun getCards(context: Context, userId: Int): List<Card?> {
             override fun onFailure(call: Call<List<Card?>>, t: Throwable) {
                 Log.d("HistoryScreen", "Failure: ${t.message}")
                 continuation.resume(emptyList())
+            }
+        })
+    }
+}
+
+private suspend fun getChargerName(context: Context, chargerId: Int): String? {
+    val chargerService = NetworkService.chargerService
+    val auth = "Bearer " + TokenManager.getInstance(context).getjWTtoken()
+
+    return suspendCoroutine { continuation ->
+        chargerService.getCharger(chargerId, auth).enqueue(object : retrofit2.Callback<Charger?> {
+            override fun onResponse(call: Call<Charger?>, response: Response<Charger?>) {
+                if (response.isSuccessful) {
+                    continuation.resume(response.body()!!.name)
+                    Log.d("HistoryScreen", "Cards: ${response.body()}")
+                } else {
+                    Log.d("HistoryScreen", "Error: ${response.errorBody()}")
+                    continuation.resume(null)
+                }
+            }
+
+            override fun onFailure(call: Call<Charger?>, t: Throwable) {
+                Log.d("HistoryScreen", "Failure: ${t.message}")
+                continuation.resume(null)
             }
         })
     }
