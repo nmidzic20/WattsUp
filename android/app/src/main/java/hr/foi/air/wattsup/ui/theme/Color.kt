@@ -15,3 +15,8 @@ val colorPrimaryDark = colorPrimary
 
 val colorBtnRed = Color(0xffFF6262)
 val colorSilver = Color(0xffC0C0C0)
+
+val colorDarkGray = Color(0xFF1a1717)
+val colorOrange = Color(0xFFdb660d)
+val colorGray = Color(0xFF3F3F3F)
+val colorWhite = Color(0xFFF3F3F3)
