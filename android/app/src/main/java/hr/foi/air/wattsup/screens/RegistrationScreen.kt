@@ -202,7 +202,7 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
             invalidEmail = !Regex("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}\$").matches(email)
             invalidPassword = !Regex("^.{6,}\$").matches(password)
             if (invalidPassword || invalidEmail) {
-                toast(context, "Invalid Email or password")
+                toast(context, "Invalid e-mail or password")
             } else {
                 authService.registerUser(
                     RegistrationBody(firstName, lastName, email, password, card),

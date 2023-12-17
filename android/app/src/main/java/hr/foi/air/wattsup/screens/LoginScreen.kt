@@ -144,7 +144,7 @@ fun LoginView(onRegisterClick: () -> Unit, onLogin: () -> Unit, context: Context
                                 Log.i("Response", responseBody.jwt)
                                 onLogin()
                             } else {
-                                toast(context, "Invalid username or password")
+                                toast(context, "Invalid e-mail or password")
                             }
                         }
 
@@ -173,7 +173,7 @@ fun LoginView(onRegisterClick: () -> Unit, onLogin: () -> Unit, context: Context
                 Text(
                     text = "Login",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = androidx.compose.ui.graphics.Color.White,
+                    color = Color.White,
                 )
             }
         }

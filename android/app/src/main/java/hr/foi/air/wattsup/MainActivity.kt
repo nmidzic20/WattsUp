@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
@@ -71,8 +72,6 @@ class MainActivity : ComponentActivity() {
                     }
 
                     NavHost(navController = navController, startDestination = "landing") {
-                        // TODO: disable back button on user mode screen
-
                         composable("landing") {
                             val onChargerModeClick = { navController.navigate("scanCard") }
                             val onUserModeClick = { navController.navigate("login") }
@@ -100,6 +99,7 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("userMode") {
                             val onHistoryClick = { navController.navigate("chargingHistory") }
+                            BackHandler(true) { }
                             UserModeScreen(onHistoryClick, onArrowBackClick)
                         }
                         composable("chargingHistory") {
