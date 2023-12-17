@@ -118,6 +118,7 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
         value = firstName,
         onValueChange = { firstName = it },
         label = { Text(stringResource(R.string.first_name_label)) },
+        singleLine = true,
     )
 
     OutlinedTextField(
@@ -125,6 +126,7 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
         value = lastName,
         onValueChange = { lastName = it },
         label = { Text(stringResource(R.string.last_name_label)) },
+        singleLine = true,
     )
 
     OutlinedTextField(
@@ -144,6 +146,7 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
             TextFieldDefaults.outlinedTextFieldColors()
         },
         label = { Text(stringResource(R.string.e_mail_label)) },
+        singleLine = true,
     )
 
     OutlinedTextField(
@@ -164,6 +167,7 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
         },
         visualTransformation = PasswordVisualTransformation(),
         label = { Text(stringResource(R.string.password_label)) },
+        singleLine = true,
     )
 
     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -174,6 +178,7 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
             value = card?.value ?: "",
             onValueChange = { card = Card(id = 0, value = it) },
             label = { Text(stringResource(R.string.card_label)) },
+            singleLine = true,
         )
         Spacer(modifier = Modifier.width(4.dp))
         ElevatedButton(

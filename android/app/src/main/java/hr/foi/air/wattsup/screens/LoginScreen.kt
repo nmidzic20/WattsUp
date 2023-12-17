@@ -107,6 +107,7 @@ fun LoginView(onRegisterClick: () -> Unit, onLogin: () -> Unit, context: Context
             value = email,
             onValueChange = { email = it },
             label = { Text(stringResource(R.string.emailLabel)) },
+            singleLine = true,
         )
 
         OutlinedTextField(
@@ -114,6 +115,7 @@ fun LoginView(onRegisterClick: () -> Unit, onLogin: () -> Unit, context: Context
             value = password,
             onValueChange = { password = it },
             label = { Text(stringResource(R.string.passwordLabel)) },
+            singleLine = true,
         )
         if(showToast){
             Text(

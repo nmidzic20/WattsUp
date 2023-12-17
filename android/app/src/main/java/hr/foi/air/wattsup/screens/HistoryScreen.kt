@@ -58,6 +58,10 @@ import retrofit2.Call
 import retrofit2.Response
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import java.util.Locale
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -175,9 +179,7 @@ fun EventCard(event: Event) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    // display full day of week
-                    text = "${SimpleDateFormat("EEEE").format(event.startedAt).uppercase()}, " +
-                           "${SimpleDateFormat("dd.MM.yyyy.").format(event.startedAt)}",
+                    text = SimpleDateFormat("EEEE, dd.MM.yyyy.", Locale.US).format(event.startedAt),
                     fontSize = 20.sp,
                 )
             }
@@ -228,12 +230,12 @@ private fun DetailDialog(event: Event, show: MutableState<Boolean>) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Started: ${SimpleDateFormat("dd.MM.yyyy. hh:mm:ss").format(event.startedAt)}",
+                    text = "Started: ${SimpleDateFormat("dd.MM.yyyy. hh:mm:ss", Locale.US).format(event.startedAt)}",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = " Ended:  ${SimpleDateFormat("dd.MM.yyyy. hh:mm:ss").format(event.endedAt)}",
+                    text = " Ended:  ${SimpleDateFormat("dd.MM.yyyy. hh:mm:ss", Locale.US).format(event.endedAt)}",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -250,9 +252,7 @@ private fun DetailDialog(event: Event, show: MutableState<Boolean>) {
                     horizontalAlignment = Alignment.Start
                 ) {
                     Text(
-                        text =
-                            if (event.chargerLocation.isNullOrEmpty()) "Unnamed Charger"
-                            else event.chargerLocation,
+                        text = event.chargerLocation.ifEmpty { "Unnamed Charger" },
                         style = MaterialTheme.typography.bodyLarge,
                         textAlign = TextAlign.Start
                     )
