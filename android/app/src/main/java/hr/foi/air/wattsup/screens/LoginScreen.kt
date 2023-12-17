@@ -3,6 +3,7 @@ package hr.foi.air.wattsup.screens
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -82,9 +83,6 @@ fun LoginView(onRegisterClick: () -> Unit, onLogin: () -> Unit, context: Context
     val interactionSource = remember { MutableInteractionSource() }
     var email: String by remember { mutableStateOf("") }
     var password: String by remember { mutableStateOf("") }
-    var statusMessage: String by remember { mutableStateOf("") }
-    var showToast by remember { mutableStateOf(false) }
-    val coroutineScope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -117,11 +115,7 @@ fun LoginView(onRegisterClick: () -> Unit, onLogin: () -> Unit, context: Context
             label = { Text(stringResource(R.string.passwordLabel)) },
             singleLine = true,
         )
-        if(showToast){
-            Text(
-                text = statusMessage
-            )
-        }
+
         ElevatedButton(
             onClick = {
                 authService.loginUser(
@@ -142,26 +136,13 @@ fun LoginView(onRegisterClick: () -> Unit, onLogin: () -> Unit, context: Context
                                 Log.i("Response", responseBody.jwt)
                                 onLogin()
                             } else {
-                                val responseBody = response!!.body()
-                                statusMessage = "Invalid username or password"
-                                showToast = true
-                                coroutineScope.launch {
-                                    delay(2000)
-                                    showToast = false
-                                }
-                                Log.i("Response", statusMessage)
+                                toast(context, "Invalid username or password")
                             }
                         }
 
                         override fun onFailure(call: Call<LoginResponseBody>?, t: Throwable?) {
-                            statusMessage = "Failed to login user"
-                            Log.i("Response", statusMessage)
                             Log.i("Response", t.toString())
-                            showToast = true
-                            coroutineScope.launch {
-                                delay(2000)
-                                showToast = false
-                            }
+                            toast(context, "Failed to login user")
                         }
                     },
                 )
@@ -196,6 +177,10 @@ fun LoginView(onRegisterClick: () -> Unit, onLogin: () -> Unit, context: Context
             }
         }
     }
+}
+
+private fun toast(context: Context, message: String) {
+    Toast.makeText(context, message, Toast.LENGTH_LONG).show()
 }
 
 /*@Preview(showBackground = false)
