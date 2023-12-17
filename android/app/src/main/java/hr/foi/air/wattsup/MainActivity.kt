@@ -79,7 +79,12 @@ class MainActivity : ComponentActivity() {
                         composable("scanCard") {
                             val onScan = { navController.navigate("chargerMode") }
 
-                            ScanScreen(onArrowBackClick, onScan, scanViewModel, cardManagers)
+                            ScanScreen(
+                                { navController.navigate("landing") },
+                                onScan,
+                                scanViewModel,
+                                cardManagers,
+                            )
                         }
                         composable("chargerMode") {
                             ChargerScreen({
@@ -94,7 +99,7 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("login") {
                             val onRegisterClick = { navController.navigate("registration") }
-                            LoginScreen(onRegisterClick)
+                            LoginScreen(onRegisterClick, { navController.navigate("landing") })
                         }
                         composable("EVsimulator") {
                             SimulatorScreen {
