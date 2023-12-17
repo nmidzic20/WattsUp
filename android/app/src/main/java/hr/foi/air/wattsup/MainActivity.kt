@@ -83,6 +83,8 @@ class MainActivity : ComponentActivity() {
                         composable("chargerMode") {
                             ChargerScreen({
                                 navController.navigate("scanCard")
+                            }, {
+                                navController.navigate("EVsimulator")
                             }, chargerViewModel)
                         }
                         composable("registration") {
@@ -92,6 +94,8 @@ class MainActivity : ComponentActivity() {
                         composable("login") {
                             val onRegisterClick = { navController.navigate("registration") }
                             LoginScreen(onRegisterClick)
+                        }
+                        composable("EVsimulator") {
                         }
                     }
                 }
