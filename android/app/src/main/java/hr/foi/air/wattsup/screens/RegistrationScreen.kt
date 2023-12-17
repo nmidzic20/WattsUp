@@ -1,7 +1,9 @@
 package hr.foi.air.wattsup.screens
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -39,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -108,10 +111,8 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
     var card: Card? by remember { mutableStateOf(null) }
     var invalidEmail by remember { mutableStateOf(false) }
     var invalidPassword by remember { mutableStateOf(false) }
-    var statusMessage by remember { mutableStateOf("") }
-    var showToast by remember { mutableStateOf(false) }
-    val coroutineScope = rememberCoroutineScope()
     val interactionSource = remember { MutableInteractionSource() }
+    val context = LocalContext.current
 
     OutlinedTextField(
         modifier = modifier,
@@ -199,23 +200,12 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
         }
     }
 
-    if (showToast) {
-        Text(
-            text = statusMessage,
-        )
-    }
-
     ElevatedButton(
         onClick = {
             invalidEmail = !Regex("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}\$").matches(email)
             invalidPassword = !Regex("^.{6,}\$").matches(password)
             if (invalidPassword || invalidEmail) {
-                statusMessage = "Invalid Email or password"
-                showToast = true
-                coroutineScope.launch {
-                    delay(2000)
-                    showToast = false
-                }
+                toast(context, "Invalid Email or password")
             } else {
                 authService.registerUser(
                     RegistrationBody(firstName, lastName, email, password, card),
@@ -231,11 +221,13 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
                                 val responseBody = response.body()
                                 val message =
                                     "Registered new user under ID ${responseBody?.id}, first name: ${responseBody?.firstName}, last name: ${responseBody?.lastName}, email: ${responseBody?.email}"
-                                Log.i("Response", message.toString())
+                                Log.i("Response", message)
+                                toast(context, "Successfully registered user")
                                 onLogInClick()
                             } else {
                                 val responseBody = response?.body()
                                 Log.i("Response", (responseBody ?: response).toString())
+                                toast(context, "Failed to register user")
                                 onLogInClick()
                             }
                         }
@@ -244,14 +236,8 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
                             call: Call<RegistrationResponseBody>?,
                             t: Throwable?,
                         ) {
-                            statusMessage = "Failed to register user"
-                            Log.i("Response", statusMessage)
                             Log.i("Response", t.toString())
-                            showToast = true
-                            coroutineScope.launch {
-                                delay(2000)
-                                showToast = false
-                            }
+                            toast(context, "Failed to register user")
                         }
                     },
                 )
@@ -281,6 +267,10 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
             )
         }
     }
+}
+
+private fun toast(context: Context, message: String) {
+    Toast.makeText(context, message, Toast.LENGTH_LONG).show()
 }
 
 @Preview(showBackground = false)
