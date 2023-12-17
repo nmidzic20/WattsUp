@@ -75,6 +75,7 @@ class MainActivity : ComponentActivity() {
                         composable("landing") {
                             val onChargerModeClick = { navController.navigate("scanCard") }
                             val onUserModeClick = { navController.navigate("login") }
+                            BackHandler(true) { }
 
                             LandingScreen(onChargerModeClick, onUserModeClick)
                         }
@@ -109,7 +110,6 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("chargingHistory") {
                             HistoryScreen(onArrowBackClick)
-                            LoginScreen(onRegisterClick, { navController.navigate("landing") })
                         }
                     }
                 }
