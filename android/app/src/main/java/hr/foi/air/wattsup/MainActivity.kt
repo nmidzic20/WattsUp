@@ -27,6 +27,7 @@ import hr.foi.air.wattsup.screens.LandingScreen
 import hr.foi.air.wattsup.screens.LoginScreen
 import hr.foi.air.wattsup.screens.RegistrationScreen
 import hr.foi.air.wattsup.screens.ScanScreen
+import hr.foi.air.wattsup.screens.SimulatorScreen
 import hr.foi.air.wattsup.ui.theme.WattsUpTheme
 import hr.foi.air.wattsup.viewmodels.ChargerViewModel
 import hr.foi.air.wattsup.viewmodels.ScanViewModel
@@ -96,6 +97,9 @@ class MainActivity : ComponentActivity() {
                             LoginScreen(onRegisterClick)
                         }
                         composable("EVsimulator") {
+                            SimulatorScreen {
+                                navController.navigate("landing")
+                            }
                         }
                     }
                 }
