@@ -87,13 +87,12 @@ fun RegistrationView(onLogInClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
-            .padding(0.dp, 5.dp)
-            .verticalScroll(rememberScrollState()),
+            .padding(0.dp, 5.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
-            modifier = Modifier.padding(0.dp, 90.dp, 0.dp, 40.dp),
+            modifier = Modifier.padding(0.dp, 90.dp, 0.dp, 30.dp),
             style = MaterialTheme.typography.headlineLarge,
             text = stringResource(R.string.registerLabel),
         )
@@ -171,7 +170,9 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
         singleLine = true,
     )
 
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         OutlinedTextField(
             modifier = Modifier
                 .padding(0.dp, 15.dp)
@@ -181,7 +182,9 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
             label = { Text(stringResource(R.string.card_label)) },
             singleLine = true,
         )
+
         Spacer(modifier = Modifier.width(4.dp))
+
         ElevatedButton(
             onClick = {
             },
@@ -243,13 +246,16 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
                 )
             }
         },
-        modifier = Modifier.padding(0.dp, 40.dp, 0.dp, 0.dp),
+        modifier = Modifier.padding(0.dp, 30.dp, 0.dp, 0.dp),
         contentPadding = PaddingValues(122.dp, 0.dp),
         interactionSource = interactionSource,
     ) {
         Text(text = "Register", style = MaterialTheme.typography.bodyMedium, color = Color.White)
     }
-    Row(verticalAlignment = Alignment.CenterVertically) {
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         Text(
             stringResource(R.string.Alreadyhaveaccountlabel),
             style = MaterialTheme.typography.bodySmall,

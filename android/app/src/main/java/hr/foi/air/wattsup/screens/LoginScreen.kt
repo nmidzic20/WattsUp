@@ -39,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -92,8 +93,7 @@ fun LoginView(onRegisterClick: () -> Unit, onLogin: () -> Unit, context: Context
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
-            .padding(0.dp, 15.dp)
-            .verticalScroll(rememberScrollState()),
+            .padding(0.dp, 10.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -118,6 +118,7 @@ fun LoginView(onRegisterClick: () -> Unit, onLogin: () -> Unit, context: Context
             onValueChange = { password = it },
             label = { Text(stringResource(R.string.passwordLabel)) },
             singleLine = true,
+            visualTransformation = PasswordVisualTransformation()
         )
 
         ElevatedButton(
