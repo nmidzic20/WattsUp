@@ -67,7 +67,7 @@ fun RegistrationScreen(onArrowBackClick: () -> Unit, onLogInClick: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.app_name)) },
+                title = { Text("Register") },
                 navigationIcon = {
                     IconButton(onClick = { onArrowBackClick() }) {
                         Icon(Icons.Filled.ArrowBack, null, tint = Color.White)
@@ -75,7 +75,6 @@ fun RegistrationScreen(onArrowBackClick: () -> Unit, onLogInClick: () -> Unit) {
                 },
             )
         },
-
     ) {
         RegistrationView(onLogInClick)
     }
@@ -87,15 +86,10 @@ fun RegistrationView(onLogInClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
-            .padding(0.dp, 5.dp),
-        verticalArrangement = Arrangement.Top,
+            .padding(top = 50.dp),
+        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(
-            modifier = Modifier.padding(0.dp, 90.dp, 0.dp, 30.dp),
-            style = MaterialTheme.typography.headlineLarge,
-            text = stringResource(R.string.registerLabel),
-        )
         CentralView(Modifier.padding(0.dp, 15.dp), onLogInClick)
     }
 }
@@ -260,7 +254,9 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
             stringResource(R.string.Alreadyhaveaccountlabel),
             style = MaterialTheme.typography.bodySmall,
         )
+
         Spacer(modifier = Modifier.width(2.dp))
+
         TextButton(
             modifier = Modifier
                 .padding(0.dp)

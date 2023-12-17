@@ -96,7 +96,7 @@ class MainActivity : ComponentActivity() {
                         composable("login") {
                             val onRegisterClick = { navController.navigate("registration") }
                             val onLogin = { navController.navigate("userMode") }
-                            LoginScreen(onRegisterClick, onLogin)
+                            LoginScreen(onRegisterClick, onLogin, onArrowBackClick)
                         }
                         composable("userMode") {
                             val onHistoryClick = { navController.navigate("chargingHistory") }

@@ -19,10 +19,14 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -37,6 +41,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -50,6 +55,7 @@ import hr.foi.air.wattsup.network.NetworkService
 import hr.foi.air.wattsup.network.models.TokenManager
 import hr.foi.air.wattsup.network.models.LoginBody
 import hr.foi.air.wattsup.network.models.LoginResponseBody
+import hr.foi.air.wattsup.ui.component.TopAppBar
 import hr.foi.air.wattsup.utils.UserCard
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -62,18 +68,17 @@ private val authService = NetworkService.authService
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(onRegisterClick: () -> Unit, onLogin: () -> Unit) {
+fun LoginScreen(onRegisterClick: () -> Unit, onLogin: () -> Unit, onArrowBackClick: () -> Unit) {
     val context = LocalContext.current
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(stringResource(R.string.app_name))
+            TopAppBar(
+                title = { Text("Login") },
+                navigationIcon = {
+                    IconButton(onClick = { onArrowBackClick() }) {
+                        Icon(Icons.Filled.ArrowBack, null, tint = Color.White)
+                    }
                 },
-                colors = TopAppBarDefaults.mediumTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                ),
             )
         },
     ) {
@@ -93,15 +98,10 @@ fun LoginView(onRegisterClick: () -> Unit, onLogin: () -> Unit, context: Context
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
-            .padding(0.dp, 10.dp),
-        verticalArrangement = Arrangement.Top,
+            .padding(20.dp),
+        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(
-            modifier = Modifier.padding(0.dp, 200.dp, 0.dp, 40.dp),
-            style = MaterialTheme.typography.headlineLarge,
-            text = stringResource(R.string.login),
-        )
         val modifier = Modifier.padding(0.dp, 15.dp)
 
         OutlinedTextField(
@@ -156,7 +156,7 @@ fun LoginView(onRegisterClick: () -> Unit, onLogin: () -> Unit, context: Context
                     },
                 )
             },
-            modifier = Modifier.padding(0.dp, 180.dp, 0.dp, 0.dp),
+            modifier = Modifier.padding(0.dp, 25.dp, 0.dp, 0.dp),
             contentPadding = PaddingValues(122.dp, 0.dp),
             interactionSource = interactionSource,
             enabled = !showLoading.value,
@@ -182,17 +182,17 @@ fun LoginView(onRegisterClick: () -> Unit, onLogin: () -> Unit, context: Context
                 stringResource(R.string.LoginDontHaveAccountLabel),
                 style = MaterialTheme.typography.bodySmall,
             )
+
             Spacer(modifier = Modifier.width(2.dp))
+
             TextButton(
                 modifier = Modifier
-                    .padding(0.dp)
                     .wrapContentWidth(Alignment.CenterHorizontally),
                 contentPadding = PaddingValues(0.dp),
                 onClick = onRegisterClick,
             ) {
                 Text(
                     stringResource(R.string.registerLabel),
-                    color = androidx.compose.ui.graphics.Color.White,
                 )
             }
         }
