@@ -100,7 +100,7 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("userMode") {
                             val onHistoryClick = { navController.navigate("chargingHistory") }
-                            UserModeScreen(onHistoryClick)
+                            UserModeScreen(onHistoryClick, onArrowBackClick)
                         }
                         composable("chargingHistory") {
                             HistoryScreen(onArrowBackClick)
