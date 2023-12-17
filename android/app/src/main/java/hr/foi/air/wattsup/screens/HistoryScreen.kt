@@ -5,6 +5,7 @@ package hr.foi.air.wattsup.screens
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,6 +24,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -58,9 +61,6 @@ import retrofit2.Call
 import retrofit2.Response
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
 import java.util.Locale
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -90,6 +90,7 @@ fun HistoryView(topPadding: Dp, context: Context = LocalContext.current) {
     val coroutineScope = rememberCoroutineScope()
     val cards = remember { mutableStateOf(listOf<Card?>()) }
     val events = remember { mutableStateOf(listOf<Event?>()) }
+    val showLoading = remember { mutableStateOf(true) }
     val userId = TokenManager.getInstance(context).getId()
 
     LaunchedEffect(Unit) {
@@ -102,6 +103,7 @@ fun HistoryView(topPadding: Dp, context: Context = LocalContext.current) {
                     event.chargerLocation = getChargerName(context, event.chargerId) ?: ""
                 }
                 events.value += data
+                showLoading.value = false
             }
             events.value = events.value.sortedByDescending { it!!.startedAt }
         }
@@ -118,7 +120,18 @@ fun HistoryView(topPadding: Dp, context: Context = LocalContext.current) {
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (events.value.isEmpty()) {
+            if (showLoading.value) {
+                item {
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .fillMaxWidth()
+                            .wrapContentSize(Alignment.Center)
+                            .padding(top = 300.dp)
+                    )
+                }
+            } else if (events.value.isEmpty()) {
                 item {
                     Text(
                         text = "No events to show",
@@ -206,14 +219,14 @@ fun EventCard(event: Event) {
 }
 
 @Composable
-private fun DetailDialog(event: Event, show: MutableState<Boolean>) {
+private fun DetailDialog(event: Event, showDetails: MutableState<Boolean>) {
     val df = DecimalFormat("#.###")
 
-    if (!show.value) {
+    if (!showDetails.value) {
         return
     }
 
-    Dialog(onDismissRequest = { show.value = !show.value }) {
+    Dialog(onDismissRequest = { showDetails.value = !showDetails.value }) {
         Column(
             modifier = Modifier
                 .width(450.dp)
@@ -296,16 +309,22 @@ private suspend fun getEvents(context: Context, cardId: Int) : List<Event?> {
                     Log.d("HistoryScreen", "Events: ${response.body()}")
                 } else {
                     Log.d("HistoryScreen", "Error: ${response.errorBody()}")
+                    toast(context, "Error: ${response.errorBody()}")
                     continuation.resume(emptyList())
                 }
             }
 
             override fun onFailure(call: Call<List<Event?>>, t: Throwable) {
                 Log.d("HistoryScreen", "Failure: ${t.message}")
+                toast(context, "Failure: ${t.message}")
                 continuation.resume(emptyList())
             }
         })
     }
+}
+
+private fun toast(context: Context, message: String) {
+    Toast.makeText(context, message, Toast.LENGTH_LONG).show()
 }
 
 private suspend fun getCards(context: Context, userId: Int): List<Card?> {
