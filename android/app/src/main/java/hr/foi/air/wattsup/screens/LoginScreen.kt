@@ -12,12 +12,15 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -83,6 +86,7 @@ fun LoginView(onRegisterClick: () -> Unit, onLogin: () -> Unit, context: Context
     val interactionSource = remember { MutableInteractionSource() }
     var email: String by remember { mutableStateOf("") }
     var password: String by remember { mutableStateOf("") }
+    val showLoading = remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -118,6 +122,8 @@ fun LoginView(onRegisterClick: () -> Unit, onLogin: () -> Unit, context: Context
 
         ElevatedButton(
             onClick = {
+                showLoading.value = true
+
                 authService.loginUser(
                     LoginBody(email, password),
                 ).enqueue(
@@ -126,6 +132,7 @@ fun LoginView(onRegisterClick: () -> Unit, onLogin: () -> Unit, context: Context
                             call: Call<LoginResponseBody>?,
                             response: Response<LoginResponseBody>?,
                         ) {
+                            showLoading.value = false
                             Log.i("RES", response.toString())
                             if (response?.isSuccessful == true) {
                                 val responseBody = response.body()
@@ -141,6 +148,7 @@ fun LoginView(onRegisterClick: () -> Unit, onLogin: () -> Unit, context: Context
                         }
 
                         override fun onFailure(call: Call<LoginResponseBody>?, t: Throwable?) {
+                            showLoading.value = false
                             Log.i("Response", t.toString())
                             toast(context, "Failed to login user")
                         }
@@ -150,12 +158,23 @@ fun LoginView(onRegisterClick: () -> Unit, onLogin: () -> Unit, context: Context
             modifier = Modifier.padding(0.dp, 180.dp, 0.dp, 0.dp),
             contentPadding = PaddingValues(122.dp, 0.dp),
             interactionSource = interactionSource,
+            enabled = !showLoading.value,
         ) {
-            Text(
-                text = "Login",
-                style = MaterialTheme.typography.bodyMedium,
-                color = androidx.compose.ui.graphics.Color.White,
-            )
+            if (showLoading.value) {
+                CircularProgressIndicator(
+                    color = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier
+                        .height(25.dp)
+                        .width(25.dp)
+                        .wrapContentSize(Alignment.Center)
+                )
+            } else {
+                Text(
+                    text = "Login",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = androidx.compose.ui.graphics.Color.White,
+                )
+            }
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(

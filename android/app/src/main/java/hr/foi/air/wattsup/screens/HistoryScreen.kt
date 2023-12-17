@@ -103,9 +103,9 @@ fun HistoryView(topPadding: Dp, context: Context = LocalContext.current) {
                     event.chargerLocation = getChargerName(context, event.chargerId) ?: ""
                 }
                 events.value += data
-                showLoading.value = false
             }
             events.value = events.value.sortedByDescending { it!!.startedAt }
+            showLoading.value = false
         }
     }
 
