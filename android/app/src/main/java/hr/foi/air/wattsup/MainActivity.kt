@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,10 +24,13 @@ import hr.foi.air.wattsup.ble.BLEManager
 import hr.foi.air.wattsup.core.CardManager
 import hr.foi.air.wattsup.rfid.RFIDManager
 import hr.foi.air.wattsup.screens.ChargerScreen
+import hr.foi.air.wattsup.screens.HistoryScreen
 import hr.foi.air.wattsup.screens.LandingScreen
 import hr.foi.air.wattsup.screens.LoginScreen
 import hr.foi.air.wattsup.screens.RegistrationScreen
 import hr.foi.air.wattsup.screens.ScanScreen
+import hr.foi.air.wattsup.screens.UserModeScreen
+import hr.foi.air.wattsup.screens.SimulatorScreen
 import hr.foi.air.wattsup.ui.theme.WattsUpTheme
 import hr.foi.air.wattsup.viewmodels.ChargerViewModel
 import hr.foi.air.wattsup.viewmodels.ScanViewModel
@@ -39,10 +43,13 @@ class MainActivity : ComponentActivity() {
     private val chargerViewModel: ChargerViewModel by viewModels()
     private val scanViewModel: ScanViewModel by viewModels()
 
+    var cardManagers: List<CardManager> = emptyList()
+    var receivers: MutableList<BroadcastReceiver> = emptyList<BroadcastReceiver>().toMutableList()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val cardManagers: List<CardManager> = listOf(
+        cardManagers = listOf(
             BLEManager(this),
             RFIDManager(this),
         )
@@ -54,6 +61,7 @@ class MainActivity : ComponentActivity() {
             val receiver = cardManager.getStateReceiver()
             val action = cardManager.getAction()
             registerCardSupportStateReceiver(receiver, action)
+            receivers.add(receiver)
         }
 
         setContent {
@@ -72,6 +80,7 @@ class MainActivity : ComponentActivity() {
                         composable("landing") {
                             val onChargerModeClick = { navController.navigate("scanCard") }
                             val onUserModeClick = { navController.navigate("login") }
+                            BackHandler(true) { }
 
                             LandingScreen(onChargerModeClick, onUserModeClick)
                         }
@@ -88,6 +97,8 @@ class MainActivity : ComponentActivity() {
                         composable("chargerMode") {
                             ChargerScreen({
                                 navController.navigate("scanCard")
+                            }, {
+                                navController.navigate("EVsimulator")
                             }, chargerViewModel)
                         }
                         composable("registration") {
@@ -96,12 +107,34 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("login") {
                             val onRegisterClick = { navController.navigate("registration") }
-                            LoginScreen(onRegisterClick, { navController.navigate("landing") })
+                            val onLogin = { navController.navigate("userMode") }
+                            LoginScreen(onRegisterClick, onLogin, onArrowBackClick)
+                        }
+                        composable("userMode") {
+                            val onHistoryClick = { navController.navigate("chargingHistory") }
+                            BackHandler(true) { }
+                            UserModeScreen(onHistoryClick, onArrowBackClick)
+                        }
+                        composable("chargingHistory") {
+                            HistoryScreen(onArrowBackClick)
+                        }
+                        composable("EVsimulator") {
+                            SimulatorScreen(chargerViewModel) {
+                                navController.navigate("chargerMode")
+                            }
                         }
                     }
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        receivers.forEach { receiver ->
+            unregisterReceiver(receiver)
+        }
+
+        super.onDestroy()
     }
 
     private fun registerCardSupportStateReceiver(

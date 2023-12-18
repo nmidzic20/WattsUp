@@ -1,7 +1,9 @@
 package hr.foi.air.wattsup.screens
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -39,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -64,7 +67,7 @@ fun RegistrationScreen(onArrowBackClick: () -> Unit, onLogInClick: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.app_name)) },
+                title = { Text("Register") },
                 navigationIcon = {
                     IconButton(onClick = { onArrowBackClick() }) {
                         Icon(Icons.Filled.ArrowBack, null, tint = Color.White)
@@ -72,7 +75,6 @@ fun RegistrationScreen(onArrowBackClick: () -> Unit, onLogInClick: () -> Unit) {
                 },
             )
         },
-
     ) {
         RegistrationView(onLogInClick)
     }
@@ -84,16 +86,10 @@ fun RegistrationView(onLogInClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
-            .padding(0.dp, 5.dp)
-            .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.Top,
+            .padding(top = 50.dp),
+        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(
-            modifier = Modifier.padding(0.dp, 90.dp, 0.dp, 40.dp),
-            style = MaterialTheme.typography.headlineLarge,
-            text = stringResource(R.string.registerLabel),
-        )
         CentralView(Modifier.padding(0.dp, 15.dp), onLogInClick)
     }
 }
@@ -108,16 +104,15 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
     var card: Card? by remember { mutableStateOf(null) }
     var invalidEmail by remember { mutableStateOf(false) }
     var invalidPassword by remember { mutableStateOf(false) }
-    var statusMessage by remember { mutableStateOf("") }
-    var showToast by remember { mutableStateOf(false) }
-    val coroutineScope = rememberCoroutineScope()
     val interactionSource = remember { MutableInteractionSource() }
+    val context = LocalContext.current
 
     OutlinedTextField(
         modifier = modifier,
         value = firstName,
         onValueChange = { firstName = it },
         label = { Text(stringResource(R.string.first_name_label)) },
+        singleLine = true,
     )
 
     OutlinedTextField(
@@ -125,6 +120,7 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
         value = lastName,
         onValueChange = { lastName = it },
         label = { Text(stringResource(R.string.last_name_label)) },
+        singleLine = true,
     )
 
     OutlinedTextField(
@@ -144,6 +140,7 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
             TextFieldDefaults.outlinedTextFieldColors()
         },
         label = { Text(stringResource(R.string.e_mail_label)) },
+        singleLine = true,
     )
 
     OutlinedTextField(
@@ -164,9 +161,12 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
         },
         visualTransformation = PasswordVisualTransformation(),
         label = { Text(stringResource(R.string.password_label)) },
+        singleLine = true,
     )
 
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         OutlinedTextField(
             modifier = Modifier
                 .padding(0.dp, 15.dp)
@@ -174,8 +174,11 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
             value = card?.value ?: "",
             onValueChange = { card = Card(id = 0, value = it) },
             label = { Text(stringResource(R.string.card_label)) },
+            singleLine = true,
         )
+
         Spacer(modifier = Modifier.width(4.dp))
+
         ElevatedButton(
             onClick = {
             },
@@ -194,23 +197,12 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
         }
     }
 
-    if (showToast) {
-        Text(
-            text = statusMessage,
-        )
-    }
-
     ElevatedButton(
         onClick = {
             invalidEmail = !Regex("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}\$").matches(email)
             invalidPassword = !Regex("^.{6,}\$").matches(password)
             if (invalidPassword || invalidEmail) {
-                statusMessage = "Invalid Email or password"
-                showToast = true
-                coroutineScope.launch {
-                    delay(2000)
-                    showToast = false
-                }
+                toast(context, "Invalid e-mail or password")
             } else {
                 authService.registerUser(
                     RegistrationBody(firstName, lastName, email, password, card),
@@ -226,11 +218,13 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
                                 val responseBody = response.body()
                                 val message =
                                     "Registered new user under ID ${responseBody?.id}, first name: ${responseBody?.firstName}, last name: ${responseBody?.lastName}, email: ${responseBody?.email}"
-                                Log.i("Response", message.toString())
+                                Log.i("Response", message)
+                                toast(context, "Successfully registered user")
                                 onLogInClick()
                             } else {
                                 val responseBody = response?.body()
                                 Log.i("Response", (responseBody ?: response).toString())
+                                toast(context, "Failed to register user")
                                 onLogInClick()
                             }
                         }
@@ -239,31 +233,30 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
                             call: Call<RegistrationResponseBody>?,
                             t: Throwable?,
                         ) {
-                            statusMessage = "Failed to register user"
-                            Log.i("Response", statusMessage)
                             Log.i("Response", t.toString())
-                            showToast = true
-                            coroutineScope.launch {
-                                delay(2000)
-                                showToast = false
-                            }
+                            toast(context, "Failed to register user")
                         }
                     },
                 )
             }
         },
-        modifier = Modifier.padding(0.dp, 40.dp, 0.dp, 0.dp),
+        modifier = Modifier.padding(0.dp, 30.dp, 0.dp, 0.dp),
         contentPadding = PaddingValues(122.dp, 0.dp),
         interactionSource = interactionSource,
     ) {
         Text(text = "Register", style = MaterialTheme.typography.bodyMedium, color = Color.White)
     }
-    Row(verticalAlignment = Alignment.CenterVertically) {
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         Text(
             stringResource(R.string.Alreadyhaveaccountlabel),
             style = MaterialTheme.typography.bodySmall,
         )
+
         Spacer(modifier = Modifier.width(2.dp))
+
         TextButton(
             modifier = Modifier
                 .padding(0.dp)
@@ -276,6 +269,10 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
             )
         }
     }
+}
+
+private fun toast(context: Context, message: String) {
+    Toast.makeText(context, message, Toast.LENGTH_LONG).show()
 }
 
 @Preview(showBackground = false)

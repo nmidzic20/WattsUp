@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -70,7 +71,7 @@ private fun PortraitLayout(onChargerModeClick: () -> Unit, onUserModeClick: () -
                 .fillMaxHeight()
                 .padding(it),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceEvenly,
+            verticalArrangement = Arrangement.Center,
         ) {
             ModeSelection(onChargerModeClick, onUserModeClick)
         }
@@ -79,11 +80,6 @@ private fun PortraitLayout(onChargerModeClick: () -> Unit, onUserModeClick: () -
 
 @Composable
 fun ModeSelection(onChargerModeClick: () -> Unit, onUserModeClick: () -> Unit) {
-    Text(
-        text = "Select app mode:",
-        style = MaterialTheme.typography.titleLarge,
-    )
-
     CircleButton(
         mode = "User mode",
         iconId = R.drawable.icon_user_mode,
@@ -92,6 +88,8 @@ fun ModeSelection(onChargerModeClick: () -> Unit, onUserModeClick: () -> Unit) {
         modifier = Modifier.size(220.dp)
             .padding(16.dp),
     )
+
+    Spacer(modifier = Modifier.size(32.dp))
 
     CircleButton(
         mode = "Charger mode",
