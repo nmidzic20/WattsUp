@@ -2,6 +2,7 @@ package hr.foi.air.wattsup.network.models
 
 import android.content.Context
 import android.content.SharedPreferences
+import java.util.Base64
 
 class TokenManager private constructor(context: Context) {
 
@@ -39,6 +40,11 @@ class TokenManager private constructor(context: Context) {
 
     fun getrefreshTokenExpiresAt(): String? {
         return sharedPreferences.getString("refreshTokenExpiresAt", null)
+    }
+
+    fun getId(): Int {
+        val payload = String(Base64.getUrlDecoder().decode(getjWTtoken()!!.split(".")[1]))
+        return payload.split(",")[0].split(":")[1].replace("\"", "").toInt()
     }
 
     companion object {

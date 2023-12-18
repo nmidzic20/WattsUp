@@ -47,4 +47,5 @@ object NetworkService {
     val authService: AuthenticationService by lazy { instance.create(AuthenticationService::class.java) }
     val cardService: CardService by lazy { instance.create(CardService::class.java) }
     val eventService: EventService by lazy { instance.create(EventService::class.java) }
+    val chargerService: ChargerService by lazy { instance.create(ChargerService::class.java) }
 }

@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,10 +24,12 @@ import hr.foi.air.wattsup.ble.BLEManager
 import hr.foi.air.wattsup.core.CardManager
 import hr.foi.air.wattsup.rfid.RFIDManager
 import hr.foi.air.wattsup.screens.ChargerScreen
+import hr.foi.air.wattsup.screens.HistoryScreen
 import hr.foi.air.wattsup.screens.LandingScreen
 import hr.foi.air.wattsup.screens.LoginScreen
 import hr.foi.air.wattsup.screens.RegistrationScreen
 import hr.foi.air.wattsup.screens.ScanScreen
+import hr.foi.air.wattsup.screens.UserModeScreen
 import hr.foi.air.wattsup.screens.SimulatorScreen
 import hr.foi.air.wattsup.ui.theme.WattsUpTheme
 import hr.foi.air.wattsup.viewmodels.ChargerViewModel
@@ -77,6 +80,7 @@ class MainActivity : ComponentActivity() {
                         composable("landing") {
                             val onChargerModeClick = { navController.navigate("scanCard") }
                             val onUserModeClick = { navController.navigate("login") }
+                            BackHandler(true) { }
 
                             LandingScreen(onChargerModeClick, onUserModeClick)
                         }
@@ -103,7 +107,16 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("login") {
                             val onRegisterClick = { navController.navigate("registration") }
-                            LoginScreen(onRegisterClick, { navController.navigate("landing") })
+                            val onLogin = { navController.navigate("userMode") }
+                            LoginScreen(onRegisterClick, onLogin, onArrowBackClick)
+                        }
+                        composable("userMode") {
+                            val onHistoryClick = { navController.navigate("chargingHistory") }
+                            BackHandler(true) { }
+                            UserModeScreen(onHistoryClick, onArrowBackClick)
+                        }
+                        composable("chargingHistory") {
+                            HistoryScreen(onArrowBackClick)
                         }
                         composable("EVsimulator") {
                             SimulatorScreen(chargerViewModel) {
