@@ -22,14 +22,13 @@ import java.util.concurrent.TimeUnit
 class ChargerViewModel : ViewModel() {
 
     private val maxChargePercentage = 1f
+    private val selectedChargerId = MutableLiveData(1)
 
     private val _charging = MutableLiveData(false)
     private val _startTime = MutableLiveData(0L)
     private val _endTime = MutableLiveData(0L)
     private val _timeElapsed = MutableLiveData(0L)
-
     private val _timeTrackingJob = MutableLiveData<Job?>(null)
-
     private val _initialChargeAmount = MutableLiveData(0f)
     private val _amountNecessaryForFullCharge =
         MutableLiveData(maxChargePercentage - _initialChargeAmount.value!!)
@@ -37,26 +36,32 @@ class ChargerViewModel : ViewModel() {
         MutableLiveData(_initialChargeAmount.value)
     private val _percentageChargedUntilFull = MutableLiveData(0f)
     private val _currentChargeVolume = MutableLiveData(0f)
-
     private val _eventService = NetworkService.eventService
-
+    private val _openFullChargeAlertDialog = MutableLiveData(false)
     private val _toastMessage = MutableLiveData<String>()
     private val currentChargeVolume: LiveData<Float> get() = _currentChargeVolume
 
     val charging: LiveData<Boolean> get() = _charging
     val timeElapsed: LiveData<Long> get() = _timeElapsed
-
     val percentageChargedUntilFull: LiveData<Float> get() = _percentageChargedUntilFull
     val amountNecessaryForFullCharge: LiveData<Float> get() = _amountNecessaryForFullCharge
-    val currentChargeAmount: LiveData<Float> get() = _currentChargeAmount
+
     // Variable used to track the amount of charge in kWh for current charging session
-
-    private val _openFullChargeAlertDialog = MutableLiveData(false)
+    val currentChargeAmount: LiveData<Float> get() = _currentChargeAmount
     val openFullChargeAlertDialog: LiveData<Boolean> = _openFullChargeAlertDialog
-
     val toastMessage: LiveData<String> get() = _toastMessage
     fun setOpenFullChargeAlertDialog(value: Boolean) {
         _openFullChargeAlertDialog.value = value
+    }
+
+    fun updateInitialChargeAmount(positionValue: Float) {
+        _initialChargeAmount.value = positionValue
+        _amountNecessaryForFullCharge.value = maxChargePercentage - _initialChargeAmount.value!!
+        _currentChargeAmount.value = _initialChargeAmount.value
+    }
+
+    fun updateSelectedCharger(chargerId: Int) {
+        selectedChargerId.value = chargerId
     }
 
     fun toggleCharging(onFullyCharged: () -> Unit) {
@@ -81,7 +86,8 @@ class ChargerViewModel : ViewModel() {
         _currentChargeVolume.value = 0f
         viewModelScope.launch {
             launch {
-                val eventPOSTBody = EventPOSTBody(1, UserCard.userCard.value!!.id)
+                val eventPOSTBody =
+                    EventPOSTBody(selectedChargerId.value!!, UserCard.userCard.value!!.id)
                 // chargerID is sent as 1 since charger selection is yet to be implemented
                 startEvent(eventPOSTBody)
             }
