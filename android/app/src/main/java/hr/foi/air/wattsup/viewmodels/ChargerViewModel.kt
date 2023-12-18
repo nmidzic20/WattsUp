@@ -60,6 +60,10 @@ class ChargerViewModel : ViewModel() {
         _currentChargeAmount.value = _initialChargeAmount.value
     }
 
+    fun updateSelectedCharger(chargerId: Int) {
+        selectedChargerId.value = chargerId
+    }
+
     fun toggleCharging(onFullyCharged: () -> Unit) {
         if (isVehicleFullyCharged()) {
             onFullyCharged()
