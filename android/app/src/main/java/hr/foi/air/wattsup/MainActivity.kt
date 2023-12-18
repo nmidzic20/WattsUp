@@ -27,6 +27,7 @@ import hr.foi.air.wattsup.screens.LandingScreen
 import hr.foi.air.wattsup.screens.LoginScreen
 import hr.foi.air.wattsup.screens.RegistrationScreen
 import hr.foi.air.wattsup.screens.ScanScreen
+import hr.foi.air.wattsup.screens.SimulatorScreen
 import hr.foi.air.wattsup.ui.theme.WattsUpTheme
 import hr.foi.air.wattsup.viewmodels.ChargerViewModel
 import hr.foi.air.wattsup.viewmodels.ScanViewModel
@@ -39,10 +40,13 @@ class MainActivity : ComponentActivity() {
     private val chargerViewModel: ChargerViewModel by viewModels()
     private val scanViewModel: ScanViewModel by viewModels()
 
+    var cardManagers: List<CardManager> = emptyList()
+    var receivers: MutableList<BroadcastReceiver> = emptyList<BroadcastReceiver>().toMutableList()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val cardManagers: List<CardManager> = listOf(
+        cardManagers = listOf(
             BLEManager(this),
             RFIDManager(this),
         )
@@ -54,6 +58,7 @@ class MainActivity : ComponentActivity() {
             val receiver = cardManager.getStateReceiver()
             val action = cardManager.getAction()
             registerCardSupportStateReceiver(receiver, action)
+            receivers.add(receiver)
         }
 
         setContent {
@@ -88,6 +93,8 @@ class MainActivity : ComponentActivity() {
                         composable("chargerMode") {
                             ChargerScreen({
                                 navController.navigate("scanCard")
+                            }, {
+                                navController.navigate("EVsimulator")
                             }, chargerViewModel)
                         }
                         composable("registration") {
@@ -98,10 +105,23 @@ class MainActivity : ComponentActivity() {
                             val onRegisterClick = { navController.navigate("registration") }
                             LoginScreen(onRegisterClick, { navController.navigate("landing") })
                         }
+                        composable("EVsimulator") {
+                            SimulatorScreen(chargerViewModel) {
+                                navController.navigate("chargerMode")
+                            }
+                        }
                     }
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        receivers.forEach { receiver ->
+            unregisterReceiver(receiver)
+        }
+
+        super.onDestroy()
     }
 
     private fun registerCardSupportStateReceiver(
