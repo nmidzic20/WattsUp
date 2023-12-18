@@ -15,6 +15,7 @@ export class StationManagementComponent implements OnInit {
   unavailableStations = 0;
   offlineStations = 0;
   stations: Station[] = [];
+  isAddStationDialogueVisible: boolean = false;
 
   constructor(private router: Router, private userManagerService: UserManagerService){}
 
@@ -35,7 +36,11 @@ export class StationManagementComponent implements OnInit {
     }
   }
 
-  private async getStations(jwt: string) {
+  openAddStationDialogue() {
+    this.isAddStationDialogueVisible = true;
+  }
+
+  async getStations(jwt: string) {
     let header = new Headers();
     header.set("Accept", "application/json");
     header.set("Authorization", "Bearer " + jwt);

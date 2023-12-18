@@ -46,4 +46,5 @@
     </tbody>
 </table>
 
-<button class="floating-button">Add station</button>
+<button class="floating-button" (click)="openAddStationDialogue()">Add station</button>
+<app-add-station-dialogue [isVisible]="isAddStationDialogueVisible" (closeDialogue)="isAddStationDialogueVisible=false" (refreshChargerView)="getStations($event)"></app-add-station-dialogue>
