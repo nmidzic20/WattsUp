@@ -12,8 +12,6 @@
 
 .dialogue-content {
     background: #fff;
-    width: 40vw;
-    height: 60vh;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -68,6 +66,7 @@ button{
     flex-direction: row;
     justify-content: space-evenly;
     align-items: center;
+    margin-bottom: 30px;
 }
 
 label{
@@ -98,15 +97,19 @@ input{
   }
 
 .map {
-    width: 100%;
+    width: 500px;
     height: 300px;
     display: flex;
     justify-self: center;
-    margin-left: 10%;
+    padding: 0% 5% 5% 5%;
   }
 
 .map-buttons{
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
+}
+
+.ol-layer{
+    width: 100px !important;
 }
