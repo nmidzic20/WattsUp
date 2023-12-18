@@ -43,19 +43,21 @@ class ChargerViewModel : ViewModel() {
 
     val charging: LiveData<Boolean> get() = _charging
     val timeElapsed: LiveData<Long> get() = _timeElapsed
-
     val percentageChargedUntilFull: LiveData<Float> get() = _percentageChargedUntilFull
     val amountNecessaryForFullCharge: LiveData<Float> get() = _amountNecessaryForFullCharge
 
     // Variable used to track the amount of charge in kWh for current charging session
-
     val currentChargeAmount: LiveData<Float> get() = _currentChargeAmount
-
     val openFullChargeAlertDialog: LiveData<Boolean> = _openFullChargeAlertDialog
-
     val toastMessage: LiveData<String> get() = _toastMessage
     fun setOpenFullChargeAlertDialog(value: Boolean) {
         _openFullChargeAlertDialog.value = value
+    }
+
+    fun updateInitialChargeAmount(positionValue: Float) {
+        _initialChargeAmount.value = positionValue
+        _amountNecessaryForFullCharge.value = maxChargePercentage - _initialChargeAmount.value!!
+        _currentChargeAmount.value = _initialChargeAmount.value
     }
 
     fun toggleCharging(onFullyCharged: () -> Unit) {

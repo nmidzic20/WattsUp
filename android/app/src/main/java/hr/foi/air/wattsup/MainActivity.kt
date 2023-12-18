@@ -40,10 +40,13 @@ class MainActivity : ComponentActivity() {
     private val chargerViewModel: ChargerViewModel by viewModels()
     private val scanViewModel: ScanViewModel by viewModels()
 
+    var cardManagers: List<CardManager> = emptyList()
+    var receivers: MutableList<BroadcastReceiver> = emptyList<BroadcastReceiver>().toMutableList()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val cardManagers: List<CardManager> = listOf(
+        cardManagers = listOf(
             BLEManager(this),
             RFIDManager(this),
         )
@@ -55,6 +58,7 @@ class MainActivity : ComponentActivity() {
             val receiver = cardManager.getStateReceiver()
             val action = cardManager.getAction()
             registerCardSupportStateReceiver(receiver, action)
+            receivers.add(receiver)
         }
 
         setContent {
@@ -102,14 +106,22 @@ class MainActivity : ComponentActivity() {
                             LoginScreen(onRegisterClick, { navController.navigate("landing") })
                         }
                         composable("EVsimulator") {
-                            SimulatorScreen {
-                                navController.navigate("landing")
+                            SimulatorScreen(chargerViewModel) {
+                                navController.navigate("chargerMode")
                             }
                         }
                     }
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        receivers.forEach { receiver ->
+            unregisterReceiver(receiver)
+        }
+
+        super.onDestroy()
     }
 
     private fun registerCardSupportStateReceiver(

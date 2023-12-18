@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.pm.ActivityInfo
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,8 +21,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,10 +33,11 @@ import hr.foi.air.wattsup.ui.component.TopAppBar
 import hr.foi.air.wattsup.ui.theme.colorDarkGray
 import hr.foi.air.wattsup.ui.theme.colorGray
 import hr.foi.air.wattsup.ui.theme.colorOrange
+import hr.foi.air.wattsup.viewmodels.ChargerViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SimulatorScreen(onArrowBackClick: () -> Unit) {
+fun SimulatorScreen(viewModel: ChargerViewModel, onArrowBackClick: () -> Unit) {
     LockScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
 
     Scaffold(
@@ -68,7 +68,10 @@ fun SimulatorScreen(onArrowBackClick: () -> Unit) {
                 primaryColor = colorOrange,
                 secondaryColor = colorGray,
                 circleRadius = 230f,
-                onPositionChange = {
+                onPositionChange = { position ->
+                    Log.i("POSITION", "${position / 100f}")
+
+                    viewModel.updateInitialChargeAmount(position / 100f)
                 },
             )
         }
@@ -98,5 +101,5 @@ fun Context.findActivity(): Activity? = when (this) {
 @Preview(device = Devices.AUTOMOTIVE_1024p, widthDp = 720, heightDp = 360)
 @Composable
 fun SimulatorScreenPreview() {
-    SimulatorScreen({})
+    SimulatorScreen(ChargerViewModel(), {})
 }
