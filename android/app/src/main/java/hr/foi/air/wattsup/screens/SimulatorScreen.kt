@@ -1,12 +1,10 @@
 package hr.foi.air.wattsup.screens
 
-import android.app.Activity
-import android.content.Context
-import android.content.ContextWrapper
-import android.content.pm.ActivityInfo
+import android.content.res.Configuration
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,7 +24,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,9 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Devices
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import hr.foi.air.wattsup.ui.component.CarChargeIndicator
 import hr.foi.air.wattsup.ui.component.TopAppBar
@@ -48,7 +43,8 @@ import hr.foi.air.wattsup.viewmodels.ChargerViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SimulatorScreen(viewModel: ChargerViewModel, onArrowBackClick: () -> Unit) {
-    LockScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     Scaffold(
         topBar = {
@@ -65,96 +61,104 @@ fun SimulatorScreen(viewModel: ChargerViewModel, onArrowBackClick: () -> Unit) {
         },
         containerColor = colorDarkGray,
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-                .padding(it),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            CarChargeIndicator(
-                modifier = Modifier
-                    .size(250.dp)
-                    .background(colorDarkGray),
-                initialValue = 50,
-                primaryColor = colorOrange,
-                secondaryColor = colorGray,
-                circleRadius = 230f,
-                onPositionChange = { position ->
-                    Log.i("POSITION", "${position / 100f}")
+        val modifier = Modifier.padding(it)
 
-                    viewModel.updateInitialChargeAmount(position / 100f)
-                },
-            )
-
-            val options = listOf("Option 1", "Option 2", "Option 3", "Option 4", "Option 5")
-            var expanded by remember { mutableStateOf(false) }
-            var selectedOptionText by remember { mutableStateOf(options[0]) }
-
-            ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = {
-                    expanded = !expanded
-                },
-            ) {
-                TextField(
-                    readOnly = true,
-                    value = selectedOptionText,
-                    onValueChange = { },
-                    label = { Text("Label") },
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(
-                            expanded = expanded,
-                        )
-                    },
-                    modifier = Modifier.menuAnchor(),
-                    colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                )
-                ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = {
-                        expanded = false
-                    },
-                ) {
-                    options.forEach { selectionOption ->
-                        DropdownMenuItem(
-                            text = { Text(text = selectionOption, color = colorDarkGray) },
-                            onClick = {
-                                selectedOptionText = selectionOption
-                                expanded = false
-                            },
-                            modifier = Modifier
-                                .background(MaterialTheme.colorScheme.secondary),
-                        )
-                    }
-                }
-            }
+        if (isLandscape) {
+            LandscapeChargerLayout(viewModel, modifier)
+        } else {
+            PortraitChargerLayout(viewModel, modifier)
         }
     }
 }
 
 @Composable
-fun LockScreenOrientation(orientation: Int) {
-    val context = LocalContext.current
-    DisposableEffect(orientation) {
-        val activity = context.findActivity() ?: return@DisposableEffect onDispose {}
-        val originalOrientation = activity.requestedOrientation
-        activity.requestedOrientation = orientation
-        onDispose {
-            // restore original orientation when view disappears
-            activity.requestedOrientation = originalOrientation
+fun PortraitChargerLayout(viewModel: ChargerViewModel, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .fillMaxHeight(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceEvenly,
+    ) {
+        SimulatorView(viewModel)
+    }
+}
+
+@Composable
+fun LandscapeChargerLayout(viewModel: ChargerViewModel, modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .fillMaxHeight(),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        SimulatorView(viewModel)
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SimulatorView(viewModel: ChargerViewModel) {
+    CarChargeIndicator(
+        modifier = Modifier
+            .size(250.dp)
+            .background(colorDarkGray),
+        initialValue = 50,
+        primaryColor = colorOrange,
+        secondaryColor = colorGray,
+        circleRadius = 230f,
+        onPositionChange = { position ->
+            Log.i("POSITION", "${position / 100f}")
+
+            viewModel.updateInitialChargeAmount(position / 100f)
+        },
+    )
+
+    val options = listOf("Option 1", "Option 2", "Option 3", "Option 4", "Option 5")
+    var expanded by remember { mutableStateOf(false) }
+    var selectedOptionText by remember { mutableStateOf(options[0]) }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = {
+            expanded = !expanded
+        },
+    ) {
+        TextField(
+            readOnly = true,
+            value = selectedOptionText,
+            onValueChange = { },
+            label = { Text("Label") },
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(
+                    expanded = expanded,
+                )
+            },
+            modifier = Modifier.menuAnchor(),
+            colors = ExposedDropdownMenuDefaults.textFieldColors(),
+        )
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = {
+                expanded = false
+            },
+        ) {
+            options.forEach { selectionOption ->
+                DropdownMenuItem(
+                    text = { Text(text = selectionOption, color = colorDarkGray) },
+                    onClick = {
+                        selectedOptionText = selectionOption
+                        expanded = false
+                    },
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.secondary),
+                )
+            }
         }
     }
 }
 
-fun Context.findActivity(): Activity? = when (this) {
-    is Activity -> this
-    is ContextWrapper -> baseContext.findActivity()
-    else -> null
-}
-
-@Preview(device = Devices.AUTOMOTIVE_1024p, widthDp = 720, heightDp = 360)
 @Composable
 fun SimulatorScreenPreview() {
     SimulatorScreen(ChargerViewModel(), {})
