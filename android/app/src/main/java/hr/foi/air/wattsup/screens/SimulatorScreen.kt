@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hr.foi.air.wattsup.ui.component.CarChargeIndicator
 import hr.foi.air.wattsup.ui.component.TopAppBar
@@ -159,6 +160,7 @@ fun SimulatorView(viewModel: ChargerViewModel) {
     }
 }
 
+@Preview
 @Composable
 fun SimulatorScreenPreview() {
     SimulatorScreen(ChargerViewModel(), {})
