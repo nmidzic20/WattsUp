@@ -96,6 +96,8 @@ builder.Services.AddCors(options =>
         });
 });
 
+builder.Services.AddSingleton<SSEService>();
+
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
