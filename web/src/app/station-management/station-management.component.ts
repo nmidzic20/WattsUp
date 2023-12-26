@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { UserManagerService } from '../services/user-manager.service';
 import { Station, StationResponse } from '../interfaces/Station';
 import { environment } from 'src/environments/environment';
+import { SSEService } from '../services/sse.service';
 
 @Component({
   selector: 'app-station-management',
@@ -17,7 +18,7 @@ export class StationManagementComponent implements OnInit {
   stations: Station[] = [];
   isAddStationDialogueVisible: boolean = false;
 
-  constructor(private router: Router, private userManagerService: UserManagerService){}
+  constructor(private router: Router, private userManagerService: UserManagerService, private sseService: SSEService, private cdr: ChangeDetectorRef){}
 
   async ngOnInit(): Promise<void> {
     let tokens = this.userManagerService.getTokens();
@@ -27,6 +28,17 @@ export class StationManagementComponent implements OnInit {
           this.router.navigate(['/map']);
         } else {
           await this.getStations(tokens.jwt);
+          this.sseService
+          .connect(environment.apiUrl + '/Charger/SSE')
+          .subscribe((event: MessageEvent) => {
+            const eventData = JSON.parse(event.data) as { chargers: StationResponse[] };
+            this.stations = [];
+            this.stations = eventData.chargers.map((station: StationResponse) =>
+              this.mapStationResponseToStation(station)
+            );
+            this.updateStatistics();
+            this.cdr.detectChanges();
+          });
         }
       } else {
         this.router.navigate(['/login']);
@@ -34,6 +46,10 @@ export class StationManagementComponent implements OnInit {
     } else {
       this.router.navigate(['/login']);
     }
+  }
+
+  ngOnDestroy(): void {
+    this.sseService.closeConnection();
   }
 
   openAddStationDialogue() {
