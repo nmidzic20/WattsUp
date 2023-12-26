@@ -3,6 +3,7 @@ using backend.Data;
 using backend.Models.Entities;
 using backend.Models.Requests;
 using backend.Models.Responses;
+using backend.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,7 +34,7 @@ namespace ControllerUnitTests.ControllersTests
         {
             // Arrange
             using var context = new DatabaseContext(_options);
-            ChargerController chargerController = new(context, new HttpClient());
+            ChargerController chargerController = new(context, new HttpClient(), new SSEService());
 
             // Act
             var result = (await chargerController.GetChargers()).Result as ObjectResult;
@@ -47,7 +48,7 @@ namespace ControllerUnitTests.ControllersTests
         {
             // Arrange
             using var context = new DatabaseContext(_options);
-            ChargerController chargerController = new(context, new HttpClient());
+            ChargerController chargerController = new(context, new HttpClient(), new SSEService());
             context.Charger.Add(new Charger
             {
                 Id = 1,
@@ -102,7 +103,7 @@ namespace ControllerUnitTests.ControllersTests
         {
             // Arrange
             using var context = new DatabaseContext(_options);
-            ChargerController chargerController = new(context, new HttpClient());
+            ChargerController chargerController = new(context, new HttpClient(), new SSEService());
             context.Charger.Add(new Charger
             {
                 Id = 1,
@@ -127,7 +128,7 @@ namespace ControllerUnitTests.ControllersTests
         {
             // Arrange
             using var context = new DatabaseContext(_options);
-            ChargerController chargerController = new(context, new HttpClient());
+            ChargerController chargerController = new(context, new HttpClient(), new SSEService());
             context.Charger.Add(new Charger
             {
                 Id = 99,
@@ -151,7 +152,7 @@ namespace ControllerUnitTests.ControllersTests
         {
             // Arrange
             using var context = new DatabaseContext(_options);
-            ChargerController chargerController = new(context, new HttpClient());
+            ChargerController chargerController = new(context, new HttpClient(), new SSEService());
             context.Charger.Add(new Charger
             {
                 Id = 1,
@@ -194,7 +195,7 @@ namespace ControllerUnitTests.ControllersTests
         {
             // Arrange
             using var context = new DatabaseContext(_options);
-            ChargerController chargerController = new(context, new HttpClient());
+            ChargerController chargerController = new(context, new HttpClient(), new SSEService());
             context.Charger.Add(new Charger
             {
                 Id = 1,
@@ -237,7 +238,7 @@ namespace ControllerUnitTests.ControllersTests
         {
             // Arrange
             using var context = new DatabaseContext(_options);
-            ChargerController chargerController = new(context, new HttpClient());
+            ChargerController chargerController = new(context, new HttpClient(), new SSEService());
             context.User.Add(new User
             {
                 Id = 1,
@@ -266,7 +267,7 @@ namespace ControllerUnitTests.ControllersTests
         {
             // Arrange
             using var context = new DatabaseContext(_options);
-            ChargerController chargerController = new(context, new HttpClient());
+            ChargerController chargerController = new(context, new HttpClient(), new SSEService());
 
             // Act
             var chargers = await chargerController.UpdateChargerByID(9999, new Charger
@@ -289,7 +290,7 @@ namespace ControllerUnitTests.ControllersTests
         {
             // Arrange
             using var context = new DatabaseContext(_options);
-            ChargerController chargerController = new(context, new HttpClient());
+            ChargerController chargerController = new(context, new HttpClient(), new SSEService());
             context.Charger.Add(new Charger
             {
                 Id = 1,
@@ -320,7 +321,7 @@ namespace ControllerUnitTests.ControllersTests
         {
             // Arrange
             using var context = new DatabaseContext(_options);
-            ChargerController chargerController = new(context, new HttpClient());
+            ChargerController chargerController = new(context, new HttpClient(), new SSEService());
 
             // Act
             var chargers = await chargerController.DeleteChargerByID(9999);
@@ -335,7 +336,7 @@ namespace ControllerUnitTests.ControllersTests
         {
             // Arrange
             using var context = new DatabaseContext(_options);
-            ChargerController chargerController = new(context, new HttpClient());
+            ChargerController chargerController = new(context, new HttpClient(), new SSEService());
             context.Charger.Add(new Charger
             {
                 Id = 1,
