@@ -1,6 +1,7 @@
 ﻿using backend.Data;
 using backend.Models.Entities;
 using backend.Models.Requests;
+using backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -137,7 +138,8 @@ namespace backend.Controllers
 
         private async Task<bool> UpdateChargerState(bool state, long id)
         {
-            var chargerController = new ChargerController(_dbContext, _client);
+            var sseService = new SSEService();
+            var chargerController = new ChargerController(_dbContext, _client, sseService);
             var result = (await chargerController.GetChargerByID(id)).Result as ObjectResult;
 
             if (result.Value is not Charger charger)
