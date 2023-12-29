@@ -19,7 +19,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -28,6 +30,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -43,6 +46,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -105,43 +109,15 @@ fun CardView(topPadding: Dp, context: Context = LocalContext.current) {
 
     Column (
         modifier = Modifier
-            .padding(10.dp)
+            .padding(10.dp, top = 30.dp)
             .fillMaxHeight()
             .fillMaxWidth()
     ) {
-        Row(
+        LazyRow(
             modifier = Modifier
-                .padding(top = topPadding + 15.dp)
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .fillMaxHeight(0.9f),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            ElevatedButton(
-                onClick = { /*TODO*/ },
-            ) {
-                Text(
-                    text = "Add Card",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = Color.White,
-                    modifier = Modifier.width(120.dp),
-                    textAlign = TextAlign.Center
-                )
-            }
-            ElevatedButton(
-                onClick = { /*TODO*/ },
-                colors = ButtonDefaults.elevatedButtonColors(containerColor = Color.Red)
-            ) {
-                Text(
-                    text = "Remove Card",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = Color.White,
-                    modifier = Modifier.width(120.dp),
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
             state = state,
             flingBehavior = rememberSnapFlingBehavior(lazyListState = state)
         ) {
@@ -173,82 +149,88 @@ fun CardView(topPadding: Dp, context: Context = LocalContext.current) {
                     CardCard(item!!)
                 }
             }*/
-            item {
+            items(count = 3) { _ ->
+                CardCard()
+            }
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 30.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly,
+        ) {
+            ElevatedButton(
+                onClick = { /*TODO*/ },
+            ) {
                 Text(
-                    text = "You have no cards",
-                    style = MaterialTheme.typography.headlineMedium,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(500.dp)
-                        .wrapContentHeight(Alignment.CenterVertically)
+                    text = "Add Card",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Color.White,
+                    modifier = Modifier.width(120.dp),
+                    textAlign = TextAlign.Center
                 )
             }
+
         }
     }
 }
 
 @Composable
-fun CardCard(event: Event) {
-    val showDetails = remember { mutableStateOf(false) }
-    val df = DecimalFormat("#.##")
+fun CardCard() {
+    val width = LocalConfiguration.current.screenWidthDp.dp * 0.875f
 
-    if (showDetails.value) {
-        DetailDialog(event, showDetails)
-    }
-
-    Card(
-        onClick = {
-            showDetails.value = !showDetails.value
-        },
+    ElevatedCard(
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            containerColor = Color.White,
             contentColor = MaterialTheme.colorScheme.onSurface,
         ),
         shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.elevatedCardElevation(),
+        elevation = CardDefaults.elevatedCardElevation(10.dp),
         modifier = Modifier
             .padding(15.dp)
-            .height(100.dp)
-            .fillMaxWidth()
+            .height(200.dp)
+            .width(width)
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxHeight()
-                .fillMaxWidth()
-                .padding(10.dp),
-            verticalArrangement = Arrangement.SpaceBetween,
+            verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight(),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically
+                    .height(100.dp)
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.Bottom,
+                horizontalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = SimpleDateFormat("EEEE, dd.MM.yyyy.", Locale.US).format(event.startedAt),
-                    fontSize = 20.sp,
+                    text = "0x123456789",
+                    color = Color.Black,
+                    textAlign = TextAlign.Center,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold
                 )
             }
             Row(
                 modifier = Modifier
+                    .height(100.dp)
                     .fillMaxWidth()
-                    .wrapContentHeight(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                    .padding(10.dp),
+                verticalAlignment = Alignment.Bottom,
+                horizontalArrangement = Arrangement.End
             ) {
-                Text(
-                    text = event.chargerLocation,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = "${df.format(event.volumeKwh)} kWh",
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold
-                )
+                ElevatedButton(
+                    onClick = { /*TODO*/ },
+                    colors = ButtonDefaults.elevatedButtonColors(containerColor = Color.Red),
+                    modifier = Modifier.wrapContentSize()
+                ) {
+                    Text(
+                        text = "Remove",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = Color.White,
+                        textAlign = TextAlign.Center,
+                    )
+                }
             }
         }
     }
