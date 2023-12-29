@@ -3,6 +3,11 @@ import { Router } from '@angular/router';
 import { UserManagerService } from '../services/user-manager.service';
 import { environment } from 'src/environments/environment';
 import { Station, StationResponse } from '../interfaces/Station';
+import Map from 'ol/Map';
+import TileLayer from 'ol/layer/Tile';
+import { OSM } from 'ol/source';
+import { View } from 'ol';
+import { fromLonLat } from 'ol/proj';
 
 @Component({
   selector: 'app-map-page',
@@ -11,6 +16,7 @@ import { Station, StationResponse } from '../interfaces/Station';
 })
 export class MapPageComponent implements OnInit{
   stations: Station[] = [];
+  map!: Map | null;
 
   constructor(private router: Router, private userManagerService: UserManagerService) { }
 
@@ -19,6 +25,7 @@ export class MapPageComponent implements OnInit{
     if (tokens) {
       if (await this.userManagerService.validTokens(tokens)) {
           await this.getStations(tokens.jwt);
+          this.drawMap();
       } else {
         this.router.navigate(['/login']);
       }
@@ -45,6 +52,32 @@ export class MapPageComponent implements OnInit{
     } catch (error) {
       console.error(error);
     }
+  }
+
+  drawMap(){
+    if (this.map == null){
+      this.createMap();
+   
+    }else{
+      this.map.updateSize();
+    }
+  }
+
+  private createMap(){
+    const varazdinCoordinates = [16.33778, 46.30444] //longitude, latitude
+    this.map = new Map({
+      layers: [
+        new TileLayer({
+          source: new OSM(),
+        }),
+      ],
+      target: 'map',
+      controls: [],
+      view: new View({
+        center: fromLonLat(varazdinCoordinates),
+        zoom: 14, maxZoom: 18,
+      }),
+    });
   }
 
   private mapStationResponseToStation(stationResponse: StationResponse): Station {
