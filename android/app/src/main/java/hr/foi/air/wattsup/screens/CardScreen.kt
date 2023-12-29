@@ -6,25 +6,28 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -52,7 +55,6 @@ import androidx.compose.ui.window.Dialog
 import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.network.NetworkService
 import hr.foi.air.wattsup.network.models.Card
-import hr.foi.air.wattsup.network.models.Charger
 import hr.foi.air.wattsup.network.models.Event
 import hr.foi.air.wattsup.network.models.TokenManager
 import hr.foi.air.wattsup.ui.component.TopAppBar
@@ -85,26 +87,18 @@ fun CardScreen(onArrowBackClick: () -> Unit) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CardView(topPadding: Dp, context: Context = LocalContext.current) {
     val coroutineScope = rememberCoroutineScope()
     val cards = remember { mutableStateOf(listOf<Card?>()) }
-    val events = remember { mutableStateOf(listOf<Event?>()) }
     val showLoading = remember { mutableStateOf(true) }
     val userId = TokenManager.getInstance(context).getId()
+    val state = rememberLazyListState()
 
     LaunchedEffect(Unit) {
         coroutineScope.launch {
             cards.value += getCards(context, userId)
-            for (card in cards.value) {
-                val data = getEvents(context, card!!.id)
-                for (event in data) {
-                    event!!.cardValue = card.value
-                    event.chargerLocation = getChargerName(context, event.chargerId) ?: ""
-                }
-                events.value += data
-            }
-            events.value = events.value.sortedByDescending { it!!.startedAt }
             showLoading.value = false
         }
     }
@@ -115,10 +109,41 @@ fun CardView(topPadding: Dp, context: Context = LocalContext.current) {
             .fillMaxHeight()
             .fillMaxWidth()
     ) {
+        Row(
+            modifier = Modifier
+                .padding(top = topPadding + 15.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            ElevatedButton(
+                onClick = { /*TODO*/ },
+            ) {
+                Text(
+                    text = "Add Card",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Color.White,
+                    modifier = Modifier.width(120.dp),
+                    textAlign = TextAlign.Center
+                )
+            }
+            ElevatedButton(
+                onClick = { /*TODO*/ },
+                colors = ButtonDefaults.elevatedButtonColors(containerColor = Color.Red)
+            ) {
+                Text(
+                    text = "Remove Card",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Color.White,
+                    modifier = Modifier.width(120.dp),
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
         LazyColumn(
-            modifier = Modifier.padding(top = topPadding),
-            verticalArrangement = Arrangement.SpaceBetween,
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier.fillMaxSize(),
+            state = state,
+            flingBehavior = rememberSnapFlingBehavior(lazyListState = state)
         ) {
             /*if (showLoading.value) {
                 item {
@@ -308,32 +333,6 @@ private fun DetailDialog(event: Event, showDetails: MutableState<Boolean>) {
     }
 }
 
-private suspend fun getEvents(context: Context, cardId: Int) : List<Event?> {
-    val eventService = NetworkService.eventService
-    val auth = "Bearer " + TokenManager.getInstance(context).getjWTtoken()
-
-    return suspendCoroutine { continuation ->
-        eventService.getEvents(cardId, auth).enqueue(object : retrofit2.Callback<List<Event?>> {
-            override fun onResponse(call: Call<List<Event?>>, response: Response<List<Event?>>) {
-                if (response.isSuccessful) {
-                    continuation.resume(response.body() ?: emptyList())
-                    Log.d("CardScreen", "Events: ${response.body()}")
-                } else {
-                    Log.d("CardScreen", "Error: ${response.errorBody()}")
-                    toast(context, "Error: ${response.errorBody()}")
-                    continuation.resume(emptyList())
-                }
-            }
-
-            override fun onFailure(call: Call<List<Event?>>, t: Throwable) {
-                Log.d("CardScreen", "Failure: ${t.message}")
-                toast(context, "Failure: ${t.message}")
-                continuation.resume(emptyList())
-            }
-        })
-    }
-}
-
 private fun toast(context: Context, message: String) {
     Toast.makeText(context, message, Toast.LENGTH_LONG).show()
 }
@@ -357,30 +356,6 @@ private suspend fun getCards(context: Context, userId: Int): List<Card?> {
             override fun onFailure(call: Call<List<Card?>>, t: Throwable) {
                 Log.d("CardScreen", "Failure: ${t.message}")
                 continuation.resume(emptyList())
-            }
-        })
-    }
-}
-
-private suspend fun getChargerName(context: Context, chargerId: Int): String? {
-    val chargerService = NetworkService.chargerService
-    val auth = "Bearer " + TokenManager.getInstance(context).getjWTtoken()
-
-    return suspendCoroutine { continuation ->
-        chargerService.getCharger(chargerId, auth).enqueue(object : retrofit2.Callback<Charger?> {
-            override fun onResponse(call: Call<Charger?>, response: Response<Charger?>) {
-                if (response.isSuccessful) {
-                    continuation.resume(response.body()!!.name)
-                    Log.d("CardScreen", "Cards: ${response.body()}")
-                } else {
-                    Log.d("CardScreen", "Error: ${response.errorBody()}")
-                    continuation.resume(null)
-                }
-            }
-
-            override fun onFailure(call: Call<Charger?>, t: Throwable) {
-                Log.d("CardScreen", "Failure: ${t.message}")
-                continuation.resume(null)
             }
         })
     }
