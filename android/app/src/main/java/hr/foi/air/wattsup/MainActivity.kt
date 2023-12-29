@@ -23,6 +23,7 @@ import androidx.navigation.compose.rememberNavController
 import hr.foi.air.wattsup.ble.BLEManager
 import hr.foi.air.wattsup.core.CardManager
 import hr.foi.air.wattsup.rfid.RFIDManager
+import hr.foi.air.wattsup.screens.CardScreen
 import hr.foi.air.wattsup.screens.ChargerScreen
 import hr.foi.air.wattsup.screens.HistoryScreen
 import hr.foi.air.wattsup.screens.LandingScreen
@@ -112,8 +113,9 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("userMode") {
                             val onHistoryClick = { navController.navigate("chargingHistory") }
+                            val onCardsClick = { navController.navigate("myCards") }
                             BackHandler(true) { }
-                            UserModeScreen(onHistoryClick, onArrowBackClick)
+                            UserModeScreen(onHistoryClick, onCardsClick, onArrowBackClick)
                         }
                         composable("chargingHistory") {
                             HistoryScreen(onArrowBackClick)
@@ -122,6 +124,9 @@ class MainActivity : ComponentActivity() {
                             SimulatorScreen(chargerViewModel) {
                                 navController.navigate("chargerMode")
                             }
+                        }
+                        composable("myCards") {
+                            CardScreen(onArrowBackClick)
                         }
                     }
                 }
