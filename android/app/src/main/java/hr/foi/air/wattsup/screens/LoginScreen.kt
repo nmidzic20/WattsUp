@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -36,9 +38,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hr.foi.air.wattsup.R
+import hr.foi.air.wattsup.ui.component.LoadingSpinner
 import hr.foi.air.wattsup.ui.component.TopAppBar
 import hr.foi.air.wattsup.viewmodels.AuthenticationViewModel
 
@@ -82,6 +86,7 @@ fun LoginView(
     val email by viewModel.email.observeAsState()
     val password by viewModel.password.observeAsState()
     val showLoading by viewModel.showLoading.observeAsState()
+    val passwordVisible by viewModel.passwordVisible.observeAsState(false)
 
     Column(
         modifier = modifier
@@ -106,7 +111,20 @@ fun LoginView(
             onValueChange = { viewModel.updatePassword(it) },
             label = { Text(stringResource(R.string.passwordLabel)) },
             singleLine = true,
-            visualTransformation = PasswordVisualTransformation(),
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            trailingIcon = {
+                val image = if (passwordVisible == true) {
+                    Icons.Filled.Visibility
+                } else {
+                    Icons.Filled.VisibilityOff
+                }
+
+                val description = if (passwordVisible == true) "Hide password" else "Show password"
+
+                IconButton(onClick = { viewModel.togglePasswordVisibility() }) {
+                    Icon(imageVector = image, description)
+                }
+            },
         )
 
         ElevatedButton(
@@ -119,13 +137,7 @@ fun LoginView(
             enabled = !showLoading!!,
         ) {
             if (showLoading == true) {
-                CircularProgressIndicator(
-                    color = MaterialTheme.colorScheme.secondary,
-                    modifier = Modifier
-                        .height(25.dp)
-                        .width(25.dp)
-                        .wrapContentSize(Alignment.Center),
-                )
+                LoadingSpinner()
             } else {
                 Text(
                     text = "Login",

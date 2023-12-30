@@ -94,4 +94,6 @@ dependencies {
     androidTestImplementation("org.mockito:mockito-android:5.7.0")
 
     testImplementation("androidx.arch.core:core-testing:2.2.0")
+
+    implementation("androidx.compose.material:material-icons-extended:1.5.4")
 }

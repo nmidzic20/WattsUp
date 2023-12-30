@@ -107,7 +107,11 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("registration") {
                             val onLogInClick = { navController.navigate("login") }
-                            RegistrationScreen(onArrowBackClick, onLogInClick)
+                            RegistrationScreen(
+                                onArrowBackClick,
+                                onLogInClick,
+                                authenticationViewModel,
+                            )
                         }
                         composable("login") {
                             val onRegisterClick = { navController.navigate("registration") }
