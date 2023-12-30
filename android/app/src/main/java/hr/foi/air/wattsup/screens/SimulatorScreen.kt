@@ -25,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -34,11 +35,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.ui.component.CarChargeIndicator
+import hr.foi.air.wattsup.ui.component.GradientImage
 import hr.foi.air.wattsup.ui.component.TopAppBar
 import hr.foi.air.wattsup.ui.theme.colorDarkGray
 import hr.foi.air.wattsup.ui.theme.colorGray
 import hr.foi.air.wattsup.ui.theme.colorOrange
+import hr.foi.air.wattsup.ui.theme.colorSilver
 import hr.foi.air.wattsup.viewmodels.ChargerViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -74,6 +78,8 @@ fun SimulatorScreen(viewModel: ChargerViewModel, onArrowBackClick: () -> Unit) {
 
 @Composable
 fun PortraitChargerLayout(viewModel: ChargerViewModel, modifier: Modifier = Modifier) {
+    val currentChargeAmount by viewModel.currentChargeAmount.observeAsState()
+    val height = 150
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -81,6 +87,15 @@ fun PortraitChargerLayout(viewModel: ChargerViewModel, modifier: Modifier = Modi
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceEvenly,
     ) {
+        GradientImage(
+            R.drawable.icon_electric_car,
+            colorSilver,
+            MaterialTheme.colorScheme.secondary,
+            currentChargeAmount!!,
+            height,
+            Modifier.size(height.dp),
+        )
+
         SimulatorView(viewModel)
     }
 }
