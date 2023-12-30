@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hr.foi.air.wattsup.network.NetworkService
+import hr.foi.air.wattsup.network.models.Charger
 import hr.foi.air.wattsup.network.models.EventPOSTBody
 import hr.foi.air.wattsup.network.models.EventPOSTResponseBody
 import hr.foi.air.wattsup.network.models.EventPUTBody
@@ -189,6 +190,35 @@ class ChargerViewModel : ViewModel() {
                 override fun onFailure(call: Call<EventPUTResponseBody>, t: Throwable) {
                     Log.i("Response", t.toString())
                     _toastMessage.value = "Error saving event"
+                }
+            },
+        )
+    }
+
+    private val _chargerList = MutableLiveData<List<Charger?>>(emptyList())
+    val chargerList: LiveData<List<Charger?>> = _chargerList
+    fun getChargers() {
+        val chargerService = NetworkService.chargerService
+
+        chargerService.getChargers().enqueue(
+            object : retrofit2.Callback<List<Charger?>> {
+                override fun onResponse(
+                    call: Call<List<Charger?>?>,
+                    response: Response<List<Charger?>?>,
+                ) {
+                    Log.i("CHARGER_RES", "${response.body()} $response")
+
+                    _chargerList.value = response.body() as List<Charger?>
+                    // Temporary measure since backend does not return id with charger info
+                    _chargerList.value = _chargerList.value?.mapIndexed { index, charger ->
+                        charger!!.copy(id = index + 1)
+                    }
+                    Log.i("CHARGER_RES", _chargerList.value.toString())
+                }
+
+                override fun onFailure(call: Call<List<Charger?>>, t: Throwable) {
+                    Log.i("Error ", t.toString())
+                    _toastMessage.value = t.toString()
                 }
             },
         )
