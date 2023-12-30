@@ -22,11 +22,11 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
@@ -37,8 +37,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -53,6 +55,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.network.NetworkService
 import hr.foi.air.wattsup.network.models.Card
@@ -170,6 +173,9 @@ fun CardView(context: Context = LocalContext.current) {
 @Composable
 fun CardCard(item: Card) {
     val width = LocalConfiguration.current.screenWidthDp.dp * 0.92f
+    val showRemoveDialog = remember { mutableStateOf(false) }
+
+    RemoveDialog(showRemoveDialog)
 
     ElevatedCard(
         colors = CardDefaults.cardColors(
@@ -215,7 +221,7 @@ fun CardCard(item: Card) {
                         .padding(top = 12.dp)
                 )
                 ElevatedButton(
-                    onClick = { /*TODO*/ },
+                    onClick = { showRemoveDialog.value = true },
                     colors = ButtonDefaults.elevatedButtonColors(containerColor = Color.Red),
                     modifier = Modifier
                         .wrapContentSize()
@@ -227,6 +233,61 @@ fun CardCard(item: Card) {
                         color = Color.White,
                         textAlign = TextAlign.Center,
                     )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun RemoveDialog(openAlertDialog: MutableState<Boolean>) {
+    when {
+        openAlertDialog.value -> {
+            Dialog(onDismissRequest = { openAlertDialog.value = false }) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp)
+                        .padding(16.dp),
+                    shape = RoundedCornerShape(16.dp),
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Text(
+                            fontSize = 20.sp,
+                            text = "Remove this card?",
+                            modifier = Modifier.padding(16.dp),
+                        )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                        ) {
+                            TextButton(
+                                onClick = { openAlertDialog.value = false },
+                                modifier = Modifier.padding(8.dp),
+                            ) {
+                                Text(
+                                    text = "Cancel",
+                                    fontSize = 16.sp,
+                                    color = Color.LightGray
+                                )
+                            }
+                            TextButton(
+                                onClick = { openAlertDialog.value = false; },
+                                modifier = Modifier.padding(8.dp),
+                            ) {
+                                Text(
+                                    text = "Yes",
+                                    fontSize = 16.sp
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }

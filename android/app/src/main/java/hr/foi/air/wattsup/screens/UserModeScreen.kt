@@ -137,7 +137,8 @@ private fun LogoutDialog(openAlertDialog: MutableState<Boolean>, onArrowBackClic
                             ) {
                                 Text(
                                     text = "Cancel",
-                                    fontSize = 16.sp
+                                    fontSize = 16.sp,
+                                    color = Color.LightGray
                                 )
                             }
                             TextButton(
