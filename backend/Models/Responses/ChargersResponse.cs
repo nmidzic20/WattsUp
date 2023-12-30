@@ -4,12 +4,12 @@ namespace backend.Models.Responses
 {
     public class ChargersResponse
     {
-        public string Name { get; set; }
-        public double Latitude { get; set; }
-        public double Longitude { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public string CreatedBy { get; set; }
-        public DateTime LastSyncAt { get; set; }
-        public bool Active { get; set; }
+        public string name { get; set; }
+        public double latitude { get; set; }
+        public double longitude { get; set; }
+        public DateTime createdAt { get; set; }
+        public string createdBy { get; set; }
+        public DateTime lastSyncAt { get; set; }
+        public bool active { get; set; }
     }
 }

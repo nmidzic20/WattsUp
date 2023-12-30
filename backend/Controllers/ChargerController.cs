@@ -2,9 +2,11 @@
 using backend.Models.Entities;
 using backend.Models.Requests;
 using backend.Models.Responses;
+using backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace backend.Controllers
 {
@@ -13,30 +15,39 @@ namespace backend.Controllers
     public class ChargerController : ControllerBase
     {
         private readonly DatabaseContext _dbContext;
+        private readonly SSEService _sse;
 
-        public ChargerController(DatabaseContext dbContext, HttpClient httpClient)
+        public ChargerController(DatabaseContext dbContext, HttpClient httpClient, SSEService sse)
         {
             _dbContext = dbContext;
+            _sse = sse;
         }
 
         [Authorize]
         [HttpGet]
         public async Task<ActionResult<List<ChargersResponse>>> GetChargers()
         {
-            var chargers = await _dbContext.Charger.Include(c => c.CreatedBy).ToListAsync();
+            ChargerService chargerService = new ChargerService(_dbContext);
+            var chargers = await chargerService.GetChargers();
 
-            var response = chargers.Select(charger => new ChargersResponse
+            return Ok(chargers);
+        }
+
+        [HttpGet("SSE")]
+        public async Task GetChargersSSE(CancellationToken cancellationToken)
+        {
+            Response.Headers.Add("Content-Type", "text/event-stream");
+
+            while (!cancellationToken.IsCancellationRequested)
             {
-                Name = charger.Name,
-                Latitude = charger.Latitude,
-                Longitude = charger.Longitude,
-                CreatedAt = charger.CreatedAt,
-                CreatedBy = charger.CreatedBy.Email,
-                LastSyncAt = charger.LastSyncAt,
-                Active = charger.Active
-            }).ToList();
+                var chargers = await _sse.WaitForChargerChange();
+                var eventData = JsonSerializer.Serialize(new { chargers });
 
-            return Ok(response);
+                await Response.WriteAsync($"data: {eventData}\n\n");
+                await Response.Body.FlushAsync();
+
+                _sse.Reset();
+            }
         }
 
         [Authorize]
@@ -94,6 +105,10 @@ namespace backend.Controllers
             _dbContext.Charger.Add(charger);
             await _dbContext.SaveChangesAsync();
 
+            ChargerService chargerService = new ChargerService(_dbContext);
+            var chargers = await chargerService.GetChargers();
+            _sse.NotifyChargerChange(chargers);
+
             return Ok(charger);
         }
 
@@ -117,7 +132,11 @@ namespace backend.Controllers
             charger.Active = _charger.Active;
 
             await _dbContext.SaveChangesAsync();
-            
+
+            ChargerService chargerService = new ChargerService(_dbContext);
+            var chargers = await chargerService.GetChargers();
+            _sse.NotifyChargerChange(chargers);
+
             return Ok(charger);
         }
 
@@ -136,6 +155,10 @@ namespace backend.Controllers
 
             _dbContext.Charger.Remove(charger);
             await _dbContext.SaveChangesAsync();
+
+            ChargerService chargerService = new ChargerService(_dbContext);
+            var chargers = await chargerService.GetChargers();
+            _sse.NotifyChargerChange(chargers);
 
             return Ok(charger);
         }
