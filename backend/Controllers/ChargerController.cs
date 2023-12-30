@@ -23,7 +23,6 @@ namespace backend.Controllers
             _sse = sse;
         }
 
-        [Authorize]
         [HttpGet]
         public async Task<ActionResult<List<ChargersResponse>>> GetChargers()
         {
