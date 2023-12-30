@@ -6,8 +6,14 @@ import { Station, StationResponse } from '../interfaces/Station';
 import Map from 'ol/Map';
 import TileLayer from 'ol/layer/Tile';
 import { OSM } from 'ol/source';
-import { View } from 'ol';
+import { Feature, View } from 'ol';
 import { fromLonLat } from 'ol/proj';
+import VectorSource from 'ol/source/Vector';
+import VectorLayer from 'ol/layer/Vector';
+import { Point } from 'ol/geom';
+import Style from 'ol/style/Style';
+import Icon from 'ol/style/Icon';
+import { Coordinate } from 'ol/coordinate';
 
 @Component({
   selector: 'app-map-page',
@@ -17,6 +23,10 @@ import { fromLonLat } from 'ol/proj';
 export class MapPageComponent implements OnInit{
   stations: Station[] = [];
   map!: Map | null;
+  private vectorSource: VectorSource = new VectorSource();
+  private vectorLayer: VectorLayer<VectorSource> = new VectorLayer({
+    source: this.vectorSource,
+  });
 
   constructor(private router: Router, private userManagerService: UserManagerService) { }
 
@@ -57,10 +67,40 @@ export class MapPageComponent implements OnInit{
   drawMap(){
     if (this.map == null){
       this.createMap();
-   
+      this.map!!.addLayer(this.vectorLayer);
+      this.stations.forEach((station) => {
+        let coordinates = fromLonLat([station.longitude, station.latitude]);
+        let marker = this.createMarkerFeature(coordinates, station.status);
+        this.vectorSource.addFeature(marker);
+      });
     }else{
       this.map.updateSize();
     }
+  }
+
+  private createMarkerFeature(coordinates: Coordinate, status: string): Feature{
+    let marker = new Feature({
+      geometry: new Point(coordinates),
+    });
+
+    let stationMarkerIconPath;
+    if (status == "In use"){
+      stationMarkerIconPath = '../../assets/station-in-use.png';
+    }else if (status == "Offline"){
+      stationMarkerIconPath = '../../assets/station-offline.png';
+    }else{
+      stationMarkerIconPath = '../../assets/station-available.png';
+    }
+
+    let markerStyle = new Style({
+      image: new Icon({
+        src: stationMarkerIconPath,
+        scale: 0.6,
+      }),
+    });
+    marker.setStyle(markerStyle);
+
+    return marker;
   }
 
   private createMap(){
