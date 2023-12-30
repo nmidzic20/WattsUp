@@ -84,7 +84,6 @@ export class AddStationDialogueComponent {
         let response = await fetch(environment.apiUrl + "/Charger", parameters);
         let body = await response.text();
         if (response.status == 200) {
-          this.refreshChargerView.emit(this.userManagerService.getTokens()?.jwt);
           this.close();
         } else {
           let errorMessage = JSON.parse(body).message;
