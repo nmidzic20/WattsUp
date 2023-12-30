@@ -132,9 +132,9 @@ namespace backend.Data.Migrations
                         {
                             Id = 1,
                             Active = false,
-                            CreatedAt = new DateTime(2024, 1, 16, 13, 17, 0, 849, DateTimeKind.Utc).AddTicks(2770),
+                            CreatedAt = new DateTime(2023, 12, 30, 15, 35, 14, 612, DateTimeKind.Utc).AddTicks(5341),
                             CreatedById = 1,
-                            LastSyncAt = new DateTime(2024, 1, 16, 14, 17, 0, 849, DateTimeKind.Utc).AddTicks(2773),
+                            LastSyncAt = new DateTime(2023, 12, 30, 16, 35, 14, 612, DateTimeKind.Utc).AddTicks(5343),
                             Latitude = 46.309735000000003,
                             Longitude = 16.348593000000001,
                             Name = "Charger Dorm"
@@ -143,9 +143,9 @@ namespace backend.Data.Migrations
                         {
                             Id = 2,
                             Active = false,
-                            CreatedAt = new DateTime(2024, 1, 16, 13, 17, 0, 849, DateTimeKind.Utc).AddTicks(2781),
+                            CreatedAt = new DateTime(2023, 12, 30, 15, 35, 14, 612, DateTimeKind.Utc).AddTicks(5350),
                             CreatedById = 1,
-                            LastSyncAt = new DateTime(2024, 1, 16, 15, 17, 0, 849, DateTimeKind.Utc).AddTicks(2782),
+                            LastSyncAt = new DateTime(2023, 12, 30, 17, 35, 14, 612, DateTimeKind.Utc).AddTicks(5351),
                             Latitude = 46.287309,
                             Longitude = 16.321732999999998,
                             Name = "Charger Mobilisis"
@@ -154,9 +154,9 @@ namespace backend.Data.Migrations
                         {
                             Id = 3,
                             Active = false,
-                            CreatedAt = new DateTime(2024, 1, 16, 13, 17, 0, 849, DateTimeKind.Utc).AddTicks(2784),
+                            CreatedAt = new DateTime(2023, 12, 30, 15, 35, 14, 612, DateTimeKind.Utc).AddTicks(5353),
                             CreatedById = 1,
-                            LastSyncAt = new DateTime(2024, 1, 16, 16, 17, 0, 849, DateTimeKind.Utc).AddTicks(2785),
+                            LastSyncAt = new DateTime(2023, 12, 30, 18, 35, 14, 612, DateTimeKind.Utc).AddTicks(5353),
                             Latitude = 46.307789999999997,
                             Longitude = 16.338061,
                             Name = "Charger FOI"
@@ -200,8 +200,8 @@ namespace backend.Data.Migrations
                             Id = 1,
                             CardId = 1,
                             ChargerId = 1,
-                            EndedAt = new DateTime(2024, 1, 16, 13, 47, 0, 849, DateTimeKind.Utc).AddTicks(2812),
-                            StartedAt = new DateTime(2024, 1, 16, 11, 17, 0, 849, DateTimeKind.Utc).AddTicks(2811),
+                            EndedAt = new DateTime(2023, 12, 30, 16, 5, 14, 612, DateTimeKind.Utc).AddTicks(5378),
+                            StartedAt = new DateTime(2023, 12, 30, 13, 35, 14, 612, DateTimeKind.Utc).AddTicks(5378),
                             VolumeKwh = 9.8000000000000007
                         },
                         new
@@ -209,8 +209,8 @@ namespace backend.Data.Migrations
                             Id = 2,
                             CardId = 2,
                             ChargerId = 1,
-                            EndedAt = new DateTime(2024, 1, 16, 13, 57, 0, 849, DateTimeKind.Utc).AddTicks(2851),
-                            StartedAt = new DateTime(2024, 1, 16, 12, 17, 0, 849, DateTimeKind.Utc).AddTicks(2850),
+                            EndedAt = new DateTime(2023, 12, 30, 16, 15, 14, 612, DateTimeKind.Utc).AddTicks(5380),
+                            StartedAt = new DateTime(2023, 12, 30, 14, 35, 14, 612, DateTimeKind.Utc).AddTicks(5380),
                             VolumeKwh = 7.2000000000000002
                         },
                         new
@@ -218,8 +218,8 @@ namespace backend.Data.Migrations
                             Id = 3,
                             CardId = 2,
                             ChargerId = 2,
-                            EndedAt = new DateTime(2024, 1, 16, 13, 52, 0, 849, DateTimeKind.Utc).AddTicks(2859),
-                            StartedAt = new DateTime(2024, 1, 16, 11, 17, 0, 849, DateTimeKind.Utc).AddTicks(2853),
+                            EndedAt = new DateTime(2023, 12, 30, 16, 10, 14, 612, DateTimeKind.Utc).AddTicks(5387),
+                            StartedAt = new DateTime(2023, 12, 30, 13, 35, 14, 612, DateTimeKind.Utc).AddTicks(5381),
                             VolumeKwh = 5.0999999999999996
                         },
                         new
@@ -227,8 +227,8 @@ namespace backend.Data.Migrations
                             Id = 4,
                             CardId = 4,
                             ChargerId = 2,
-                            EndedAt = new DateTime(2024, 1, 16, 14, 2, 0, 849, DateTimeKind.Utc).AddTicks(2862),
-                            StartedAt = new DateTime(2024, 1, 16, 12, 17, 0, 849, DateTimeKind.Utc).AddTicks(2861),
+                            EndedAt = new DateTime(2023, 12, 30, 16, 20, 14, 612, DateTimeKind.Utc).AddTicks(5389),
+                            StartedAt = new DateTime(2023, 12, 30, 14, 35, 14, 612, DateTimeKind.Utc).AddTicks(5389),
                             VolumeKwh = 14.6
                         },
                         new
@@ -236,8 +236,8 @@ namespace backend.Data.Migrations
                             Id = 5,
                             CardId = 4,
                             ChargerId = 3,
-                            EndedAt = new DateTime(2024, 1, 16, 14, 12, 0, 849, DateTimeKind.Utc).AddTicks(2865),
-                            StartedAt = new DateTime(2024, 1, 16, 10, 17, 0, 849, DateTimeKind.Utc).AddTicks(2864),
+                            EndedAt = new DateTime(2023, 12, 30, 16, 30, 14, 612, DateTimeKind.Utc).AddTicks(5391),
+                            StartedAt = new DateTime(2023, 12, 30, 12, 35, 14, 612, DateTimeKind.Utc).AddTicks(5390),
                             VolumeKwh = 11.300000000000001
                         },
                         new
@@ -245,8 +245,8 @@ namespace backend.Data.Migrations
                             Id = 6,
                             CardId = 1,
                             ChargerId = 1,
-                            EndedAt = new DateTime(2024, 1, 16, 13, 42, 0, 849, DateTimeKind.Utc).AddTicks(2868),
-                            StartedAt = new DateTime(2024, 1, 16, 10, 17, 0, 849, DateTimeKind.Utc).AddTicks(2867),
+                            EndedAt = new DateTime(2023, 12, 30, 16, 0, 14, 612, DateTimeKind.Utc).AddTicks(5393),
+                            StartedAt = new DateTime(2023, 12, 30, 12, 35, 14, 612, DateTimeKind.Utc).AddTicks(5392),
                             VolumeKwh = 7.5
                         },
                         new
@@ -254,8 +254,8 @@ namespace backend.Data.Migrations
                             Id = 7,
                             CardId = 1,
                             ChargerId = 2,
-                            EndedAt = new DateTime(2024, 1, 16, 13, 57, 0, 849, DateTimeKind.Utc).AddTicks(2871),
-                            StartedAt = new DateTime(2024, 1, 16, 9, 17, 0, 849, DateTimeKind.Utc).AddTicks(2870),
+                            EndedAt = new DateTime(2023, 12, 30, 16, 15, 14, 612, DateTimeKind.Utc).AddTicks(5394),
+                            StartedAt = new DateTime(2023, 12, 30, 11, 35, 14, 612, DateTimeKind.Utc).AddTicks(5394),
                             VolumeKwh = 8.9000000000000004
                         },
                         new
@@ -263,8 +263,8 @@ namespace backend.Data.Migrations
                             Id = 8,
                             CardId = 3,
                             ChargerId = 3,
-                            EndedAt = new DateTime(2024, 1, 16, 14, 7, 0, 849, DateTimeKind.Utc).AddTicks(2874),
-                            StartedAt = new DateTime(2024, 1, 16, 11, 17, 0, 849, DateTimeKind.Utc).AddTicks(2873),
+                            EndedAt = new DateTime(2023, 12, 30, 16, 25, 14, 612, DateTimeKind.Utc).AddTicks(5396),
+                            StartedAt = new DateTime(2023, 12, 30, 13, 35, 14, 612, DateTimeKind.Utc).AddTicks(5396),
                             VolumeKwh = 10.199999999999999
                         });
                 });
@@ -292,7 +292,7 @@ namespace backend.Data.Migrations
                         new
                         {
                             Id = 1,
-                            ExpiresAt = new DateTime(2024, 1, 17, 13, 17, 0, 465, DateTimeKind.Utc).AddTicks(4996),
+                            ExpiresAt = new DateTime(2023, 12, 31, 15, 35, 14, 433, DateTimeKind.Utc).AddTicks(8807),
                             Token = "0x1A2B3C4F5D6EAES3DF4FFDE4"
                         });
                 });
@@ -378,33 +378,33 @@ namespace backend.Data.Migrations
                         {
                             Id = 1,
                             Active = true,
-                            CreatedAt = new DateTime(2024, 1, 16, 13, 17, 0, 465, DateTimeKind.Utc).AddTicks(5064),
+                            CreatedAt = new DateTime(2023, 12, 30, 15, 35, 14, 433, DateTimeKind.Utc).AddTicks(8834),
                             Email = "admin@gmail.com",
                             FirstName = "Admin",
                             LastName = "Admin",
-                            Password = "AQAAAAIAAYagAAAAEHlPdltkW8LHEGsTfnQ3uRbZFZ7J2Qtx5n05HPU67U7cOwPW/FTOBFx8Qab1jycxWw==",
+                            Password = "AQAAAAIAAYagAAAAEB1E9GDeA2rZLf93QohsygWNvSOlpl5c71v6UV2bUaxG5ha2T488vOf4WLCFHJCKvA==",
                             RoleId = 1
                         },
                         new
                         {
                             Id = 2,
                             Active = true,
-                            CreatedAt = new DateTime(2024, 1, 16, 14, 17, 0, 626, DateTimeKind.Utc).AddTicks(4746),
+                            CreatedAt = new DateTime(2023, 12, 30, 16, 35, 14, 493, DateTimeKind.Utc).AddTicks(1008),
                             Email = "user@gmail.com",
                             FirstName = "User",
                             LastName = "User",
-                            Password = "AQAAAAIAAYagAAAAECmojiKIGq5sbaqNFRNg7A2YZsZO6nKnUoMkMGeVHz+TqVeKIWUYRA9BFLBrRPkA9Q==",
+                            Password = "AQAAAAIAAYagAAAAEHi+bzQ7he04Je0jXFcNrWNTZslldqcqJUIKkUV93jMmqGexiioCzCxmgxLYGhAt2w==",
                             RoleId = 2
                         },
                         new
                         {
                             Id = 3,
                             Active = true,
-                            CreatedAt = new DateTime(2024, 1, 16, 15, 17, 0, 737, DateTimeKind.Utc).AddTicks(8973),
+                            CreatedAt = new DateTime(2023, 12, 30, 17, 35, 14, 552, DateTimeKind.Utc).AddTicks(7033),
                             Email = "john.doe@gmail.com",
                             FirstName = "John",
                             LastName = "Doe",
-                            Password = "AQAAAAIAAYagAAAAENrmidWnL8zmtpmR9UeZ0L9XkH7krHOWUS5QPXIoZ977GqWHnLFI06deH/Me10GS5w==",
+                            Password = "AQAAAAIAAYagAAAAEOZT2Us6Z0kE9s5cpFNKoq1bhmiJUG2A0/vUti8ZYdvRFvnRnIyNYO5I5rpEMqHCtg==",
                             RefreshTokenId = 1,
                             RoleId = 2
                         });
