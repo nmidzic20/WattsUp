@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
@@ -30,7 +32,6 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -68,6 +69,7 @@ fun RegistrationScreen(
         },
     ) {
         val modifier = Modifier.padding(it)
+
         RegistrationView(onLogInClick, viewModel, modifier)
     }
 }
@@ -82,7 +84,8 @@ fun RegistrationView(
         modifier = modifier
             .fillMaxWidth()
             .fillMaxHeight()
-            .padding(top = 50.dp),
+            .padding(top = 50.dp)
+            .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -93,7 +96,6 @@ fun RegistrationView(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CentralView(modifier: Modifier, onLogInClick: () -> Unit, viewModel: AuthenticationViewModel) {
-
     val firstName by viewModel.firstName.observeAsState()
     val lastName by viewModel.lastName.observeAsState()
     val email by viewModel.email.observeAsState()
@@ -208,7 +210,11 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit, viewModel: Authent
 
     ElevatedButton(
         onClick = {
-            viewModel.updateInvalidEmail(!Regex("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}\$").matches(email!!))
+            viewModel.updateInvalidEmail(
+                !Regex("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}\$").matches(
+                    email!!,
+                ),
+            )
             viewModel.updateInvalidPassword(!Regex("^.{6,}\$").matches(password!!))
             if (invalidPassword == true || invalidEmail == true) {
                 viewModel.showToast(context, "Invalid e-mail or password")
@@ -228,14 +234,14 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit, viewModel: Authent
         contentPadding = PaddingValues(122.dp, 0.dp),
         interactionSource = interactionSource!!,
         enabled = !showLoading!!,
-        ) {
+    ) {
         if (showLoading == true) {
             LoadingSpinner()
         } else {
             Text(
                 text = "Register",
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color.White
+                color = Color.White,
             )
         }
     }

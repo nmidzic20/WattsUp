@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -62,7 +64,11 @@ fun UserModeScreen(onHistoryClick: () -> Unit, onArrowBackClick: () -> Unit) {
 }
 
 @Composable
-fun UserModeView(onHistoryClick: () -> Unit, onArrowBackClick: () -> Unit, showLogoutDialog: MutableState<Boolean>) {
+fun UserModeView(
+    onHistoryClick: () -> Unit,
+    onArrowBackClick: () -> Unit,
+    showLogoutDialog: MutableState<Boolean>,
+) {
     LogoutDialog(showLogoutDialog, onArrowBackClick)
 
     Column(
@@ -75,7 +81,8 @@ fun UserModeView(onHistoryClick: () -> Unit, onArrowBackClick: () -> Unit, showL
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         ElevatedButton(
-            onClick = onHistoryClick
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+            onClick = onHistoryClick,
         ) {
             Text(
                 text = stringResource(R.string.history),
@@ -120,7 +127,7 @@ private fun LogoutDialog(openAlertDialog: MutableState<Boolean>, onArrowBackClic
                             ) {
                                 Text(
                                     text = "Cancel",
-                                    fontSize = 16.sp
+                                    fontSize = 16.sp,
                                 )
                             }
                             TextButton(
@@ -129,7 +136,7 @@ private fun LogoutDialog(openAlertDialog: MutableState<Boolean>, onArrowBackClic
                             ) {
                                 Text(
                                     text = "Yes",
-                                    fontSize = 16.sp
+                                    fontSize = 16.sp,
                                 )
                             }
                         }
@@ -140,8 +147,8 @@ private fun LogoutDialog(openAlertDialog: MutableState<Boolean>, onArrowBackClic
     }
 }
 
-/*@Preview(showBackground = false)
+@Preview(showBackground = false)
 @Composable
 fun UserModePreview() {
-    UserModeScreen {}
-}*/
+    UserModeScreen({}, {})
+}

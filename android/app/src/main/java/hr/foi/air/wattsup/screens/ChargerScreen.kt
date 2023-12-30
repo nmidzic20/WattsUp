@@ -2,7 +2,6 @@ package hr.foi.air.wattsup.screens
 
 import android.content.res.Configuration
 import android.widget.Toast
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -48,8 +47,6 @@ import hr.foi.air.wattsup.ui.component.ProgressBarCircle
 import hr.foi.air.wattsup.ui.component.ProgressBarFill
 import hr.foi.air.wattsup.ui.component.TopAppBar
 import hr.foi.air.wattsup.ui.theme.colorBtnRed
-import hr.foi.air.wattsup.ui.theme.colorDarkGray
-import hr.foi.air.wattsup.ui.theme.colorGray
 import hr.foi.air.wattsup.ui.theme.colorSilver
 import hr.foi.air.wattsup.viewmodels.ChargerViewModel
 
@@ -286,7 +283,7 @@ fun SimulatorButton(onClick: () -> Unit) {
             .height(70.dp)
             .padding(10.dp)
             .clip(RoundedCornerShape(28.dp))
-            .shadow(4.dp, shape = RoundedCornerShape(28.dp))
+            .shadow(4.dp, shape = RoundedCornerShape(28.dp)),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -296,10 +293,10 @@ fun SimulatorButton(onClick: () -> Unit) {
                 imageVector = Icons.Default.Settings,
                 contentDescription = null,
                 modifier = Modifier.size(24.dp),
-                tint = colorGray
+                tint = Color.White,
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text(text = "Simulator", color = colorGray)
+            Text(text = "Simulator", color = Color.White)
         }
     }
 }
