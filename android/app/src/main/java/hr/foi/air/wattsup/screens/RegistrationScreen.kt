@@ -172,7 +172,7 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
                 .padding(0.dp, 15.dp)
                 .width(200.dp),
             value = card?.value ?: "",
-            onValueChange = { card = Card(id = 0, value = it) },
+            onValueChange = { card = Card(id = 0, value = it, active = true) },
             label = { Text(stringResource(R.string.card_label)) },
             singleLine = true,
         )

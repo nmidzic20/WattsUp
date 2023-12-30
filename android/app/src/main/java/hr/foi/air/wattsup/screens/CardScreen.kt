@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -56,6 +57,7 @@ import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.network.NetworkService
 import hr.foi.air.wattsup.network.models.Card
 import hr.foi.air.wattsup.network.models.TokenManager
+import hr.foi.air.wattsup.ui.component.CircleButton
 import hr.foi.air.wattsup.ui.component.TopAppBar
 import kotlinx.coroutines.launch
 import retrofit2.Call
@@ -141,9 +143,6 @@ fun CardView(context: Context = LocalContext.current) {
                     CardCard(item!!)
                 }
             }
-            /*items(count = 3) { _ ->
-                CardCard()
-            }*/
         }
         Row(
             modifier = Modifier
@@ -188,34 +187,39 @@ fun CardCard(item: Card) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Row(
+            Column(
                 modifier = Modifier
-                    .height(120.dp)
-                    .fillMaxWidth()
+                    .fillMaxSize()
                     .padding(10.dp),
-                verticalAlignment = Alignment.Bottom,
-                horizontalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.SpaceBetween,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                CircleButton(
+                    onClick = { },
+                    modifier = Modifier
+                        .height(7.dp)
+                        .width(7.dp)
+                        .align(Alignment.Start),
+                    iconId = null,
+                    color = if (item.active) Color.Green else Color.Red,
+                    mode = "fill",
+                )
                 Text(
                     text = item.value,
                     color = Color.Black,
                     textAlign = TextAlign.Center,
                     fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(top = 12.dp)
                 )
-            }
-            Row(
-                modifier = Modifier
-                    .height(100.dp)
-                    .fillMaxWidth()
-                    .padding(10.dp),
-                verticalAlignment = Alignment.Bottom,
-                horizontalArrangement = Arrangement.End
-            ) {
                 ElevatedButton(
                     onClick = { /*TODO*/ },
                     colors = ButtonDefaults.elevatedButtonColors(containerColor = Color.Red),
-                    modifier = Modifier.wrapContentSize()
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .align(Alignment.End)
                 ) {
                     Text(
                         text = "Remove",
