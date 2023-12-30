@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -47,6 +48,8 @@ import hr.foi.air.wattsup.ui.component.ProgressBarCircle
 import hr.foi.air.wattsup.ui.component.ProgressBarFill
 import hr.foi.air.wattsup.ui.component.TopAppBar
 import hr.foi.air.wattsup.ui.theme.colorBtnRed
+import hr.foi.air.wattsup.ui.theme.colorDarkGray
+import hr.foi.air.wattsup.ui.theme.colorGray
 import hr.foi.air.wattsup.ui.theme.colorSilver
 import hr.foi.air.wattsup.viewmodels.ChargerViewModel
 
@@ -277,13 +280,13 @@ fun ChargingIndicators(
 @Composable
 fun SimulatorButton(onClick: () -> Unit) {
     Button(
+        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
         onClick = onClick,
         modifier = Modifier
             .height(70.dp)
             .padding(10.dp)
             .clip(RoundedCornerShape(28.dp))
-            .background(MaterialTheme.colorScheme.secondary)
-            .shadow(4.dp, shape = RoundedCornerShape(28.dp)),
+            .shadow(4.dp, shape = RoundedCornerShape(28.dp))
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -293,9 +296,10 @@ fun SimulatorButton(onClick: () -> Unit) {
                 imageVector = Icons.Default.Settings,
                 contentDescription = null,
                 modifier = Modifier.size(24.dp),
+                tint = colorGray
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text(text = "Simulator")
+            Text(text = "Simulator", color = colorGray)
         }
     }
 }
