@@ -12,16 +12,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -36,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.ui.component.CarChargeIndicator
+import hr.foi.air.wattsup.ui.component.DropdownMenu
 import hr.foi.air.wattsup.ui.component.GradientImage
 import hr.foi.air.wattsup.ui.component.TopAppBar
 import hr.foi.air.wattsup.ui.theme.colorDarkGray
@@ -147,44 +144,21 @@ fun SimulatorView(viewModel: ChargerViewModel) {
     var expanded by remember { mutableStateOf(false) }
     var selectedOptionText by remember { mutableStateOf(options[0]) }
 
-    ExposedDropdownMenuBox(
+    DropdownMenu(
+        options = options,
+        selectedOptionText = selectedOptionText,
         expanded = expanded,
         onExpandedChange = {
             expanded = !expanded
         },
-    ) {
-        TextField(
-            readOnly = true,
-            value = selectedOptionText,
-            onValueChange = { },
-            label = { Text("Label") },
-            trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(
-                    expanded = expanded,
-                )
-            },
-            modifier = Modifier.menuAnchor(),
-            colors = ExposedDropdownMenuDefaults.textFieldColors(),
-        )
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = {
-                expanded = false
-            },
-        ) {
-            options.forEach { selectionOption ->
-                DropdownMenuItem(
-                    text = { Text(text = selectionOption, color = colorDarkGray) },
-                    onClick = {
-                        selectedOptionText = selectionOption
-                        expanded = false
-                    },
-                    modifier = Modifier
-                        .background(MaterialTheme.colorScheme.secondary),
-                )
-            }
-        }
-    }
+        onDismissRequest = {
+            expanded = false
+        },
+        onClickMenuItem = { selectionOption ->
+            selectedOptionText = selectionOption
+            expanded = false
+        },
+    )
 }
 
 @Preview
