@@ -104,6 +104,7 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<CardService>();
+builder.Services.AddScoped<EmailService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
