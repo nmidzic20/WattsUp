@@ -42,7 +42,7 @@ class HistoryViewModel : ViewModel() {
 
     private suspend fun getEvents(context: Context, cardId: Int): List<Event?> {
         val eventService = NetworkService.eventService
-        val auth = "Bearer " + TokenManager.getInstance(context).getjWTtoken()
+        val auth = "Bearer " + TokenManager.getInstance(context).getJWTToken()
 
         return suspendCoroutine { continuation ->
             eventService.getEvents(cardId, auth).enqueue(object : Callback<List<Event?>> {
@@ -71,7 +71,7 @@ class HistoryViewModel : ViewModel() {
 
     private suspend fun getCards(context: Context, userId: Int): List<Card?> {
         val cardService = NetworkService.cardService
-        val auth = "Bearer " + TokenManager.getInstance(context).getjWTtoken()
+        val auth = "Bearer " + TokenManager.getInstance(context).getJWTToken()
 
         return suspendCoroutine { continuation ->
             cardService.getCardsForUser(userId, auth)
@@ -99,7 +99,7 @@ class HistoryViewModel : ViewModel() {
 
     private suspend fun getChargerName(context: Context, chargerId: Int): String? {
         val chargerService = NetworkService.chargerService
-        val auth = "Bearer " + TokenManager.getInstance(context).getjWTtoken()
+        val auth = "Bearer " + TokenManager.getInstance(context).getJWTToken()
 
         return suspendCoroutine { continuation ->
             chargerService.getCharger(chargerId, auth)
