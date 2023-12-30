@@ -7,7 +7,6 @@ import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,15 +19,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -39,7 +38,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -52,22 +50,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.network.NetworkService
 import hr.foi.air.wattsup.network.models.Card
-import hr.foi.air.wattsup.network.models.Event
 import hr.foi.air.wattsup.network.models.TokenManager
 import hr.foi.air.wattsup.ui.component.TopAppBar
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response
-import java.text.DecimalFormat
-import java.text.SimpleDateFormat
-import java.util.Locale
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -87,13 +79,13 @@ fun CardScreen(onArrowBackClick: () -> Unit) {
             )
         },
     ) {
-        CardView(it.calculateTopPadding())
+        CardView()
     }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CardView(topPadding: Dp, context: Context = LocalContext.current) {
+fun CardView(context: Context = LocalContext.current) {
     val coroutineScope = rememberCoroutineScope()
     val cards = remember { mutableStateOf(listOf<Card?>()) }
     val showLoading = remember { mutableStateOf(true) }
@@ -109,7 +101,7 @@ fun CardView(topPadding: Dp, context: Context = LocalContext.current) {
 
     Column (
         modifier = Modifier
-            .padding(10.dp, top = 30.dp)
+            .padding(top = 30.dp)
             .fillMaxHeight()
             .fillMaxWidth()
     ) {
@@ -121,7 +113,7 @@ fun CardView(topPadding: Dp, context: Context = LocalContext.current) {
             state = state,
             flingBehavior = rememberSnapFlingBehavior(lazyListState = state)
         ) {
-            /*if (showLoading.value) {
+            if (showLoading.value) {
                 item {
                     CircularProgressIndicator(
                         color = MaterialTheme.colorScheme.primary,
@@ -132,7 +124,7 @@ fun CardView(topPadding: Dp, context: Context = LocalContext.current) {
                             .padding(top = 300.dp)
                     )
                 }
-            } else if (events.value.isEmpty()) {
+            } else if (cards.value.isEmpty()) {
                 item {
                     Text(
                         text = "You have no cards",
@@ -145,13 +137,13 @@ fun CardView(topPadding: Dp, context: Context = LocalContext.current) {
                     )
                 }
             } else {
-                itemsIndexed(events.value) { _, item ->
+                itemsIndexed(cards.value) { _, item ->
                     CardCard(item!!)
                 }
-            }*/
-            items(count = 3) { _ ->
-                CardCard()
             }
+            /*items(count = 3) { _ ->
+                CardCard()
+            }*/
         }
         Row(
             modifier = Modifier
@@ -177,8 +169,8 @@ fun CardView(topPadding: Dp, context: Context = LocalContext.current) {
 }
 
 @Composable
-fun CardCard() {
-    val width = LocalConfiguration.current.screenWidthDp.dp * 0.875f
+fun CardCard(item: Card) {
+    val width = LocalConfiguration.current.screenWidthDp.dp * 0.92f
 
     ElevatedCard(
         colors = CardDefaults.cardColors(
@@ -188,7 +180,7 @@ fun CardCard() {
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.elevatedCardElevation(10.dp),
         modifier = Modifier
-            .padding(15.dp)
+            .padding(start = 15.dp, end = 15.dp)
             .height(200.dp)
             .width(width)
     ) {
@@ -198,13 +190,14 @@ fun CardCard() {
         ) {
             Row(
                 modifier = Modifier
-                    .height(100.dp)
-                    .fillMaxWidth(),
+                    .height(120.dp)
+                    .fillMaxWidth()
+                    .padding(10.dp),
                 verticalAlignment = Alignment.Bottom,
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = "0x123456789",
+                    text = item.value,
                     color = Color.Black,
                     textAlign = TextAlign.Center,
                     fontSize = 24.sp,
@@ -229,85 +222,6 @@ fun CardCard() {
                         style = MaterialTheme.typography.bodyLarge,
                         color = Color.White,
                         textAlign = TextAlign.Center,
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun DetailDialog(event: Event, showDetails: MutableState<Boolean>) {
-    val df = DecimalFormat("#.###")
-
-    if (!showDetails.value) {
-        return
-    }
-
-    Dialog(onDismissRequest = { showDetails.value = !showDetails.value }) {
-        Column(
-            modifier = Modifier
-                .width(450.dp)
-                .height(200.dp)
-                .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(12.dp)),
-            verticalArrangement = Arrangement.SpaceAround,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Column (
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .padding(20.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "Started: ${SimpleDateFormat("dd.MM.yyyy. hh:mm:ss", Locale.US).format(event.startedAt)}",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = " Ended:  ${SimpleDateFormat("dd.MM.yyyy. hh:mm:ss", Locale.US).format(event.endedAt)}",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-            Row (
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .padding(20.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Column(
-                    verticalArrangement = Arrangement.SpaceEvenly,
-                    horizontalAlignment = Alignment.Start
-                ) {
-                    Text(
-                        text = event.chargerLocation.ifEmpty { "Unnamed Charger" },
-                        style = MaterialTheme.typography.bodyLarge,
-                        textAlign = TextAlign.Start
-                    )
-                    Text(
-                        text = "CV: ${event.cardValue}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        textAlign = TextAlign.Start
-                    )
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    Text(
-                        text = df.format(event.volumeKwh),
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.End
-                    )
-                    Text(
-                        text = " kWh",
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.End
                     )
                 }
             }
