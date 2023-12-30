@@ -42,6 +42,9 @@ class ChargerViewModel : ViewModel() {
     private val _openFullChargeAlertDialog = MutableLiveData(false)
     private val _toastMessage = MutableLiveData<String>()
     private val currentChargeVolume: LiveData<Float> get() = _currentChargeVolume
+    private val _lastSelectedCharger = MutableLiveData<Charger?>(null)
+
+    private val _chargerList = MutableLiveData<List<Charger?>>(emptyList())
 
     val charging: LiveData<Boolean> get() = _charging
     val timeElapsed: LiveData<Long> get() = _timeElapsed
@@ -51,6 +54,9 @@ class ChargerViewModel : ViewModel() {
     // Variable used to track the amount of charge in kWh for current charging session
     val currentChargeAmount: LiveData<Float> get() = _currentChargeAmount
     val lastSelectedInitialChargeValue: LiveData<Int> get() = _lastSelectedInitialChargeValue
+    val lastSelectedCharger: LiveData<Charger?> get() = _lastSelectedCharger
+
+    val chargerList: LiveData<List<Charger?>> = _chargerList
 
     val openFullChargeAlertDialog: LiveData<Boolean> = _openFullChargeAlertDialog
     val toastMessage: LiveData<String> get() = _toastMessage
@@ -67,8 +73,9 @@ class ChargerViewModel : ViewModel() {
             (positionValue * 100).toInt()
     }
 
-    fun updateSelectedCharger(chargerId: Int) {
-        selectedChargerId.value = chargerId
+    fun updateSelectedCharger(charger: Charger) {
+        selectedChargerId.value = charger.id
+        _lastSelectedCharger.value = charger
     }
 
     fun toggleCharging(onFullyCharged: () -> Unit) {
@@ -95,7 +102,6 @@ class ChargerViewModel : ViewModel() {
             launch {
                 val eventPOSTBody =
                     EventPOSTBody(selectedChargerId.value!!, UserCard.userCard.value!!.id)
-                // chargerID is sent as 1 since charger selection is yet to be implemented
                 startEvent(eventPOSTBody)
             }
             while (_charging.value == true) {
@@ -195,8 +201,6 @@ class ChargerViewModel : ViewModel() {
         )
     }
 
-    private val _chargerList = MutableLiveData<List<Charger?>>(emptyList())
-    val chargerList: LiveData<List<Charger?>> = _chargerList
     fun getChargers() {
         val chargerService = NetworkService.chargerService
 
@@ -209,10 +213,6 @@ class ChargerViewModel : ViewModel() {
                     Log.i("CHARGER_RES", "${response.body()} $response")
 
                     _chargerList.value = response.body() as List<Charger?>
-                    // Temporary measure since backend does not return id with charger info
-                    _chargerList.value = _chargerList.value?.mapIndexed { index, charger ->
-                        charger!!.copy(id = index + 1)
-                    }
                     Log.i("CHARGER_RES", _chargerList.value.toString())
                 }
 

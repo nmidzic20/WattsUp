@@ -1,7 +1,6 @@
 package hr.foi.air.wattsup.screens
 
 import android.content.res.Configuration
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -147,22 +146,12 @@ fun SimulatorView(viewModel: ChargerViewModel) {
     }
     val chargers by viewModel.chargerList.observeAsState(emptyList())
     val options = chargers.map { charger -> charger!!.name }
-    // listOf("Option 1", "Option 2", "Option 3", "Option 4", "Option 5")
-
-    Log.i("MENU charger", chargers.toString())
-    Log.i("MENU names", options.toString())
-
     var expanded by remember { mutableStateOf(false) }
-    var selectedOptionText by remember { mutableStateOf<String>("") }
-
-    // Triggered whenever options is updated, including with data from backend
-    LaunchedEffect(options) {
-        if (options.isNotEmpty()) {
-            selectedOptionText = options.first()
-        }
-    }
+    val lastSelectedCharger by viewModel.lastSelectedCharger.observeAsState()
+    var selectedOptionText by remember { mutableStateOf<String>(lastSelectedCharger?.name ?: "") }
 
     DropdownMenu(
+        labelText = "Choose charger",
         options = options,
         selectedOptionText = selectedOptionText,
         expanded = expanded,
@@ -175,6 +164,8 @@ fun SimulatorView(viewModel: ChargerViewModel) {
         onClickMenuItem = { selectionOption ->
             selectedOptionText = selectionOption
             expanded = false
+            val selectedCharger = chargers.find { charger -> charger!!.name == selectionOption }
+            viewModel.updateSelectedCharger(selectedCharger!!)
         },
     )
 }

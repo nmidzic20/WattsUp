@@ -15,6 +15,7 @@ import hr.foi.air.wattsup.ui.theme.colorDarkGray
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DropdownMenu(
+    labelText: String,
     options: List<String>,
     selectedOptionText: String,
     expanded: Boolean,
@@ -30,7 +31,7 @@ fun DropdownMenu(
             readOnly = true,
             value = selectedOptionText,
             onValueChange = { },
-            label = { Text("Label") },
+            label = { Text(labelText) },
             trailingIcon = {
                 ExposedDropdownMenuDefaults.TrailingIcon(
                     expanded = expanded,
