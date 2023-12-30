@@ -95,18 +95,33 @@ namespace backend.Controllers {
             return Ok(newUser);
         }
 
-        //POST: api/Users/ResetPassword
-        [HttpPost("ResetPassword")]
-        public async Task<ActionResult<User>> ResetUserPasswordRequest(UserResetPasswordRequest userRequest) {
+        //POST: api/Users/ResetPassword/Email
+        [HttpPost("ResetPassword/Email")]
+        public async Task<ActionResult<User>> ResetUserPasswordRequest(UserResetPasswordEmailRequest userRequest) {
             User user = await _userService.GetUserAsync(userRequest.Email);
             if (user == null) {
                 return NotFound(new { message = "No users with specified Email exist." });
             } else {
                 try {
-                    await _emailService.SendForgotMyPasswordEmail(user);
+                    string userToken = await _emailService.SendForgotMyPasswordEmail(user);
+                    await _userService.UpdateResetPasswordToken(user, userToken);
                     return Ok();
                 } catch{
                     return StatusCode(500, "Failed to send password reset email");
+                }
+            }
+        }
+        //POST api/Users/ResetPassword/Reset
+        [HttpPost("ResetPassword/Reset")]
+        public async Task<ActionResult<User>> ResetUserPasswordRequest(UserResetPasswordRequest userRequest) {
+            if(userRequest.token.Length < 16) {
+                return BadRequest();
+            } else {
+                try {
+                    await _userService.UpdateUserPassword(userRequest.token, userRequest.password);
+                    return Ok();
+                } catch {
+                    return StatusCode(500, "Failed to update user password");
                 }
             }
         }

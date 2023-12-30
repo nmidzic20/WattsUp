@@ -167,7 +167,34 @@ namespace backend.Services
             } else {
                 return user;
             }
+        }
 
+        public async Task UpdateResetPasswordToken(User user, string userToken) {
+
+            var _user = await _context.User.FirstOrDefaultAsync(u => u == user);
+
+            if (_user == null) {
+                throw new Exception("User not found");
+            } else {
+                _user.PasswordResetToken = userToken;
+                _context.User.Update(_user);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task UpdateUserPassword(string userToken, string password) {
+
+            var user = await _context.User.FirstOrDefaultAsync(u => u.PasswordResetToken == userToken);
+
+            if (user == null) {
+                throw new Exception("User not found");
+            } else {
+                user.Password = password;
+                user = HashPassword(user);
+                user.PasswordResetToken = "";
+                _context.User.Update(user);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }
