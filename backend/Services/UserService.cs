@@ -157,5 +157,17 @@ namespace backend.Services
 
             return loginResponse;
         }
+
+        public async Task<User> GetUserAsync(string email) {
+
+            var user = await _context.User.FirstOrDefaultAsync(u => u.Email == email);
+
+            if(user == null) {
+                throw new Exception("User not found");
+            } else {
+                return user;
+            }
+
+        }
     }
 }
