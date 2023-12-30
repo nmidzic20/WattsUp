@@ -1,7 +1,6 @@
 package hr.foi.air.wattsup.screens
 
 import android.content.res.Configuration
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -137,8 +136,9 @@ fun SimulatorView(viewModel: ChargerViewModel) {
         secondaryColor = colorGray,
         circleRadius = 230f,
         onPositionChange = { position ->
-            Log.i("POSITION", "${position / 100f}")
-
+            viewModel.updateInitialChargeAmount(position / 100f)
+        },
+        onDrag = { position ->
             viewModel.updateInitialChargeAmount(position / 100f)
         },
     )
