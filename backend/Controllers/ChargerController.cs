@@ -6,6 +6,7 @@ using backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 
 namespace backend.Controllers
@@ -24,10 +25,9 @@ namespace backend.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<ChargersResponse>>> GetChargers()
+        public async Task<ActionResult<List<Charger>>> GetChargers()
         {
-            ChargerService chargerService = new ChargerService(_dbContext);
-            var chargers = await chargerService.GetChargers();
+            var chargers = await _dbContext.Charger.ToListAsync();
 
             return Ok(chargers);
         }

@@ -40,7 +40,7 @@ namespace ControllerUnitTests.ControllersTests
             var result = (await chargerController.GetChargers()).Result as ObjectResult;
 
             // Assert
-            Assert.IsFalse((result.Value as List<ChargersResponse>).Any());
+            Assert.IsFalse((result.Value as List<Charger>).Any());
         }
 
         [TestMethod]
@@ -95,7 +95,7 @@ namespace ControllerUnitTests.ControllersTests
             var result = (await chargerController.GetChargers()).Result as ObjectResult;
 
             // Assert
-            Assert.AreEqual(2, (result.Value as List<ChargersResponse>).Count);
+            Assert.AreEqual(2, (result.Value as List<Charger>).Count);
         }
 
         [TestMethod]
