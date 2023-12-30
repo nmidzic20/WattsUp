@@ -102,6 +102,8 @@ fun PortraitChargerLayout(viewModel: ChargerViewModel, modifier: Modifier = Modi
 
 @Composable
 fun LandscapeChargerLayout(viewModel: ChargerViewModel, modifier: Modifier = Modifier) {
+    val currentChargeAmount by viewModel.currentChargeAmount.observeAsState()
+    val height = 150
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -109,6 +111,14 @@ fun LandscapeChargerLayout(viewModel: ChargerViewModel, modifier: Modifier = Mod
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        GradientImage(
+            R.drawable.icon_electric_car,
+            colorSilver,
+            MaterialTheme.colorScheme.secondary,
+            currentChargeAmount!!,
+            height,
+            Modifier.size(height.dp),
+        )
         SimulatorView(viewModel)
     }
 }
@@ -116,11 +126,13 @@ fun LandscapeChargerLayout(viewModel: ChargerViewModel, modifier: Modifier = Mod
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SimulatorView(viewModel: ChargerViewModel) {
+    val lastSelectedInitialValue by viewModel.lastSelectedInitialChargeValue.observeAsState()
+
     CarChargeIndicator(
         modifier = Modifier
             .size(250.dp)
             .background(colorDarkGray),
-        initialValue = 50,
+        initialValue = lastSelectedInitialValue!!,
         primaryColor = colorOrange,
         secondaryColor = colorGray,
         circleRadius = 230f,
