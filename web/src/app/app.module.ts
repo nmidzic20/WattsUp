@@ -9,6 +9,7 @@ import { LoginComponent } from './login/login.component';
 import { StationManagementComponent } from './station-management/station-management.component';
 import { AddStationDialogueComponent } from './add-station-dialogue/add-station-dialogue.component';
 import { StatisticsComponent } from './statistics/statistics.component';
+import { NgChartsModule } from 'ng2-charts';
 
 @NgModule({
   declarations: [
@@ -23,7 +24,8 @@ import { StatisticsComponent } from './statistics/statistics.component';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    FormsModule
+    FormsModule,
+    NgChartsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
