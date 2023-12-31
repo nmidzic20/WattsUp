@@ -13,7 +13,7 @@ import { ChartConfiguration } from 'chart.js';
 export class StatisticsComponent implements OnInit {
   events: ChargingEvent[] = [];
 
-  public barChartData: ChartConfiguration<'bar'>['data'] = {
+  barChartData: ChartConfiguration<'bar'>['data'] = {
     labels: [ 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
     datasets: [
       { 
@@ -27,6 +27,7 @@ export class StatisticsComponent implements OnInit {
 
   public barChartOptions: ChartConfiguration<'bar'>['options'] = {
     responsive: true,
+    maintainAspectRatio: false,
   };
 
   constructor(private router: Router ,private userManagerService: UserManagerService) { }
