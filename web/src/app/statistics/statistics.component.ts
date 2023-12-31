@@ -3,6 +3,7 @@ import { UserManagerService } from '../services/user-manager.service';
 import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
 import { ChargingEvent } from '../interfaces/Event';
+import { ChartConfiguration } from 'chart.js';
 
 @Component({
   selector: 'app-statistics',
@@ -11,6 +12,22 @@ import { ChargingEvent } from '../interfaces/Event';
 })
 export class StatisticsComponent implements OnInit {
   events: ChargingEvent[] = [];
+
+  public barChartData: ChartConfiguration<'bar'>['data'] = {
+    labels: [ 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+    datasets: [
+      { 
+        data: [ 65, 59, 80, 81, 56, 55, 40 ],
+        borderColor: '#11cb54',
+        backgroundColor: '#11cb54',
+        borderRadius: 6,
+      }
+    ]
+  };
+
+  public barChartOptions: ChartConfiguration<'bar'>['options'] = {
+    responsive: true,
+  };
 
   constructor(private router: Router ,private userManagerService: UserManagerService) { }
 
