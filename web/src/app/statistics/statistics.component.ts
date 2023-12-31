@@ -12,6 +12,8 @@ import { ChartConfiguration } from 'chart.js';
 })
 export class StatisticsComponent implements OnInit {
   events: ChargingEvent[] = [];
+  amountCharged: number = 0;
+  timeCharged: string = "";
 
   barChartData: ChartConfiguration<'bar'>['data'] = {
     labels: [ 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
@@ -35,12 +37,15 @@ export class StatisticsComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     let tokens = this.userManagerService.getTokens();
     if (tokens && tokens.jwtInfo?.id != undefined) {
-      if (await this.userManagerService.validTokens(tokens)) {
+      if (await this.userManagerService.validTokens(tokens)) {       
 
         const cards = await this.getCards(tokens.jwtInfo.id, tokens.jwt);
-        cards.forEach(async (card: any) => {
-          this.events.push(...await this.getEvents(card.id, tokens!.jwt));
-        });
+
+        const eventsPromises = cards.map((card: any) => this.getEvents(card.id, tokens!.jwt));
+        const eventsArray = await Promise.all(eventsPromises);
+        this.events = eventsArray.flat();
+
+        this.calculateTimeAndAmountCharged();
 
       } else {
         this.router.navigate(['/login']);
@@ -79,7 +84,8 @@ export class StatisticsComponent implements OnInit {
       let response = await fetch(environment.apiUrl + "/Event/forCard/" + cardId, parameters);
       let body = await response.json();
       if (response.status == 200) {
-        return body as ChargingEvent[];
+        const events = body as ChargingEvent[];
+        return this.parseChargingEventDates(events);
       } else {
         console.error(body.message);
         throw new Error("Failed to fetch events");
@@ -88,6 +94,36 @@ export class StatisticsComponent implements OnInit {
       console.error(error);
       throw new Error("Failed to fetch events");
     }
+  }
+
+  parseChargingEventDates(events: ChargingEvent[]): ChargingEvent[] {
+    return events.map(event => ({
+      ...event,
+      startedAt: new Date(event.startedAt),
+      endedAt: new Date(event.endedAt),
+    }));
+  }
+
+  calculateTimeAndAmountCharged() {
+    let timeCharged = 0;
+
+    this.events.forEach(event => {
+      this.amountCharged += event.volumeKwh;
+
+      const duration = event.endedAt.getTime() - event.startedAt.getTime();
+      timeCharged += duration;
+    });
+    
+    this.timeCharged = this.formatTime(timeCharged);
+    this.amountCharged = Math.round(this.amountCharged * 100) / 100;
+  }
+
+  formatTime(milliseconds: number): string {
+    const totalMinutes = Math.floor(milliseconds / (1000 * 60));
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+  
+    return `${hours}h ${minutes}m`;
   }
 
 }

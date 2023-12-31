@@ -1,9 +1,7 @@
 <div class="statistics">
         <div class="data">
                 <div class="graph">
-                        <div class="graph-title">
-                                Weekly charging 
-                        </div>
+                        <div class="graph-title">Weekly charging</div>
                         <div class="canvas">
                                 <canvas baseChart
                                         [data]="barChartData"
@@ -20,20 +18,12 @@
                 </div>
                 <div class="cards">
                         <div class="card">
-                                <div class="car-title">
-                                        Total amount charged
-                                </div>
-                                <div class="card-value">
-                                        150kWh
-                                </div>
+                                <div class="car-title">Total amount charged</div>
+                                <div class="card-value">{{amountCharged}} kWh</div>
                         </div>
                         <div class="card">
-                                <div class="car-title">
-                                        Time spent charging
-                                </div>
-                                <div class="card-value">
-                                        3 h  24 min
-                                </div>
+                                <div class="car-title">Time spent charging</div>
+                                <div class="card-value">{{timeCharged}}</div>
                         </div>
                 </div>
         </div>
