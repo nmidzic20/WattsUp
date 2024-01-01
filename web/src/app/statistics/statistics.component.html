@@ -4,16 +4,16 @@
                         <div class="graph-title">Weekly charging</div>
                         <div class="canvas">
                                 <canvas baseChart
-                                        [data]="barChartData"
-                                        [options]="barChartOptions"
+                                        [data]="chartData"
+                                        [options]="chartOptions"
                                         [legend]="false"
                                         [type]="'bar'">
                                 </canvas>
                         </div>
                         <div class="date">
-                                <button class="arrow"><</button>
-                                <div class="date-value">16.10.2023 - 22.10.2023</div>
-                                <button class="arrow">></button>
+                                <button class="arrow" (click)="prevWeek()"><</button>
+                                <div class="date-value">{{ weekStartDate | date:'dd.MM.yyyy' }} &ndash; {{ weekEndDate | date:'dd.MM.yyyy' }}</div>
+                                <button class="arrow" (click)="nextWeek()">></button>
                         </div>
                 </div>
                 <div class="cards">

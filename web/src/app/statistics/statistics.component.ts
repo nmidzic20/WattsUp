@@ -14,22 +14,30 @@ export class StatisticsComponent implements OnInit {
   events: ChargingEvent[] = [];
   amountCharged: number = 0;
   timeCharged: string = "";
+  weekStartDate: Date = new Date();
+  weekEndDate: Date = new Date();
 
-  barChartData: ChartConfiguration<'bar'>['data'] = {
-    labels: [ 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-    datasets: [
-      { 
-        data: [ 65, 59, 80, 81, 56, 55, 40 ],
-        borderColor: '#11cb54',
-        backgroundColor: '#11cb54',
-        borderRadius: 6,
-      }
-    ]
+  chartData: ChartConfiguration<'bar'>['data'] = {
+    datasets: []
   };
-
-  public barChartOptions: ChartConfiguration<'bar'>['options'] = {
+  chartOptions: ChartConfiguration<'bar'>['options'] = {
     responsive: true,
     maintainAspectRatio: false,
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          callback: (value) => `${value} kWh`
+        }
+      }
+    },
+    plugins: {
+      tooltip: {
+        callbacks: {
+          label: (item) => `${item.formattedValue} kWh`
+        }
+      }
+    }
   };
 
   constructor(private router: Router ,private userManagerService: UserManagerService) { }
@@ -46,6 +54,9 @@ export class StatisticsComponent implements OnInit {
         this.events = eventsArray.flat();
 
         this.calculateTimeAndAmountCharged();
+        
+        this.setWeekDates(new Date());
+        this.chartData = this.calculateChartData();
 
       } else {
         this.router.navigate(['/login']);
@@ -124,6 +135,66 @@ export class StatisticsComponent implements OnInit {
     const minutes = totalMinutes % 60;
   
     return `${hours}h ${minutes}m`;
+  }
+
+  calculateChartData(): ChartConfiguration<'bar'>['data'] {
+    const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const kwhVolume = [0, 0, 0, 0, 0, 0, 0];
+  
+    this.events.forEach((event) => {
+      if(event.startedAt < this.weekStartDate || event.startedAt > this.weekEndDate) return;
+
+      let dayOfWeek = new Date(event.startedAt).getDay();
+      dayOfWeek = dayOfWeek-- == -1 ? 6 : dayOfWeek--;
+      kwhVolume[dayOfWeek] += event.volumeKwh;
+    });
+  
+    const chartData: ChartConfiguration<'bar'>['data'] = {
+      labels: daysOfWeek,
+      datasets: [
+        {
+          data: kwhVolume,
+          borderColor: '#11cb54',
+          backgroundColor: '#11cb54',
+          borderRadius: 6,
+        },
+      ],
+    };
+  
+    return chartData;
+  }
+
+  setWeekDates(date: Date): void {
+    let dayOfWeek = date.getDay();
+    dayOfWeek = dayOfWeek-- == -1 ? 6 : dayOfWeek--;
+  
+    this.weekStartDate.setDate(date.getDate() - dayOfWeek);
+    this.weekStartDate.setHours(0, 0, 0, 0);
+    this.weekStartDate = new Date(this.weekStartDate);
+  
+    this.weekEndDate.setDate(this.weekStartDate.getDate() + 6);
+    this.weekEndDate.setHours(23, 59, 59, 999);
+    this.weekEndDate = new Date(this.weekEndDate);
+  }
+
+  prevWeek(): void {
+    this.weekStartDate.setDate(this.weekStartDate.getDate() - 7);
+    this.weekStartDate = new Date(this.weekStartDate);
+
+    this.weekEndDate.setDate(this.weekEndDate.getDate() - 7);
+    this.weekEndDate = new Date(this.weekEndDate);
+
+    this.chartData = this.calculateChartData();
+  }
+  
+  nextWeek(): void {
+    this.weekStartDate.setDate(this.weekStartDate.getDate() + 7);
+    this.weekStartDate = new Date(this.weekStartDate);
+
+    this.weekEndDate.setDate(this.weekEndDate.getDate() + 7);
+    this.weekEndDate = new Date(this.weekEndDate);
+
+    this.chartData = this.calculateChartData();
   }
 
 }
