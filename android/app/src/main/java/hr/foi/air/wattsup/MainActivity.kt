@@ -109,7 +109,7 @@ class MainActivity : ComponentActivity() {
                             ScanScreen(
                                 stringResource(R.string.scan_card),
                                 true,
-                                { navController.navigate("registration") },
+                                onArrowBackClick,
                                 onScan,
                                 scanViewModel,
                                 cardManagers,

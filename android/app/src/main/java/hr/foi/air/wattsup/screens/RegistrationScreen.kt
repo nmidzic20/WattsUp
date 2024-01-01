@@ -166,17 +166,17 @@ fun CentralView(
         } else {
             TextFieldDefaults.outlinedTextFieldColors()
         },
-        visualTransformation = if (passwordVisible == true) VisualTransformation.None else PasswordVisualTransformation(),
+        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
         label = { Text(stringResource(R.string.password_label)) },
         singleLine = true,
         trailingIcon = {
-            val image = if (passwordVisible == true) {
+            val image = if (passwordVisible) {
                 Icons.Filled.Visibility
             } else {
                 Icons.Filled.VisibilityOff
             }
 
-            val description = if (passwordVisible == true) "Hide password" else "Show password"
+            val description = if (passwordVisible) "Hide password" else "Show password"
 
             IconButton(onClick = { viewModel.togglePasswordVisibility() }) {
                 Icon(imageVector = image, description)
