@@ -1,10 +1,6 @@
 package hr.foi.air.wattsup.screens
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.util.Log
-import android.widget.Toast
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -21,6 +17,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -33,10 +31,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,26 +39,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hr.foi.air.wattsup.R
-import hr.foi.air.wattsup.network.NetworkService
 import hr.foi.air.wattsup.network.models.Card
-import hr.foi.air.wattsup.network.models.RegistrationBody
-import hr.foi.air.wattsup.network.models.RegistrationResponseBody
+import hr.foi.air.wattsup.ui.component.LoadingSpinner
 import hr.foi.air.wattsup.ui.component.TopAppBar
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-
-private val authService = NetworkService.authService
+import hr.foi.air.wattsup.viewmodels.AuthenticationViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegistrationScreen(onArrowBackClick: () -> Unit, onLogInClick: () -> Unit) {
+fun RegistrationScreen(
+    onArrowBackClick: () -> Unit,
+    onLogInClick: () -> Unit,
+    viewModel: AuthenticationViewModel,
+) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -76,60 +68,68 @@ fun RegistrationScreen(onArrowBackClick: () -> Unit, onLogInClick: () -> Unit) {
             )
         },
     ) {
-        RegistrationView(onLogInClick)
+        val modifier = Modifier.padding(it)
+
+        RegistrationView(onLogInClick, viewModel, modifier)
     }
 }
 
 @Composable
-fun RegistrationView(onLogInClick: () -> Unit) {
+fun RegistrationView(
+    onLogInClick: () -> Unit,
+    viewModel: AuthenticationViewModel,
+    modifier: Modifier = Modifier,
+) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .fillMaxHeight()
-            .padding(top = 50.dp),
+            .padding(top = 50.dp)
+            .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        CentralView(Modifier.padding(0.dp, 15.dp), onLogInClick)
+        CentralView(Modifier.padding(0.dp, 15.dp), onLogInClick, viewModel)
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
-    var firstName: String by remember { mutableStateOf("") }
-    var lastName: String by remember { mutableStateOf("") }
-    var email: String by remember { mutableStateOf("") }
-    var password: String by remember { mutableStateOf("") }
-    var card: Card? by remember { mutableStateOf(null) }
-    var invalidEmail by remember { mutableStateOf(false) }
-    var invalidPassword by remember { mutableStateOf(false) }
-    val interactionSource = remember { MutableInteractionSource() }
+fun CentralView(modifier: Modifier, onLogInClick: () -> Unit, viewModel: AuthenticationViewModel) {
+    val firstName by viewModel.firstName.observeAsState()
+    val lastName by viewModel.lastName.observeAsState()
+    val email by viewModel.email.observeAsState()
+    val password by viewModel.password.observeAsState()
+    val card by viewModel.card.observeAsState()
+    val invalidEmail by viewModel.invalidEmail.observeAsState()
+    val invalidPassword by viewModel.invalidPassword.observeAsState()
+    val interactionSource by viewModel.interactionSource.observeAsState()
+    val passwordVisible by viewModel.passwordVisible.observeAsState(false)
+    val showLoading by viewModel.showLoading.observeAsState()
+
     val context = LocalContext.current
 
     OutlinedTextField(
         modifier = modifier,
-        value = firstName,
-        onValueChange = { firstName = it },
+        value = firstName!!,
+        onValueChange = { viewModel.updateFirstName(it) },
         label = { Text(stringResource(R.string.first_name_label)) },
         singleLine = true,
     )
 
     OutlinedTextField(
         modifier = modifier,
-        value = lastName,
-        onValueChange = { lastName = it },
+        value = lastName!!,
+        onValueChange = { viewModel.updateLastName(it) },
         label = { Text(stringResource(R.string.last_name_label)) },
         singleLine = true,
     )
 
     OutlinedTextField(
         modifier = modifier,
-        value = email,
-        onValueChange = {
-            email = it
-        },
-        colors = if (invalidEmail) {
+        value = email!!,
+        onValueChange = { viewModel.updateEmail(it) },
+        colors = if (invalidEmail == true) {
             TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = Color.Red,
                 unfocusedBorderColor = Color.Red,
@@ -145,11 +145,9 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
 
     OutlinedTextField(
         modifier = modifier,
-        value = password,
-        onValueChange = {
-            password = it
-        },
-        colors = if (invalidPassword) {
+        value = password!!,
+        onValueChange = { viewModel.updatePassword(it) },
+        colors = if (invalidPassword == true) {
             TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = Color.Red,
                 unfocusedBorderColor = Color.Red,
@@ -159,20 +157,33 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
         } else {
             TextFieldDefaults.outlinedTextFieldColors()
         },
-        visualTransformation = PasswordVisualTransformation(),
+        visualTransformation = if (passwordVisible == true) VisualTransformation.None else PasswordVisualTransformation(),
         label = { Text(stringResource(R.string.password_label)) },
         singleLine = true,
+        trailingIcon = {
+            val image = if (passwordVisible == true) {
+                Icons.Filled.Visibility
+            } else {
+                Icons.Filled.VisibilityOff
+            }
+
+            val description = if (passwordVisible == true) "Hide password" else "Show password"
+
+            IconButton(onClick = { viewModel.togglePasswordVisibility() }) {
+                Icon(imageVector = image, description)
+            }
+        },
     )
 
     Row(
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         OutlinedTextField(
             modifier = Modifier
                 .padding(0.dp, 15.dp)
                 .width(200.dp),
             value = card?.value ?: "",
-            onValueChange = { card = Card(id = 0, value = it) },
+            onValueChange = { viewModel.updateCard(Card(id = 0, value = it)) },
             label = { Text(stringResource(R.string.card_label)) },
             singleLine = true,
         )
@@ -186,7 +197,7 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
                 .padding(10.dp)
                 .clip(MaterialTheme.shapes.medium),
             contentPadding = PaddingValues(10.dp, 0.dp),
-            interactionSource = interactionSource,
+            interactionSource = interactionSource!!,
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
@@ -199,56 +210,44 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
 
     ElevatedButton(
         onClick = {
-            invalidEmail = !Regex("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}\$").matches(email)
-            invalidPassword = !Regex("^.{6,}\$").matches(password)
-            if (invalidPassword || invalidEmail) {
-                toast(context, "Invalid e-mail or password")
+            viewModel.updateInvalidEmail(
+                !Regex("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}\$").matches(
+                    email!!,
+                ),
+            )
+            viewModel.updateInvalidPassword(!Regex("^.{6,}\$").matches(password!!))
+            if (invalidPassword == true || invalidEmail == true) {
+                viewModel.showToast(context, "Invalid e-mail or password")
             } else {
-                authService.registerUser(
-                    RegistrationBody(firstName, lastName, email, password, card),
-                ).enqueue(
-                    object : Callback<RegistrationResponseBody> {
-                        override fun onResponse(
-                            call: Call<RegistrationResponseBody>?,
-                            response: Response<RegistrationResponseBody>?,
-                        ) {
-                            Log.i("RES", response.toString())
-
-                            if (response?.isSuccessful == true) {
-                                val responseBody = response.body()
-                                val message =
-                                    "Registered new user under ID ${responseBody?.id}, first name: ${responseBody?.firstName}, last name: ${responseBody?.lastName}, email: ${responseBody?.email}"
-                                Log.i("Response", message)
-                                toast(context, "Successfully registered user")
-                                onLogInClick()
-                            } else {
-                                val responseBody = response?.body()
-                                Log.i("Response", (responseBody ?: response).toString())
-                                toast(context, "Failed to register user")
-                                onLogInClick()
-                            }
-                        }
-
-                        override fun onFailure(
-                            call: Call<RegistrationResponseBody>?,
-                            t: Throwable?,
-                        ) {
-                            Log.i("Response", t.toString())
-                            toast(context, "Failed to register user")
-                        }
-                    },
+                viewModel.registerUser(
+                    firstName!!,
+                    lastName!!,
+                    email!!,
+                    password!!,
+                    card,
+                    context,
+                    onLogInClick,
                 )
             }
         },
         modifier = Modifier.padding(0.dp, 30.dp, 0.dp, 0.dp),
         contentPadding = PaddingValues(122.dp, 0.dp),
-        interactionSource = interactionSource,
+        interactionSource = interactionSource!!,
+        enabled = !showLoading!!,
     ) {
-        Text(text = "Register", style = MaterialTheme.typography.bodyMedium, color = Color.White)
+        if (showLoading == true) {
+            LoadingSpinner()
+        } else {
+            Text(
+                text = "Register",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.White,
+            )
+        }
     }
 
     Row(
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             stringResource(R.string.Alreadyhaveaccountlabel),
@@ -271,12 +270,8 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit) {
     }
 }
 
-private fun toast(context: Context, message: String) {
-    Toast.makeText(context, message, Toast.LENGTH_LONG).show()
-}
-
 @Preview(showBackground = false)
 @Composable
 fun RegistrationPreview() {
-    RegistrationScreen({}, {})
+    RegistrationScreen({}, {}, AuthenticationViewModel())
 }
