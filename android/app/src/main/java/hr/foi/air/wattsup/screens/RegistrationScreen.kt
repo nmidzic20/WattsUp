@@ -54,6 +54,7 @@ import hr.foi.air.wattsup.viewmodels.AuthenticationViewModel
 fun RegistrationScreen(
     onArrowBackClick: () -> Unit,
     onLogInClick: () -> Unit,
+    onAddCard: () -> Unit,
     viewModel: AuthenticationViewModel,
 ) {
     Scaffold(
@@ -273,5 +274,5 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit, viewModel: Authent
 @Preview(showBackground = false)
 @Composable
 fun RegistrationPreview() {
-    RegistrationScreen({}, {}, AuthenticationViewModel())
+    RegistrationScreen({}, {}, {}, AuthenticationViewModel())
 }

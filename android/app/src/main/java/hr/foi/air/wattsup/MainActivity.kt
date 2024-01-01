@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.navigation.compose.NavHost
@@ -92,7 +93,21 @@ class MainActivity : ComponentActivity() {
                             val onScan = { navController.navigate("chargerMode") }
 
                             ScanScreen(
+                                stringResource(R.string.charger_mode),
                                 { navController.navigate("landing") },
+                                onScan,
+                                scanViewModel,
+                                cardManagers,
+                            )
+                        }
+                        composable("addCard") {
+                            val onScan = {
+                                navController.navigate("registration")
+                            }
+
+                            ScanScreen(
+                                stringResource(R.string.scan_card),
+                                { navController.navigate("registration") },
                                 onScan,
                                 scanViewModel,
                                 cardManagers,
@@ -107,9 +122,11 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("registration") {
                             val onLogInClick = { navController.navigate("login") }
+                            var onAddCard = { navController.navigate("addCard") }
                             RegistrationScreen(
                                 onArrowBackClick,
                                 onLogInClick,
+                                onAddCard,
                                 authenticationViewModel,
                             )
                         }
