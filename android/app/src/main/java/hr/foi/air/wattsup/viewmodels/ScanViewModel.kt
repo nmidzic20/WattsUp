@@ -59,7 +59,7 @@ class ScanViewModel : ViewModel() {
         cardManager.startScanningForCard(
             object : CardScanCallback {
                 override fun onScanResult(cardAddress: Any) {
-                    handleScanResult(cardAddress, onScan, cardManager)
+                    handleScanResult(cardAddress, onScan, cardManager, addCard)
                 }
 
                 override fun onScanFailed(error: String) {
@@ -89,15 +89,41 @@ class ScanViewModel : ViewModel() {
         )
     }
 
-    private fun handleScanResult(result: Any, onScan: () -> Unit, cardManager: CardManager) {
+    private fun handleScanResult(
+        result: Any,
+        onScan: () -> Unit,
+        cardManager: CardManager,
+        addCard: Boolean,
+    ) {
         if (cardManager.scanResultRequiresAsyncHandling()) {
             viewModelScope.launch(Dispatchers.Main) {
-                checkedCardAddresses.clear()
-                handleScan(result, onScan, cardManager) { cardManager.stopScanningForCard() }
+                if (addCard) {
+                    saveCardToUserCard(result)
+                } else {
+                    checkedCardAddresses.clear()
+                    handleScan(result, onScan, cardManager) { cardManager.stopScanningForCard() }
+                }
             }
         } else {
-            handleScan(result, onScan, cardManager) { cardManager.stopScanningForCard() }
+            if (addCard) {
+                saveCardToUserCard(result)
+            } else {
+                handleScan(result, onScan, cardManager) { cardManager.stopScanningForCard() }
+            }
         }
+    }
+
+    private fun formatDeviceAddress(result: Any): String = when (result) {
+        is ByteArray -> HexUtils.formatHexToPrefix(HexUtils.bytesToHexString(result))
+        is String -> HexUtils.formatHexToPrefix(result)
+        else -> throw IllegalArgumentException("Unsupported result type")
+    }
+
+    private fun saveCardToUserCard(result: Any) {
+        var deviceAddress: String = formatDeviceAddress(result)
+
+        UserCard.userCard.value = Card(id = 0, value = deviceAddress)
+        Log.i("CARD_ADDED", UserCard.userCard.value.toString())
     }
 
     private val checkedCardAddresses = mutableSetOf<String>()
@@ -108,12 +134,7 @@ class ScanViewModel : ViewModel() {
         cardManager: CardManager,
         onCardFound: () -> Unit,
     ) {
-        var deviceAddress = ""
-        if (result is ByteArray) {
-            deviceAddress = HexUtils.formatHexToPrefix(HexUtils.bytesToHexString(result))
-        } else if (result is String) {
-            deviceAddress = HexUtils.formatHexToPrefix(result)
-        }
+        var deviceAddress: String = formatDeviceAddress(result)
 
         Log.i("SCAN", "Scanned: $deviceAddress")
 
