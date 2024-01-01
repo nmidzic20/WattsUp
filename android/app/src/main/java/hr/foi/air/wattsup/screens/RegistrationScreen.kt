@@ -71,13 +71,14 @@ fun RegistrationScreen(
     ) {
         val modifier = Modifier.padding(it)
 
-        RegistrationView(onLogInClick, viewModel, modifier)
+        RegistrationView(onLogInClick, onAddCard, viewModel, modifier)
     }
 }
 
 @Composable
 fun RegistrationView(
     onLogInClick: () -> Unit,
+    onAddCard: () -> Unit,
     viewModel: AuthenticationViewModel,
     modifier: Modifier = Modifier,
 ) {
@@ -90,13 +91,18 @@ fun RegistrationView(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        CentralView(Modifier.padding(0.dp, 15.dp), onLogInClick, viewModel)
+        CentralView(Modifier.padding(0.dp, 15.dp), onLogInClick, onAddCard, viewModel)
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CentralView(modifier: Modifier, onLogInClick: () -> Unit, viewModel: AuthenticationViewModel) {
+fun CentralView(
+    modifier: Modifier,
+    onLogInClick: () -> Unit,
+    onAddCard: () -> Unit,
+    viewModel: AuthenticationViewModel,
+) {
     val firstName by viewModel.firstName.observeAsState()
     val lastName by viewModel.lastName.observeAsState()
     val email by viewModel.email.observeAsState()
@@ -192,8 +198,7 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit, viewModel: Authent
         Spacer(modifier = Modifier.width(4.dp))
 
         ElevatedButton(
-            onClick = {
-            },
+            onClick = onAddCard,
             modifier = Modifier
                 .padding(10.dp)
                 .clip(MaterialTheme.shapes.medium),
