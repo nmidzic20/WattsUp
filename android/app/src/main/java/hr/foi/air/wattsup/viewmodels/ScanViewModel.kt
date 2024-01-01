@@ -32,13 +32,13 @@ class ScanViewModel : ViewModel() {
     private val _userMessage = MutableLiveData("")
     val userMessage: LiveData<String> get() = _userMessage
 
-    fun getStatusMessage(scanning: Boolean, cardManager: CardManager): String =
+    fun getStatusMessage(scanning: Boolean, addCard: Boolean, cardManager: CardManager): String =
         if (!cardManager.isCardSupportAvailableOnDevice()) {
             "${cardManager.getName()} is not supported on this device"
         } else if (!cardManager.isCardSupportEnabledOnDevice()) {
             "${cardManager.getName()} is not enabled on this device"
         } else {
-            if (scanning) "No registered ${cardManager.getName()} card found" else "${cardManager.getName()} is supported and enabled on this device"
+            if (scanning) "No ${if (!addCard) "registered " else ""}${cardManager.getName()} card found" else "${cardManager.getName()} is supported and enabled on this device"
         }
 
     fun startScanning(cardManager: CardManager, onScan: () -> Unit, addCard: Boolean) {
@@ -66,7 +66,7 @@ class ScanViewModel : ViewModel() {
                 override fun onScanFailed(error: String) {
                     _scanning.value = false
                     _scanSuccess.value = false
-                    _userMessage.value = getStatusMessage(true, cardManager)
+                    _userMessage.value = getStatusMessage(true, addCard, cardManager)
                     Log.i("SCAN", "Scanning failed, error message: $error")
                 }
 
@@ -78,7 +78,7 @@ class ScanViewModel : ViewModel() {
                             cardManager.stopScanningForCard()
                             _scanning.value = false
                             _scanSuccess.value = false
-                            _userMessage.value = getStatusMessage(true, cardManager)
+                            _userMessage.value = getStatusMessage(true, addCard, cardManager)
                         }
                     }
                 }

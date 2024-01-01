@@ -60,7 +60,7 @@ fun ScanScreen(
 
     val cardStatusMessageList = remember {
         cardManagers.map { cardManager ->
-            mutableStateOf(viewModel.getStatusMessage(false, cardManager))
+            mutableStateOf(viewModel.getStatusMessage(false, addCard, cardManager))
         }.toMutableList()
     }
 
@@ -83,14 +83,20 @@ fun ScanScreen(
 
     Scaffold(
         snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
+            if (!scanning!!) {
+                SnackbarHost(hostState = snackbarHostState)
+            } else {
+                null
+            }
         },
         topBar = {
             TopAppBar(
                 title = { Text(title) },
                 navigationIcon = {
-                    IconButton(onClick = { onArrowBackClick() }) {
-                        Icon(Icons.Filled.ArrowBack, null, tint = Color.White)
+                    if (!scanning!!) {
+                        IconButton(onClick = { onArrowBackClick() }) {
+                            Icon(Icons.Filled.ArrowBack, null, tint = Color.White)
+                        }
                     }
                 },
             )
