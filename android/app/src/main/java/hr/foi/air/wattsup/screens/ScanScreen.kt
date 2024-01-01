@@ -45,6 +45,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ScanScreen(
     title: String,
+    addCard: Boolean,
     onArrowBackClick: () -> Unit,
     onScan: () -> Unit,
     viewModel: ScanViewModel,
@@ -105,6 +106,7 @@ fun ScanScreen(
                     viewModel.startScanning(
                         cardManager,
                         onScan,
+                        addCard,
                     )
                 },
                 onScan,
@@ -120,6 +122,7 @@ fun ScanScreen(
                     viewModel.startScanning(
                         cardManager,
                         onScan,
+                        addCard,
                     )
                 },
                 onScan,

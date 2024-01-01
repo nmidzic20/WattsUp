@@ -94,6 +94,7 @@ class MainActivity : ComponentActivity() {
 
                             ScanScreen(
                                 stringResource(R.string.charger_mode),
+                                false,
                                 { navController.navigate("landing") },
                                 onScan,
                                 scanViewModel,
@@ -107,6 +108,7 @@ class MainActivity : ComponentActivity() {
 
                             ScanScreen(
                                 stringResource(R.string.scan_card),
+                                true,
                                 { navController.navigate("registration") },
                                 onScan,
                                 scanViewModel,

@@ -40,7 +40,7 @@ class ScanViewModel : ViewModel() {
             if (scanning) "No registered ${cardManager.getName()} card found" else "${cardManager.getName()} is supported and enabled on this device"
         }
 
-    fun startScanning(cardManager: CardManager, onScan: () -> Unit) {
+    fun startScanning(cardManager: CardManager, onScan: () -> Unit, addCard: Boolean) {
         if (!cardManager.isCardSupportEnabledOnDevice()) {
             cardManager.stopScanningForCard()
             _scanning.value = false
