@@ -125,7 +125,7 @@ class ScanViewModel : ViewModel() {
         onScan: () -> Unit,
         onCardFound: () -> Unit,
     ) {
-        var deviceAddress: String = formatDeviceAddress(result)
+        var deviceAddress: String = formatDeviceAddress(result).uppercase()
 
         LastAddedCard.userCard.value = Card(id = 0, value = deviceAddress, active = true)
         Log.i("CARD_ADDED", LastAddedCard.userCard.value.toString())

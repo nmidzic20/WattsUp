@@ -333,7 +333,7 @@ private fun AddDialog(scannedCard: Card?, cards: List<Card?>, viewModel: CardVie
                     ) {
                         Text(
                             fontSize = 20.sp,
-                            text = "Add card ${scannedCard.value.uppercase()}?",
+                            text = "Add card ${scannedCard.value}?",
                             modifier = Modifier.padding(16.dp),
                             color = Color.White
                         )
