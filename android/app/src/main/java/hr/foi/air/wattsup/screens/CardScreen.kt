@@ -4,8 +4,6 @@ package hr.foi.air.wattsup.screens
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
@@ -43,9 +41,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -54,22 +52,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import hr.foi.air.wattsup.R
-import hr.foi.air.wattsup.network.NetworkService
 import hr.foi.air.wattsup.network.models.Card
 import hr.foi.air.wattsup.network.models.TokenManager
 import hr.foi.air.wattsup.ui.component.CircleButton
 import hr.foi.air.wattsup.ui.component.TopAppBar
 import hr.foi.air.wattsup.viewmodels.CardViewModel
-import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Response
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -96,7 +87,6 @@ fun CardScreen(onArrowBackClick: () -> Unit, onAddCard: () -> Unit, viewModel: C
 fun CardView(viewModel: CardViewModel, onAddCard: () -> Unit, context: Context = LocalContext.current) {
     val userId = TokenManager.getInstance(context).getId()
     val state = rememberLazyListState()
-    val showAddDialog = remember { mutableStateOf(false) }
 
     val cards by viewModel.cards.observeAsState(emptyList())
     val showLoading by viewModel.showLoading.observeAsState(true)
@@ -110,14 +100,14 @@ fun CardView(viewModel: CardViewModel, onAddCard: () -> Unit, context: Context =
 
     Column (
         modifier = Modifier
-            .padding(top = 30.dp)
+            .padding(top = 50.dp)
             .fillMaxHeight()
             .fillMaxWidth()
     ) {
         LazyRow(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.9f),
+                .fillMaxHeight(0.85f),
             verticalAlignment = Alignment.CenterVertically,
             state = state,
             flingBehavior = rememberSnapFlingBehavior(lazyListState = state)
@@ -146,7 +136,7 @@ fun CardView(viewModel: CardViewModel, onAddCard: () -> Unit, context: Context =
                 }
             } else {
                 itemsIndexed(cards) { _, item ->
-                    CardCard(item!!)
+                    CardCard(item!!, viewModel)
                 }
             }
         }
@@ -173,11 +163,12 @@ fun CardView(viewModel: CardViewModel, onAddCard: () -> Unit, context: Context =
 }
 
 @Composable
-fun CardCard(item: Card) {
+fun CardCard(item: Card, viewModel: CardViewModel) {
     val width = LocalConfiguration.current.screenWidthDp.dp * 0.92f
     val showRemoveDialog = remember { mutableStateOf(false) }
+    val selectedCardId = remember { mutableIntStateOf(-1) }
 
-    RemoveDialog(showRemoveDialog)
+    RemoveDialog(showRemoveDialog, selectedCardId, viewModel)
 
     ElevatedCard(
         colors = CardDefaults.cardColors(
@@ -223,7 +214,7 @@ fun CardCard(item: Card) {
                         .padding(top = 12.dp)
                 )
                 ElevatedButton(
-                    onClick = { showRemoveDialog.value = true },
+                    onClick = { showRemoveDialog.value = true; selectedCardId.intValue = item.id },
                     colors = ButtonDefaults.elevatedButtonColors(containerColor = Color.Red),
                     modifier = Modifier
                         .wrapContentSize()
@@ -241,23 +232,12 @@ fun CardCard(item: Card) {
     }
 }
 
-private fun checkCard(scannedCard: Card?, cards: List<Card?>, context : Context): Boolean {
-    if (scannedCard == null) {
-        Toast.makeText(context, "Card not scanned!", Toast.LENGTH_LONG).show()
-        return false
-    }
-
-    val exists = cards.any { it?.value == scannedCard.value }
-
-    if (exists) {
-        Toast.makeText(context, "Scanned card already exists!", Toast.LENGTH_LONG).show()
-        return false
-    }
-    return true
-}
-
 @Composable
-private fun RemoveDialog(openAlertDialog: MutableState<Boolean>) {
+private fun RemoveDialog(
+    openAlertDialog: MutableState<Boolean>,
+    cardId: MutableState<Int>,
+    viewModel: CardViewModel,
+    context : Context = LocalContext.current) {
     when {
         openAlertDialog.value -> {
             Dialog(onDismissRequest = { openAlertDialog.value = false }) {
@@ -296,7 +276,10 @@ private fun RemoveDialog(openAlertDialog: MutableState<Boolean>) {
                                 )
                             }
                             TextButton(
-                                onClick = { openAlertDialog.value = false; },
+                                onClick = {
+                                    openAlertDialog.value = false
+                                    viewModel.deleteCard(cardId.value, context)
+                                },
                                 modifier = Modifier.padding(8.dp),
                             ) {
                                 Text(

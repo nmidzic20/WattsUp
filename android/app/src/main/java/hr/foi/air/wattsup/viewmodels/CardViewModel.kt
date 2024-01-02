@@ -67,16 +67,16 @@ class CardViewModel : ViewModel() {
                 override fun onResponse(call: Call<List<Card?>>, response: Response<List<Card?>>) {
                     if (response.isSuccessful) {
                         continuation.resume(response.body() ?: emptyList())
-                        Log.d("CardScreen", "Cards: ${response.body()}")
+                        Log.d("CardView", "Cards: ${response.body()}")
                     } else {
-                        Log.d("CardScreen", "Error: ${response.errorBody()}")
+                        Log.d("CardView", "Error: ${response.errorBody()}")
                         toast(context, "Error: ${response.errorBody()}")
                         continuation.resume(emptyList())
                     }
                 }
 
                 override fun onFailure(call: Call<List<Card?>>, t: Throwable) {
-                    Log.d("CardScreen", "Failure: ${t.message}")
+                    Log.d("CardView", "Failure: ${t.message}")
                     continuation.resume(emptyList())
                     toast(context, "Failure: ${t.message}")
                 }
@@ -84,42 +84,17 @@ class CardViewModel : ViewModel() {
         }
     }
 
-    /*private suspend fun addCard(context: Context, userId: Int, card: Card): List<Card?> {
-        val cardService = NetworkService.cardService
-        val auth = "Bearer " + TokenManager.getInstance(context).getJWTToken()
-
-        return suspendCoroutine { continuation ->
-            cardService.addCard(CardPOSTBody(userId, card.value), auth).enqueue(object : Callback<Card> {
-                override fun onResponse(call: Call<Card>, response: Response<Card>) {
-                    if (response.isSuccessful) {
-                        continuation.resume(response.body() ?: emptyList())
-                        Log.d("CardScreen", "Cards: ${response.body()}")
-                    } else {
-                        Log.d("CardScreen", "Error: ${response.errorBody()}")
-                        toast(context, "Error: ${response.errorBody()}")
-                        continuation.resume(emptyList())
-                    }
-                }
-
-                override fun onFailure(call: Call<Card>, t: Throwable) {
-                    Log.d("CardScreen", "Failure: ${t.message}")
-                    continuation.resume()
-                    toast(context, "Failure: ${t.message}")
-                }
-            })
-        }
-    }*/
-
     fun addCard(userId: Int, context: Context) {
         val auth = "Bearer " + TokenManager.getInstance(context).getJWTToken()
 
         cardService.addCard(CardPOSTBody(userId, card.value!!.value), auth).enqueue(
-            object : retrofit2.Callback<Card> {
+            object : Callback<Card> {
                 override fun onResponse(
                     call: Call<Card>,
                     response: Response<Card>,
                 ) {
                     Log.i("CardView", response.toString())
+
                     if (response.isSuccessful) {
                         toast(context, "Card added!")
                     } else if (response.code() == 409){
@@ -136,6 +111,32 @@ class CardViewModel : ViewModel() {
         )
 
         updateCard(null)
+    }
+
+    fun deleteCard(cardId: Int, context: Context) {
+        val auth = "Bearer " + TokenManager.getInstance(context).getJWTToken()
+
+        cardService.deleteCard(cardId, auth).enqueue(
+            object : Callback<Card> {
+                override fun onResponse(
+                    call: Call<Card>,
+                    response: Response<Card>,
+                ) {
+                    Log.i("CardView", response.toString())
+                    if (response.isSuccessful) {
+                        toast(context, "Card deleted!")
+                    } else if (response.code() == 409){
+                        toast(context, "Card not found!")
+                    } else {
+                        toast(context, "Error deleting card!")
+                    }
+                }
+
+                override fun onFailure(call: Call<Card>, t: Throwable) {
+                    Log.i("CardView", t.toString())
+                }
+            },
+        )
     }
 
     private fun toast(context: Context, message: String) {
