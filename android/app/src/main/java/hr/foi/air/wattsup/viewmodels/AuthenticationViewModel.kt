@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import hr.foi.air.wattsup.network.NetworkService
 import hr.foi.air.wattsup.network.models.Card
@@ -14,6 +15,7 @@ import hr.foi.air.wattsup.network.models.LoginResponseBody
 import hr.foi.air.wattsup.network.models.RegistrationBody
 import hr.foi.air.wattsup.network.models.RegistrationResponseBody
 import hr.foi.air.wattsup.network.models.TokenManager
+import hr.foi.air.wattsup.utils.LastAddedCard
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -57,6 +59,20 @@ class AuthenticationViewModel : ViewModel() {
     private val _passwordVisible = MutableLiveData<Boolean>(false)
     val passwordVisible: LiveData<Boolean> = _passwordVisible
 
+    private val lastAddedCardObserver = Observer<Card> { newCard ->
+        updateCard(newCard)
+    }
+
+    init {
+        // Update card variable if LastAddedCard.userCard has a new card added
+        LastAddedCard.userCard.observeForever(lastAddedCardObserver)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        LastAddedCard.userCard.removeObserver(lastAddedCardObserver)
+    }
+
     fun togglePasswordVisibility() {
         _passwordVisible.value = !_passwordVisible.value!!
     }
@@ -77,7 +93,7 @@ class AuthenticationViewModel : ViewModel() {
         _lastName.value = value
     }
 
-    fun updateCard(value: Card?) {
+    fun updateCard(value: Card) {
         _card.value = value
     }
 

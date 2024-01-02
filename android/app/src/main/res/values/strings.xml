@@ -15,4 +15,6 @@
     <string name="login">Login</string>
     <string name="history">Charging History</string>
     <string name="cards">My Cards</string>
+    <string name="scan_card">Scan card</string>
+    <string name="scanning_for_card">Scanning for card...</string>
 </resources>

@@ -22,7 +22,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -50,6 +49,7 @@ import androidx.compose.ui.window.Dialog
 import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.network.models.Event
 import hr.foi.air.wattsup.network.models.TokenManager
+import hr.foi.air.wattsup.ui.component.LoadingSpinner
 import hr.foi.air.wattsup.ui.component.TopAppBar
 import hr.foi.air.wattsup.viewmodels.HistoryViewModel
 import java.text.DecimalFormat
@@ -104,9 +104,8 @@ fun HistoryView(
         ) {
             if (showLoading) {
                 item {
-                    CircularProgressIndicator(
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier
+                    LoadingSpinner(
+                        Modifier
                             .fillMaxHeight()
                             .fillMaxWidth()
                             .wrapContentSize(Alignment.Center)
