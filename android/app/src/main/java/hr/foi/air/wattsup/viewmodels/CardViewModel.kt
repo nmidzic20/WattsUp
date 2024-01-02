@@ -9,7 +9,11 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import hr.foi.air.wattsup.network.NetworkService
 import hr.foi.air.wattsup.network.models.Card
+import hr.foi.air.wattsup.network.models.CardPOSTBody
+import hr.foi.air.wattsup.network.models.EventPOSTBody
+import hr.foi.air.wattsup.network.models.EventPOSTResponseBody
 import hr.foi.air.wattsup.network.models.TokenManager
+import hr.foi.air.wattsup.utils.CurrentEvent
 import hr.foi.air.wattsup.utils.LastAddedCard
 import retrofit2.Call
 import retrofit2.Callback
@@ -18,11 +22,16 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 class CardViewModel : ViewModel() {
+    private val cardService = NetworkService.cardService
+
     private val _cards = MutableLiveData<List<Card?>>()
     val cards: LiveData<List<Card?>> = _cards
 
     private val _showLoading = MutableLiveData<Boolean>()
     val showLoading: LiveData<Boolean> = _showLoading
+
+    private val _disableAddButton = MutableLiveData<Boolean>()
+    val disableAddButton: LiveData<Boolean> = _disableAddButton
 
     private val _card = MutableLiveData<Card?>(null)
     val card: LiveData<Card?> = _card
@@ -51,7 +60,6 @@ class CardViewModel : ViewModel() {
     }
 
     private suspend fun getCards(context: Context, userId: Int): List<Card?> {
-        val cardService = NetworkService.cardService
         val auth = "Bearer " + TokenManager.getInstance(context).getJWTToken()
 
         return suspendCoroutine { continuation ->
@@ -74,6 +82,60 @@ class CardViewModel : ViewModel() {
                 }
             })
         }
+    }
+
+    /*private suspend fun addCard(context: Context, userId: Int, card: Card): List<Card?> {
+        val cardService = NetworkService.cardService
+        val auth = "Bearer " + TokenManager.getInstance(context).getJWTToken()
+
+        return suspendCoroutine { continuation ->
+            cardService.addCard(CardPOSTBody(userId, card.value), auth).enqueue(object : Callback<Card> {
+                override fun onResponse(call: Call<Card>, response: Response<Card>) {
+                    if (response.isSuccessful) {
+                        continuation.resume(response.body() ?: emptyList())
+                        Log.d("CardScreen", "Cards: ${response.body()}")
+                    } else {
+                        Log.d("CardScreen", "Error: ${response.errorBody()}")
+                        toast(context, "Error: ${response.errorBody()}")
+                        continuation.resume(emptyList())
+                    }
+                }
+
+                override fun onFailure(call: Call<Card>, t: Throwable) {
+                    Log.d("CardScreen", "Failure: ${t.message}")
+                    continuation.resume()
+                    toast(context, "Failure: ${t.message}")
+                }
+            })
+        }
+    }*/
+
+    fun addCard(userId: Int, context: Context) {
+        val auth = "Bearer " + TokenManager.getInstance(context).getJWTToken()
+
+        cardService.addCard(CardPOSTBody(userId, card.value!!.value), auth).enqueue(
+            object : retrofit2.Callback<Card> {
+                override fun onResponse(
+                    call: Call<Card>,
+                    response: Response<Card>,
+                ) {
+                    Log.i("CardView", response.toString())
+                    if (response.isSuccessful) {
+                        toast(context, "Card added!")
+                    } else if (response.code() == 409){
+                        toast(context, "Card already exists!")
+                    } else {
+                        toast(context, "Error adding card!")
+                    }
+                }
+
+                override fun onFailure(call: Call<Card>, t: Throwable) {
+                    Log.i("CardView", t.toString())
+                }
+            },
+        )
+
+        updateCard(null)
     }
 
     private fun toast(context: Context, message: String) {

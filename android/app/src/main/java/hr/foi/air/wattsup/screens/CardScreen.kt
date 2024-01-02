@@ -102,7 +102,7 @@ fun CardView(viewModel: CardViewModel, onAddCard: () -> Unit, context: Context =
     val showLoading by viewModel.showLoading.observeAsState(true)
     val scannedCard by viewModel.card.observeAsState()
 
-    AddDialog(scannedCard, cards, viewModel)
+    AddDialog(scannedCard, userId, viewModel)
 
     LaunchedEffect(Unit) {
         viewModel.fetchCards(context, userId)
@@ -158,7 +158,7 @@ fun CardView(viewModel: CardViewModel, onAddCard: () -> Unit, context: Context =
             horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
             ElevatedButton(
-                onClick = { onAddCard() /*viewModel.updateCard(Card(0, "0x3530A832", true))*/ },
+                onClick = { onAddCard() },
             ) {
                 Text(
                     text = "Add Card",
@@ -314,9 +314,13 @@ private fun RemoveDialog(openAlertDialog: MutableState<Boolean>) {
 }
 
 @Composable
-private fun AddDialog(scannedCard: Card?, cards: List<Card?>, viewModel: CardViewModel) {
+private fun AddDialog(
+    scannedCard: Card?,
+    userId: Int,
+    viewModel: CardViewModel,
+    context: Context = LocalContext.current) {
     when {
-        scannedCard != null && checkCard(scannedCard, cards, LocalContext.current) -> {
+        scannedCard != null -> {
             Dialog(onDismissRequest = { viewModel.updateCard(null) }) {
                 Card(
                     modifier = Modifier
@@ -353,7 +357,7 @@ private fun AddDialog(scannedCard: Card?, cards: List<Card?>, viewModel: CardVie
                                 )
                             }
                             TextButton(
-                                onClick = { viewModel.updateCard(null); /*TODO*/ },
+                                onClick = { viewModel.addCard(userId, context) },
                                 modifier = Modifier.padding(8.dp),
                             ) {
                                 Text(
