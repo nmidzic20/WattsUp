@@ -9,41 +9,41 @@ class TokenManager private constructor(context: Context) {
     private val sharedPreferences: SharedPreferences =
         context.getSharedPreferences("TokenStorage", Context.MODE_PRIVATE)
 
-    fun setjWTtoken(_jWTtoken: String) {
+    fun setJWTToken(_jWTtoken: String) {
         with(sharedPreferences.edit()) {
             putString("jwtToken", _jWTtoken)
             apply()
         }
     }
 
-    fun getjWTtoken(): String? {
+    fun getJWTToken(): String? {
         return sharedPreferences.getString("jwtToken", null)
     }
 
-    fun setrefreshToken(_refreshToken: String) {
+    fun setRefreshToken(_refreshToken: String) {
         with(sharedPreferences.edit()) {
             putString("refreshToken", _refreshToken)
             apply()
         }
     }
 
-    fun getrefreshToken(): String? {
+    fun getRefreshToken(): String? {
         return sharedPreferences.getString("refreshToken", null)
     }
 
-    fun setrefreshTokenExpiresAt(_refreshTokenExpiresAt: String) {
+    fun setRefreshTokenExpiresAt(_refreshTokenExpiresAt: String) {
         with(sharedPreferences.edit()) {
             putString("refreshTokenExpiresAt", _refreshTokenExpiresAt)
             apply()
         }
     }
 
-    fun getrefreshTokenExpiresAt(): String? {
+    fun getRefreshTokenExpiresAt(): String? {
         return sharedPreferences.getString("refreshTokenExpiresAt", null)
     }
 
     fun getId(): Int {
-        val payload = String(Base64.getUrlDecoder().decode(getjWTtoken()!!.split(".")[1]))
+        val payload = String(Base64.getUrlDecoder().decode(getJWTToken()!!.split(".")[1]))
         return payload.split(",")[0].split(":")[1].replace("\"", "").toInt()
     }
 

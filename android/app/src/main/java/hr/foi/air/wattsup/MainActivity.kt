@@ -30,10 +30,12 @@ import hr.foi.air.wattsup.screens.LandingScreen
 import hr.foi.air.wattsup.screens.LoginScreen
 import hr.foi.air.wattsup.screens.RegistrationScreen
 import hr.foi.air.wattsup.screens.ScanScreen
-import hr.foi.air.wattsup.screens.UserModeScreen
 import hr.foi.air.wattsup.screens.SimulatorScreen
+import hr.foi.air.wattsup.screens.UserModeScreen
 import hr.foi.air.wattsup.ui.theme.WattsUpTheme
+import hr.foi.air.wattsup.viewmodels.AuthenticationViewModel
 import hr.foi.air.wattsup.viewmodels.ChargerViewModel
+import hr.foi.air.wattsup.viewmodels.HistoryViewModel
 import hr.foi.air.wattsup.viewmodels.ScanViewModel
 
 class MainActivity : ComponentActivity() {
@@ -43,6 +45,8 @@ class MainActivity : ComponentActivity() {
 
     private val chargerViewModel: ChargerViewModel by viewModels()
     private val scanViewModel: ScanViewModel by viewModels()
+    private val historyViewModel: HistoryViewModel by viewModels()
+    private val authenticationViewModel: AuthenticationViewModel by viewModels()
 
     var cardManagers: List<CardManager> = emptyList()
     var receivers: MutableList<BroadcastReceiver> = emptyList<BroadcastReceiver>().toMutableList()
@@ -104,12 +108,21 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("registration") {
                             val onLogInClick = { navController.navigate("login") }
-                            RegistrationScreen(onArrowBackClick, onLogInClick)
+                            RegistrationScreen(
+                                onArrowBackClick,
+                                onLogInClick,
+                                authenticationViewModel,
+                            )
                         }
                         composable("login") {
                             val onRegisterClick = { navController.navigate("registration") }
                             val onLogin = { navController.navigate("userMode") }
-                            LoginScreen(onRegisterClick, onLogin, onArrowBackClick)
+                            LoginScreen(
+                                onRegisterClick,
+                                onLogin,
+                                onArrowBackClick,
+                                authenticationViewModel,
+                            )
                         }
                         composable("userMode") {
                             val onHistoryClick = { navController.navigate("chargingHistory") }
@@ -118,7 +131,7 @@ class MainActivity : ComponentActivity() {
                             UserModeScreen(onHistoryClick, onCardsClick, onArrowBackClick)
                         }
                         composable("chargingHistory") {
-                            HistoryScreen(onArrowBackClick)
+                            HistoryScreen(onArrowBackClick, historyViewModel)
                         }
                         composable("EVsimulator") {
                             SimulatorScreen(chargerViewModel) {

@@ -46,6 +46,11 @@ class ScanViewModel : ViewModel() {
             _scanning.value = false
             _scanSuccess.value = false
             _userMessage.value = "${cardManager.getName()} is not enabled on this device"
+            viewModelScope.launch {
+                // Clear the user message after 5 seconds, so that it does not stay if the user in meantime enables that card support
+                delay(5000)
+                _userMessage.value = ""
+            }
             return
         }
 
@@ -103,7 +108,7 @@ class ScanViewModel : ViewModel() {
         cardManager: CardManager,
         onCardFound: () -> Unit,
     ) {
-        var deviceAddress: String = ""
+        var deviceAddress = ""
         if (result is ByteArray) {
             deviceAddress = HexUtils.formatHexToPrefix(HexUtils.bytesToHexString(result))
         } else if (result is String) {
