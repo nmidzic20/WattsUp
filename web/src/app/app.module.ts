@@ -8,6 +8,7 @@ import { NotFoundComponent } from './not-found/not-found.component';
 import { LoginComponent } from './login/login.component';
 import { StationManagementComponent } from './station-management/station-management.component';
 import { AddStationDialogueComponent } from './add-station-dialogue/add-station-dialogue.component';
+import { MapPageComponent } from './map-page/map-page.component';
 
 @NgModule({
   declarations: [
@@ -16,7 +17,8 @@ import { AddStationDialogueComponent } from './add-station-dialogue/add-station-
     NotFoundComponent,
     LoginComponent,
     StationManagementComponent,
-    AddStationDialogueComponent
+    AddStationDialogueComponent,
+    MapPageComponent
   ],
   imports: [
     BrowserModule,
