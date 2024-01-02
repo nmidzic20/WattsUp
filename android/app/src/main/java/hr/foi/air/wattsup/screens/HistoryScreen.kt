@@ -88,7 +88,7 @@ fun HistoryView(
     val showLoading by viewModel.showLoading.observeAsState(true)
 
     LaunchedEffect(Unit) {
-        viewModel.fetchChargingHistory(context, userId)
+        viewModel.refreshHistory(context, userId)
     }
 
     LazyColumn(

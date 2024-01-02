@@ -26,7 +26,13 @@ class HistoryViewModel : ViewModel() {
     private val _showLoading = MutableLiveData<Boolean>()
     val showLoading: LiveData<Boolean> = _showLoading
 
-    suspend fun fetchChargingHistory(context: Context, userId: Int) {
+    suspend fun refreshHistory(context: Context, userId: Int) {
+        _showLoading.value = true
+        _events.value = emptyList()
+        fetchChargingHistory(context, userId)
+    }
+
+    private suspend fun fetchChargingHistory(context: Context, userId: Int) {
         _cards.value = getCards(context, userId)
         for (card in _cards.value!!) {
             val data = getEvents(context, card!!.id)
