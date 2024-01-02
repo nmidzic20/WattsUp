@@ -32,6 +32,16 @@ namespace backend.Controllers
             return Ok(chargers);
         }
 
+        [Authorize]
+        [HttpGet("web")]
+        public async Task<ActionResult<List<ChargersResponse>>> GetChargersWeb()
+        {
+            ChargerService chargerService = new ChargerService(_dbContext);
+            var chargers = await chargerService.GetChargers();
+
+            return Ok(chargers);
+        }
+
         [HttpGet("SSE")]
         public async Task GetChargersSSE(CancellationToken cancellationToken)
         {
