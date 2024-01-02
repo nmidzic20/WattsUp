@@ -72,7 +72,7 @@ namespace backend.Controllers
         }
 
         [Authorize]
-        [HttpPut("cardId")]
+        [HttpPut("{cardId}")]
         public async Task<ActionResult<Card>> UpdateCard(long cardID, Card _card)
         {
             try {
@@ -96,7 +96,7 @@ namespace backend.Controllers
         }
 
         [Authorize]
-        [HttpDelete("cardId")]
+        [HttpDelete("{cardId}")]
         public async Task<ActionResult<Card>> DeleteCard(long cardID) {
             try {
                 var card = await _dbContext.Card
