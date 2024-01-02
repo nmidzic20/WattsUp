@@ -21,6 +21,7 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import hr.foi.air.wattsup.ble.BLEManager
 import hr.foi.air.wattsup.core.CardManager
 import hr.foi.air.wattsup.rfid.RFIDManager
@@ -106,7 +107,13 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("addCard") {
                             val onScan = {
-                                navController.navigate("registration")
+                                navController.navigate(
+                                    navController.previousBackStackEntry?.destination?.route!!
+                                ) {
+                                    popUpTo(navController.previousBackStackEntry?.destination?.route!!) {
+                                        inclusive = true
+                                    }
+                                }
                             }
 
                             ScanScreen(
@@ -162,7 +169,8 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                         composable("myCards") {
-                            CardScreen(onArrowBackClick, cardViewModel)
+                            val onAddCard = { navController.navigate("addCard") }
+                            CardScreen(onArrowBackClick, onAddCard, cardViewModel)
                         }
                     }
                 }

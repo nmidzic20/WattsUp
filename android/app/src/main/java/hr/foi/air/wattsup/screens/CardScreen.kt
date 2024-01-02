@@ -74,7 +74,7 @@ import kotlin.coroutines.suspendCoroutine
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun CardScreen(onArrowBackClick: () -> Unit, viewModel: CardViewModel) {
+fun CardScreen(onArrowBackClick: () -> Unit, onAddCard: () -> Unit, viewModel: CardViewModel) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -87,13 +87,13 @@ fun CardScreen(onArrowBackClick: () -> Unit, viewModel: CardViewModel) {
             )
         },
     ) {
-        CardView(viewModel)
+        CardView(viewModel, onAddCard)
     }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CardView(viewModel: CardViewModel, context: Context = LocalContext.current) {
+fun CardView(viewModel: CardViewModel, onAddCard: () -> Unit, context: Context = LocalContext.current) {
     val userId = TokenManager.getInstance(context).getId()
     val state = rememberLazyListState()
 
@@ -154,7 +154,7 @@ fun CardView(viewModel: CardViewModel, context: Context = LocalContext.current) 
             horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
             ElevatedButton(
-                onClick = { /*TODO*/ },
+                onClick = { onAddCard() },
             ) {
                 Text(
                     text = "Add Card",
@@ -164,7 +164,6 @@ fun CardView(viewModel: CardViewModel, context: Context = LocalContext.current) 
                     textAlign = TextAlign.Center
                 )
             }
-
         }
     }
 }
