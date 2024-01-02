@@ -113,7 +113,7 @@ fun HistoryView(
                             .padding(top = 300.dp),
                     )
                 }
-            } else if (events == null || events.isEmpty()) {
+            } else if (events.isEmpty()) {
                 item {
                     Text(
                         text = "No events to show",

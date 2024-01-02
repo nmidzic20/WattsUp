@@ -41,6 +41,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -62,6 +64,7 @@ import hr.foi.air.wattsup.network.models.Card
 import hr.foi.air.wattsup.network.models.TokenManager
 import hr.foi.air.wattsup.ui.component.CircleButton
 import hr.foi.air.wattsup.ui.component.TopAppBar
+import hr.foi.air.wattsup.viewmodels.CardViewModel
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response
@@ -71,7 +74,7 @@ import kotlin.coroutines.suspendCoroutine
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun CardScreen(onArrowBackClick: () -> Unit) {
+fun CardScreen(onArrowBackClick: () -> Unit, viewModel: CardViewModel) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -84,24 +87,21 @@ fun CardScreen(onArrowBackClick: () -> Unit) {
             )
         },
     ) {
-        CardView()
+        CardView(viewModel)
     }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CardView(context: Context = LocalContext.current) {
-    val coroutineScope = rememberCoroutineScope()
-    val cards = remember { mutableStateOf(listOf<Card?>()) }
-    val showLoading = remember { mutableStateOf(true) }
+fun CardView(viewModel: CardViewModel, context: Context = LocalContext.current) {
     val userId = TokenManager.getInstance(context).getId()
     val state = rememberLazyListState()
 
+    val cards by viewModel.cards.observeAsState(emptyList())
+    val showLoading by viewModel.showLoading.observeAsState(true)
+
     LaunchedEffect(Unit) {
-        coroutineScope.launch {
-            cards.value += getCards(context, userId)
-            showLoading.value = false
-        }
+        viewModel.fetchCards(context, userId)
     }
 
     Column (
@@ -118,18 +118,17 @@ fun CardView(context: Context = LocalContext.current) {
             state = state,
             flingBehavior = rememberSnapFlingBehavior(lazyListState = state)
         ) {
-            if (showLoading.value) {
+            if (showLoading) {
                 item {
                     CircularProgressIndicator(
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier
                             .fillMaxHeight()
                             .fillMaxWidth()
-                            .wrapContentSize(Alignment.Center)
-                            .padding(top = 300.dp)
+                            .padding(top = 320.dp, start = 175.dp)
                     )
                 }
-            } else if (cards.value.isEmpty()) {
+            } else if (cards.isEmpty()) {
                 item {
                     Text(
                         text = "You have no cards",
@@ -142,7 +141,7 @@ fun CardView(context: Context = LocalContext.current) {
                     )
                 }
             } else {
-                itemsIndexed(cards.value) { _, item ->
+                itemsIndexed(cards) { _, item ->
                     CardCard(item!!)
                 }
             }
@@ -261,6 +260,7 @@ private fun RemoveDialog(openAlertDialog: MutableState<Boolean>) {
                             fontSize = 20.sp,
                             text = "Remove this card?",
                             modifier = Modifier.padding(16.dp),
+                            color = Color.White
                         )
                         Row(
                             modifier = Modifier
@@ -282,8 +282,9 @@ private fun RemoveDialog(openAlertDialog: MutableState<Boolean>) {
                                 modifier = Modifier.padding(8.dp),
                             ) {
                                 Text(
-                                    text = "Yes",
-                                    fontSize = 16.sp
+                                    text = "Remove",
+                                    fontSize = 16.sp,
+                                    color = Color.Red
                                 )
                             }
                         }
@@ -294,36 +295,8 @@ private fun RemoveDialog(openAlertDialog: MutableState<Boolean>) {
     }
 }
 
-private fun toast(context: Context, message: String) {
-    Toast.makeText(context, message, Toast.LENGTH_LONG).show()
-}
-
-private suspend fun getCards(context: Context, userId: Int): List<Card?> {
-    val cardService = NetworkService.cardService
-    val auth = "Bearer " + TokenManager.getInstance(context).getjWTtoken()
-
-    return suspendCoroutine { continuation ->
-        cardService.getCardsForUser(userId, auth).enqueue(object : retrofit2.Callback<List<Card?>> {
-            override fun onResponse(call: Call<List<Card?>>, response: Response<List<Card?>>) {
-                if (response.isSuccessful) {
-                    continuation.resume(response.body() ?: emptyList())
-                    Log.d("CardScreen", "Cards: ${response.body()}")
-                } else {
-                    Log.d("CardScreen", "Error: ${response.errorBody()}")
-                    continuation.resume(emptyList())
-                }
-            }
-
-            override fun onFailure(call: Call<List<Card?>>, t: Throwable) {
-                Log.d("CardScreen", "Failure: ${t.message}")
-                continuation.resume(emptyList())
-            }
-        })
-    }
-}
-
-@Preview(showBackground = false)
+/*@Preview(showBackground = false)
 @Composable
 fun CardPreview() {
-    CardScreen {}
-}
+    CardScreen({}, {})
+}*/

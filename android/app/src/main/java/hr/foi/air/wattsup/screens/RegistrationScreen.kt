@@ -42,6 +42,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.Visibility
 import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.network.models.Card
 import hr.foi.air.wattsup.ui.component.LoadingSpinner
@@ -157,17 +158,17 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit, viewModel: Authent
         } else {
             TextFieldDefaults.outlinedTextFieldColors()
         },
-        visualTransformation = if (passwordVisible == true) VisualTransformation.None else PasswordVisualTransformation(),
+        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
         label = { Text(stringResource(R.string.password_label)) },
         singleLine = true,
         trailingIcon = {
-            val image = if (passwordVisible == true) {
+            val image = if (passwordVisible) {
                 Icons.Filled.Visibility
             } else {
                 Icons.Filled.VisibilityOff
             }
 
-            val description = if (passwordVisible == true) "Hide password" else "Show password"
+            val description = if (passwordVisible) "Hide password" else "Show password"
 
             IconButton(onClick = { viewModel.togglePasswordVisibility() }) {
                 Icon(imageVector = image, description)
@@ -183,7 +184,7 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit, viewModel: Authent
                 .padding(0.dp, 15.dp)
                 .width(200.dp),
             value = card?.value ?: "",
-            onValueChange = { viewModel.updateCard(Card(id = 0, value = it)) },
+            onValueChange = { viewModel.updateCard(Card(id = 0, value = it, active = true)) },
             label = { Text(stringResource(R.string.card_label)) },
             singleLine = true,
         )

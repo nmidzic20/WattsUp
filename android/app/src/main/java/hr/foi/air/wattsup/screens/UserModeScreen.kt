@@ -128,6 +128,7 @@ private fun LogoutDialog(openAlertDialog: MutableState<Boolean>, onArrowBackClic
                             fontSize = 20.sp,
                             text = "Would you like to log out?",
                             modifier = Modifier.padding(16.dp),
+                            color = Color.White
                         )
                         Row(
                             modifier = Modifier
@@ -149,8 +150,9 @@ private fun LogoutDialog(openAlertDialog: MutableState<Boolean>, onArrowBackClic
                                 modifier = Modifier.padding(8.dp),
                             ) {
                                 Text(
-                                    text = "Yes",
+                                    text = "Log out",
                                     fontSize = 16.sp,
+                                    color = Color.Red
                                 )
                             }
                         }
@@ -164,5 +166,5 @@ private fun LogoutDialog(openAlertDialog: MutableState<Boolean>, onArrowBackClic
 @Preview(showBackground = false)
 @Composable
 fun UserModePreview() {
-    UserModeScreen({}, {})
+    UserModeScreen({}, {}, {})
 }
