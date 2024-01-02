@@ -93,6 +93,7 @@ fun UserModeView(onHistoryClick: () -> Unit, onCardsClick: () -> Unit, onArrowBa
         }
         Spacer(modifier = Modifier.height(16.dp))
         ElevatedButton(
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
             onClick = onCardsClick
         ) {
             Text(

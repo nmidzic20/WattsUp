@@ -9,12 +9,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -91,43 +91,36 @@ fun HistoryView(
         viewModel.fetchChargingHistory(context, userId)
     }
 
-    Column(
+    LazyColumn(
         modifier = Modifier
-            .padding(10.dp)
-            .fillMaxHeight()
-            .fillMaxWidth(),
+            .fillMaxSize()
+            .padding(top = topPadding + 15.dp),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        LazyColumn(
-            modifier = Modifier.padding(top = topPadding),
-            verticalArrangement = Arrangement.SpaceBetween,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            if (showLoading) {
-                item {
-                    LoadingSpinner(
-                        Modifier
-                            .fillMaxHeight()
-                            .fillMaxWidth()
-                            .wrapContentSize(Alignment.Center)
-                            .padding(top = 300.dp),
-                    )
-                }
-            } else if (events.isEmpty()) {
-                item {
-                    Text(
-                        text = "No events to show",
-                        style = MaterialTheme.typography.headlineMedium,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(500.dp)
-                            .wrapContentHeight(Alignment.CenterVertically),
-                    )
-                }
-            } else {
-                itemsIndexed(events) { _, item ->
-                    EventCard(item!!, viewModel)
-                }
+        if (showLoading) {
+            item {
+                LoadingSpinner(
+                    Modifier
+                        .height(40.dp)
+                        .width(40.dp)
+                        .padding(top = 320.dp)
+                )
+            }
+        } else if (events.isEmpty()) {
+            item {
+                Text(
+                    text = "No events to show",
+                    style = MaterialTheme.typography.headlineMedium,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 320.dp)
+                )
+            }
+        } else {
+            itemsIndexed(events) { _, item ->
+                EventCard(item!!)
             }
         }
     }
@@ -135,7 +128,7 @@ fun HistoryView(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EventCard(event: Event, viewModel: HistoryViewModel) {
+fun EventCard(event: Event) {
     val df = DecimalFormat("#.##")
     val showDetails = remember { mutableStateOf(false) }
 
@@ -158,7 +151,7 @@ fun EventCard(event: Event, viewModel: HistoryViewModel) {
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.elevatedCardElevation(),
         modifier = Modifier
-            .padding(15.dp)
+            .padding(10.dp)
             .height(100.dp)
             .fillMaxWidth(),
     ) {

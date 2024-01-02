@@ -101,8 +101,7 @@ fun CardView(viewModel: CardViewModel, onAddCard: () -> Unit, context: Context =
     Column (
         modifier = Modifier
             .padding(top = 50.dp)
-            .fillMaxHeight()
-            .fillMaxWidth()
+            .fillMaxSize()
     ) {
         LazyRow(
             modifier = Modifier
@@ -116,7 +115,6 @@ fun CardView(viewModel: CardViewModel, onAddCard: () -> Unit, context: Context =
             if (showLoading) {
                 item {
                     CircularProgressIndicator(
-                        color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier
                             .fillMaxSize()
                             .wrapContentHeight(Alignment.CenterVertically)
