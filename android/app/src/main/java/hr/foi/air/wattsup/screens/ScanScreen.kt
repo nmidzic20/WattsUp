@@ -46,6 +46,8 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScanScreen(
+    title: String,
+    addCard: Boolean,
     onArrowBackClick: () -> Unit,
     onScan: () -> Unit,
     viewModel: ScanViewModel,
@@ -58,7 +60,7 @@ fun ScanScreen(
 
     val cardStatusMessageList = remember {
         cardManagers.map { cardManager ->
-            mutableStateOf(viewModel.getStatusMessage(false, cardManager))
+            mutableStateOf(viewModel.getStatusMessage(false, addCard, cardManager))
         }.toMutableList()
     }
 
@@ -81,14 +83,20 @@ fun ScanScreen(
 
     Scaffold(
         snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
+            if (!scanning!!) {
+                SnackbarHost(hostState = snackbarHostState)
+            } else {
+                null
+            }
         },
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.charger_mode)) },
+                title = { Text(title) },
                 navigationIcon = {
-                    IconButton(onClick = { onArrowBackClick() }) {
-                        Icon(Icons.Filled.ArrowBack, null, tint = Color.White)
+                    if (!scanning!!) {
+                        IconButton(onClick = { onArrowBackClick() }) {
+                            Icon(Icons.Filled.ArrowBack, null, tint = Color.White)
+                        }
                     }
                 },
             )
@@ -106,6 +114,7 @@ fun ScanScreen(
                     viewModel.startScanning(
                         cardManager,
                         onScan,
+                        addCard,
                     )
                 },
                 onScan,
@@ -121,6 +130,7 @@ fun ScanScreen(
                     viewModel.startScanning(
                         cardManager,
                         onScan,
+                        addCard,
                     )
                 },
                 onScan,
@@ -262,7 +272,7 @@ fun CardOptions(
         text = if (!scanning) {
             userMessage!!
         } else {
-            "Scanning for card..."
+            stringResource(id = R.string.scanning_for_card)
         },
         style = MaterialTheme.typography.titleLarge,
     )

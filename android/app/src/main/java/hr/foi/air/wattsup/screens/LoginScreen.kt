@@ -2,7 +2,6 @@ package hr.foi.air.wattsup.screens
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -19,7 +18,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -80,7 +78,7 @@ fun LoginView(
     onLogin: () -> Unit,
     context: Context,
     viewModel: AuthenticationViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val interactionSource by viewModel.interactionSource.observeAsState()
     val email by viewModel.email.observeAsState()
@@ -113,13 +111,13 @@ fun LoginView(
             singleLine = true,
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
-                val image = if (passwordVisible == true) {
+                val image = if (passwordVisible) {
                     Icons.Filled.Visibility
                 } else {
                     Icons.Filled.VisibilityOff
                 }
 
-                val description = if (passwordVisible == true) "Hide password" else "Show password"
+                val description = if (passwordVisible) "Hide password" else "Show password"
 
                 IconButton(onClick = { viewModel.togglePasswordVisibility() }) {
                     Icon(imageVector = image, description)
@@ -137,7 +135,12 @@ fun LoginView(
             enabled = !showLoading!!,
         ) {
             if (showLoading == true) {
-                LoadingSpinner()
+                LoadingSpinner(
+                    Modifier
+                        .height(25.dp)
+                        .width(25.dp)
+                        .wrapContentSize(Alignment.Center),
+                )
             } else {
                 Text(
                     text = "Login",

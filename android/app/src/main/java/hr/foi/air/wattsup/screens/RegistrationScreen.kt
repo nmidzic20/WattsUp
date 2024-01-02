@@ -8,9 +8,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -54,6 +56,7 @@ import hr.foi.air.wattsup.viewmodels.AuthenticationViewModel
 fun RegistrationScreen(
     onArrowBackClick: () -> Unit,
     onLogInClick: () -> Unit,
+    onAddCard: () -> Unit,
     viewModel: AuthenticationViewModel,
 ) {
     Scaffold(
@@ -70,13 +73,14 @@ fun RegistrationScreen(
     ) {
         val modifier = Modifier.padding(it)
 
-        RegistrationView(onLogInClick, viewModel, modifier)
+        RegistrationView(onLogInClick, onAddCard, viewModel, modifier)
     }
 }
 
 @Composable
 fun RegistrationView(
     onLogInClick: () -> Unit,
+    onAddCard: () -> Unit,
     viewModel: AuthenticationViewModel,
     modifier: Modifier = Modifier,
 ) {
@@ -89,13 +93,18 @@ fun RegistrationView(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        CentralView(Modifier.padding(0.dp, 15.dp), onLogInClick, viewModel)
+        CentralView(Modifier.padding(0.dp, 15.dp), onLogInClick, onAddCard, viewModel)
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CentralView(modifier: Modifier, onLogInClick: () -> Unit, viewModel: AuthenticationViewModel) {
+fun CentralView(
+    modifier: Modifier,
+    onLogInClick: () -> Unit,
+    onAddCard: () -> Unit,
+    viewModel: AuthenticationViewModel,
+) {
     val firstName by viewModel.firstName.observeAsState()
     val lastName by viewModel.lastName.observeAsState()
     val email by viewModel.email.observeAsState()
@@ -157,17 +166,17 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit, viewModel: Authent
         } else {
             TextFieldDefaults.outlinedTextFieldColors()
         },
-        visualTransformation = if (passwordVisible == true) VisualTransformation.None else PasswordVisualTransformation(),
+        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
         label = { Text(stringResource(R.string.password_label)) },
         singleLine = true,
         trailingIcon = {
-            val image = if (passwordVisible == true) {
+            val image = if (passwordVisible) {
                 Icons.Filled.Visibility
             } else {
                 Icons.Filled.VisibilityOff
             }
 
-            val description = if (passwordVisible == true) "Hide password" else "Show password"
+            val description = if (passwordVisible) "Hide password" else "Show password"
 
             IconButton(onClick = { viewModel.togglePasswordVisibility() }) {
                 Icon(imageVector = image, description)
@@ -191,8 +200,7 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit, viewModel: Authent
         Spacer(modifier = Modifier.width(4.dp))
 
         ElevatedButton(
-            onClick = {
-            },
+            onClick = onAddCard,
             modifier = Modifier
                 .padding(10.dp)
                 .clip(MaterialTheme.shapes.medium),
@@ -236,7 +244,12 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit, viewModel: Authent
         enabled = !showLoading!!,
     ) {
         if (showLoading == true) {
-            LoadingSpinner()
+            LoadingSpinner(
+                Modifier
+                    .height(25.dp)
+                    .width(25.dp)
+                    .wrapContentSize(Alignment.Center),
+            )
         } else {
             Text(
                 text = "Register",
@@ -273,5 +286,5 @@ fun CentralView(modifier: Modifier, onLogInClick: () -> Unit, viewModel: Authent
 @Preview(showBackground = false)
 @Composable
 fun RegistrationPreview() {
-    RegistrationScreen({}, {}, AuthenticationViewModel())
+    RegistrationScreen({}, {}, {}, AuthenticationViewModel())
 }
