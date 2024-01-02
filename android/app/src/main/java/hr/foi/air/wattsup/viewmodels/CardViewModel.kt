@@ -5,10 +5,12 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import hr.foi.air.wattsup.network.NetworkService
 import hr.foi.air.wattsup.network.models.Card
 import hr.foi.air.wattsup.network.models.TokenManager
+import hr.foi.air.wattsup.utils.LastAddedCard
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -22,9 +24,30 @@ class CardViewModel : ViewModel() {
     private val _showLoading = MutableLiveData<Boolean>()
     val showLoading: LiveData<Boolean> = _showLoading
 
+    private val _card = MutableLiveData<Card?>(null)
+    val card: LiveData<Card?> = _card
+
+    private val lastAddedCardObserver = Observer<Card> { newCard ->
+        updateCard(newCard)
+    }
+
+    init {
+        // Update card variable if LastAddedCard.userCard has a new card added
+        LastAddedCard.userCard.observeForever(lastAddedCardObserver)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        LastAddedCard.userCard.removeObserver(lastAddedCardObserver)
+    }
+
     suspend fun fetchCards(context: Context, userId: Int) {
         _cards.value = getCards(context, userId)
         _showLoading.value = false
+    }
+
+    fun updateCard(value: Card?) {
+        _card.value = value
     }
 
     private suspend fun getCards(context: Context, userId: Int): List<Card?> {

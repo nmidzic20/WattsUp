@@ -96,9 +96,13 @@ fun CardScreen(onArrowBackClick: () -> Unit, onAddCard: () -> Unit, viewModel: C
 fun CardView(viewModel: CardViewModel, onAddCard: () -> Unit, context: Context = LocalContext.current) {
     val userId = TokenManager.getInstance(context).getId()
     val state = rememberLazyListState()
+    val showAddDialog = remember { mutableStateOf(false) }
 
     val cards by viewModel.cards.observeAsState(emptyList())
     val showLoading by viewModel.showLoading.observeAsState(true)
+    val scannedCard by viewModel.card.observeAsState()
+
+    AddDialog(scannedCard, cards, viewModel)
 
     LaunchedEffect(Unit) {
         viewModel.fetchCards(context, userId)
@@ -154,7 +158,7 @@ fun CardView(viewModel: CardViewModel, onAddCard: () -> Unit, context: Context =
             horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
             ElevatedButton(
-                onClick = { onAddCard() },
+                onClick = { onAddCard() /*viewModel.updateCard(Card(0, "0x3530A832", true))*/ },
             ) {
                 Text(
                     text = "Add Card",
@@ -237,6 +241,21 @@ fun CardCard(item: Card) {
     }
 }
 
+private fun checkCard(scannedCard: Card?, cards: List<Card?>, context : Context): Boolean {
+    if (scannedCard == null) {
+        Toast.makeText(context, "Card not scanned!", Toast.LENGTH_LONG).show()
+        return false
+    }
+
+    val exists = cards.any { it?.value == scannedCard.value }
+
+    if (exists) {
+        Toast.makeText(context, "Scanned card already exists!", Toast.LENGTH_LONG).show()
+        return false
+    }
+    return true
+}
+
 @Composable
 private fun RemoveDialog(openAlertDialog: MutableState<Boolean>) {
     when {
@@ -284,6 +303,62 @@ private fun RemoveDialog(openAlertDialog: MutableState<Boolean>) {
                                     text = "Remove",
                                     fontSize = 16.sp,
                                     color = Color.Red
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AddDialog(scannedCard: Card?, cards: List<Card?>, viewModel: CardViewModel) {
+    when {
+        scannedCard != null && checkCard(scannedCard, cards, LocalContext.current) -> {
+            Dialog(onDismissRequest = { viewModel.updateCard(null) }) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp)
+                        .padding(16.dp),
+                    shape = RoundedCornerShape(16.dp),
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Text(
+                            fontSize = 20.sp,
+                            text = "Add card ${scannedCard.value.uppercase()}?",
+                            modifier = Modifier.padding(16.dp),
+                            color = Color.White
+                        )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                        ) {
+                            TextButton(
+                                onClick = { viewModel.updateCard(null) },
+                                modifier = Modifier.padding(8.dp),
+                            ) {
+                                Text(
+                                    text = "Cancel",
+                                    fontSize = 16.sp,
+                                    color = Color.LightGray
+                                )
+                            }
+                            TextButton(
+                                onClick = { viewModel.updateCard(null); /*TODO*/ },
+                                modifier = Modifier.padding(8.dp),
+                            ) {
+                                Text(
+                                    text = "Add",
+                                    fontSize = 16.sp,
                                 )
                             }
                         }
