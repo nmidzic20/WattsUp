@@ -87,15 +87,15 @@ fun CardScreen(onArrowBackClick: () -> Unit, onAddCard: () -> Unit, viewModel: C
 fun CardView(viewModel: CardViewModel, onAddCard: () -> Unit, context: Context = LocalContext.current) {
     val userId = TokenManager.getInstance(context).getId()
     val state = rememberLazyListState()
-
     val cards by viewModel.cards.observeAsState(emptyList())
     val showLoading by viewModel.showLoading.observeAsState(true)
     val scannedCard by viewModel.card.observeAsState()
+    val refresh = remember { mutableStateOf(false) }
 
-    AddDialog(scannedCard, userId, viewModel)
+    AddDialog(refresh, scannedCard, userId, viewModel)
 
-    LaunchedEffect(Unit) {
-        viewModel.fetchCards(context, userId)
+    LaunchedEffect(Unit, refresh.value) {
+        viewModel.refreshCards(context, userId)
     }
 
     Column (
@@ -109,6 +109,7 @@ fun CardView(viewModel: CardViewModel, onAddCard: () -> Unit, context: Context =
                 .fillMaxWidth()
                 .fillMaxHeight(0.85f),
             verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
             state = state,
             flingBehavior = rememberSnapFlingBehavior(lazyListState = state)
         ) {
@@ -117,9 +118,8 @@ fun CardView(viewModel: CardViewModel, onAddCard: () -> Unit, context: Context =
                     CircularProgressIndicator(
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier
-                            .fillMaxHeight()
-                            .fillMaxWidth()
-                            .padding(top = 320.dp, start = 175.dp)
+                            .fillMaxSize()
+                            .wrapContentHeight(Alignment.CenterVertically)
                     )
                 }
             } else if (cards.isEmpty()) {
@@ -129,14 +129,13 @@ fun CardView(viewModel: CardViewModel, onAddCard: () -> Unit, context: Context =
                         style = MaterialTheme.typography.headlineMedium,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .height(500.dp)
+                            .fillMaxSize()
                             .wrapContentHeight(Alignment.CenterVertically)
                     )
                 }
             } else {
                 itemsIndexed(cards) { _, item ->
-                    CardCard(item!!, viewModel)
+                    CardCard(refresh, item!!, viewModel)
                 }
             }
         }
@@ -163,12 +162,12 @@ fun CardView(viewModel: CardViewModel, onAddCard: () -> Unit, context: Context =
 }
 
 @Composable
-fun CardCard(item: Card, viewModel: CardViewModel) {
+fun CardCard(refresh: MutableState<Boolean>, item: Card, viewModel: CardViewModel) {
     val width = LocalConfiguration.current.screenWidthDp.dp * 0.92f
     val showRemoveDialog = remember { mutableStateOf(false) }
     val selectedCardId = remember { mutableIntStateOf(-1) }
 
-    RemoveDialog(showRemoveDialog, selectedCardId, viewModel)
+    RemoveDialog(showRemoveDialog, refresh, selectedCardId, viewModel)
 
     ElevatedCard(
         colors = CardDefaults.cardColors(
@@ -235,6 +234,7 @@ fun CardCard(item: Card, viewModel: CardViewModel) {
 @Composable
 private fun RemoveDialog(
     openAlertDialog: MutableState<Boolean>,
+    refresh: MutableState<Boolean>,
     cardId: MutableState<Int>,
     viewModel: CardViewModel,
     context : Context = LocalContext.current) {
@@ -279,6 +279,7 @@ private fun RemoveDialog(
                                 onClick = {
                                     openAlertDialog.value = false
                                     viewModel.deleteCard(cardId.value, context)
+                                    refresh.value = !refresh.value
                                 },
                                 modifier = Modifier.padding(8.dp),
                             ) {
@@ -298,6 +299,7 @@ private fun RemoveDialog(
 
 @Composable
 private fun AddDialog(
+    refresh: MutableState<Boolean>,
     scannedCard: Card?,
     userId: Int,
     viewModel: CardViewModel,
@@ -340,7 +342,10 @@ private fun AddDialog(
                                 )
                             }
                             TextButton(
-                                onClick = { viewModel.addCard(userId, context) },
+                                onClick = {
+                                    viewModel.addCard(userId, context)
+                                    refresh.value = !refresh.value
+                                },
                                 modifier = Modifier.padding(8.dp),
                             ) {
                                 Text(

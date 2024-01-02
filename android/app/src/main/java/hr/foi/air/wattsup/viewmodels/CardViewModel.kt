@@ -10,10 +10,7 @@ import androidx.lifecycle.ViewModel
 import hr.foi.air.wattsup.network.NetworkService
 import hr.foi.air.wattsup.network.models.Card
 import hr.foi.air.wattsup.network.models.CardPOSTBody
-import hr.foi.air.wattsup.network.models.EventPOSTBody
-import hr.foi.air.wattsup.network.models.EventPOSTResponseBody
 import hr.foi.air.wattsup.network.models.TokenManager
-import hr.foi.air.wattsup.utils.CurrentEvent
 import hr.foi.air.wattsup.utils.LastAddedCard
 import retrofit2.Call
 import retrofit2.Callback
@@ -29,9 +26,6 @@ class CardViewModel : ViewModel() {
 
     private val _showLoading = MutableLiveData<Boolean>()
     val showLoading: LiveData<Boolean> = _showLoading
-
-    private val _disableAddButton = MutableLiveData<Boolean>()
-    val disableAddButton: LiveData<Boolean> = _disableAddButton
 
     private val _card = MutableLiveData<Card?>(null)
     val card: LiveData<Card?> = _card
@@ -50,13 +44,19 @@ class CardViewModel : ViewModel() {
         LastAddedCard.userCard.removeObserver(lastAddedCardObserver)
     }
 
-    suspend fun fetchCards(context: Context, userId: Int) {
-        _cards.value = getCards(context, userId)
-        _showLoading.value = false
-    }
-
     fun updateCard(value: Card?) {
         _card.value = value
+    }
+
+    suspend fun refreshCards(context: Context, userId: Int) {
+        _showLoading.value = true
+        _cards.value = emptyList()
+        fetchCards(context, userId)
+    }
+
+    private suspend fun fetchCards(context: Context, userId: Int) {
+        _cards.value = getCards(context, userId)
+        _showLoading.value = false
     }
 
     private suspend fun getCards(context: Context, userId: Int): List<Card?> {
