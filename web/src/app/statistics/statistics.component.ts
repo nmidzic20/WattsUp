@@ -200,8 +200,20 @@ export class StatisticsComponent implements OnInit {
 
   calculateDuration(event: ChargingEvent): string {
     const duration = event.endedAt.getTime() - event.startedAt.getTime();
-    return this.formatTime(duration);
+    return this.formatTimeSeconds(duration);
+  }
 
+  roundVolumeKwh(volumeKwh: number): number {
+    return Math.round(volumeKwh * 100) / 100;
+  }
+
+  formatTimeSeconds(milliseconds: number): string {
+    const totalSeconds = Math.floor(milliseconds / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor(totalSeconds / 60) % 60;
+    const seconds = totalSeconds % 60;
+  
+    return `${hours}h ${minutes}m ${seconds}s`;
   }
 
 }

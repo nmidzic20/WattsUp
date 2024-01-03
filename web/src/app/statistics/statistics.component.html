@@ -37,9 +37,9 @@
                     </thead>
                 <tbody>
                     <tr *ngFor="let event of events">
-                        <td>{{ event.startedAt | date: 'dd.MM.yyyy  hh.mm.ss' }}</td>
-                        <td>{{ event.endedAt | date: 'dd.MM.yyyy  hh.mm.ss' }}</td>
-                        <td>Charged {{ event.volumeKwh }}kWh in {{ calculateDuration(event) }}</td>
+                        <td>{{ event.startedAt | date: 'dd.MM.yyyy  HH:mm:ss' }}</td>
+                        <td>{{ event.endedAt | date: 'dd.MM.yyyy  HH:mm:ss' }}</td>
+                        <td>Charged {{ roundVolumeKwh(event.volumeKwh) }}kWh in {{ calculateDuration(event) }}</td>
                     </tr>
                 </tbody>
             </table>
