@@ -4,16 +4,22 @@ package hr.foi.air.wattsup.screens
 
 import android.annotation.SuppressLint
 import android.content.Context
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
@@ -39,6 +45,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
@@ -46,12 +53,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -91,6 +103,7 @@ fun CardView(viewModel: CardViewModel, onAddCard: () -> Unit, context: Context =
     val showLoading by viewModel.showLoading.observeAsState(true)
     val scannedCard by viewModel.card.observeAsState()
     val refresh = remember { mutableStateOf(false) }
+    val currentCard = remember { derivedStateOf { state.firstVisibleItemIndex } }
 
     AddDialog(refresh, scannedCard, userId, viewModel)
 
@@ -100,13 +113,23 @@ fun CardView(viewModel: CardViewModel, onAddCard: () -> Unit, context: Context =
 
     Column (
         modifier = Modifier
-            .padding(top = 50.dp)
-            .fillMaxSize()
+            .fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement
+            .spacedBy(space = 20.dp, alignment = Alignment.CenterVertically),
     ) {
+        PageIndicator(
+            numberOfPages = cards.size,
+            selectedPage = currentCard.value,
+            defaultRadius = 8.dp,
+            selectedLength = 20.dp,
+            space = 5.dp,
+            animationDurationInMillis = 500,
+        )
         LazyRow(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.85f),
+                .height(200.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
             state = state,
@@ -137,24 +160,17 @@ fun CardView(viewModel: CardViewModel, onAddCard: () -> Unit, context: Context =
                 }
             }
         }
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = 30.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly,
+        Spacer(modifier = Modifier.height(20.dp))
+        ElevatedButton(
+            onClick = { onAddCard() },
         ) {
-            ElevatedButton(
-                onClick = { onAddCard() },
-            ) {
-                Text(
-                    text = "Add Card",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = Color.White,
-                    modifier = Modifier.width(120.dp),
-                    textAlign = TextAlign.Center
-                )
-            }
+            Text(
+                text = "Add Card",
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.White,
+                modifier = Modifier.width(120.dp),
+                textAlign = TextAlign.Center
+            )
         }
     }
 }
@@ -359,8 +375,93 @@ private fun AddDialog(
     }
 }
 
-/*@Preview(showBackground = false)
+@Composable
+fun PageIndicator(
+    numberOfPages: Int,
+    modifier: Modifier = Modifier,
+    selectedPage: Int = 0,
+    selectedColor: Color = Color.Green,
+    defaultColor: Color = Color.LightGray,
+    defaultRadius: Dp = 20.dp,
+    selectedLength: Dp = 60.dp,
+    space: Dp = 30.dp,
+    animationDurationInMillis: Int = 300,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(space),
+        modifier = modifier,
+    ) {
+        for (i in 0 until numberOfPages) {
+            val isSelected = i == selectedPage
+            PageIndicatorView(
+                isSelected = isSelected,
+                selectedColor = selectedColor,
+                defaultColor = defaultColor,
+                defaultRadius = defaultRadius,
+                selectedLength = selectedLength,
+                animationDurationInMillis = animationDurationInMillis,
+            )
+        }
+    }
+}
+
+@Composable
+fun PageIndicatorView(
+    isSelected: Boolean,
+    selectedColor: Color,
+    defaultColor: Color,
+    defaultRadius: Dp,
+    selectedLength: Dp,
+    animationDurationInMillis: Int,
+    modifier: Modifier = Modifier,
+) {
+
+    val color: Color by animateColorAsState(
+        targetValue = if (isSelected) {
+            selectedColor
+        } else {
+            defaultColor
+        },
+        animationSpec = tween(
+            durationMillis = animationDurationInMillis,
+        ), label = ""
+    )
+    val width: Dp by animateDpAsState(
+        targetValue = if (isSelected) {
+            selectedLength
+        } else {
+            defaultRadius
+        },
+        animationSpec = tween(
+            durationMillis = animationDurationInMillis,
+        ), label = ""
+    )
+
+    Canvas(
+        modifier = modifier
+            .size(
+                width = width,
+                height = defaultRadius,
+            ),
+    ) {
+        drawRoundRect(
+            color = color,
+            topLeft = Offset.Zero,
+            size = Size(
+                width = width.toPx(),
+                height = defaultRadius.toPx(),
+            ),
+            cornerRadius = CornerRadius(
+                x = defaultRadius.toPx(),
+                y = defaultRadius.toPx(),
+            ),
+        )
+    }
+}
+
+@Preview(showBackground = false)
 @Composable
 fun CardPreview() {
-    CardScreen({}, {})
-}*/
+    CardScreen({}, {}, CardViewModel())
+}
