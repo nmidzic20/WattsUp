@@ -112,8 +112,7 @@ fun CardView(viewModel: CardViewModel, onAddCard: () -> Unit, context: Context =
     }
 
     Column (
-        modifier = Modifier
-            .fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement
             .spacedBy(space = 20.dp, alignment = Alignment.CenterVertically),
@@ -191,7 +190,7 @@ fun CardCard(refresh: MutableState<Boolean>, item: Card, viewModel: CardViewMode
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.elevatedCardElevation(10.dp),
         modifier = Modifier
-            .padding(start = 15.dp, end = 15.dp)
+            .padding(start = 20.dp, end = 20.dp)
             .height(200.dp)
             .width(width)
     ) {
