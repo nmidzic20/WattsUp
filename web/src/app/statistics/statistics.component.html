@@ -27,7 +27,20 @@
                         </div>
                 </div>
         </div>
-        <div class="logs">
-
-        </div>
+        <table>
+                <thead>
+                        <tr>
+                            <th>Started at</th>
+                            <th>Ended at</th>
+                            <th>Log</th>
+                        </tr>
+                    </thead>
+                <tbody>
+                    <tr *ngFor="let event of events">
+                        <td>{{ event.startedAt | date: 'dd.MM.yyyy  hh.mm.ss' }}</td>
+                        <td>{{ event.endedAt | date: 'dd.MM.yyyy  hh.mm.ss' }}</td>
+                        <td>Charged {{ event.volumeKwh }}kWh in {{ calculateDuration(event) }}</td>
+                    </tr>
+                </tbody>
+            </table>
 </div>

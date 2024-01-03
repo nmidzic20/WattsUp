@@ -197,4 +197,10 @@ export class StatisticsComponent implements OnInit {
     this.chartData = this.calculateChartData();
   }
 
+  calculateDuration(event: ChargingEvent): string {
+    const duration = event.endedAt.getTime() - event.startedAt.getTime();
+    return this.formatTime(duration);
+
+  }
+
 }
