@@ -52,6 +52,7 @@ export class StatisticsComponent implements OnInit {
         const eventsPromises = cards.map((card: any) => this.getEvents(card.id, tokens!.jwt));
         const eventsArray = await Promise.all(eventsPromises);
         this.events = eventsArray.flat();
+        this.events.sort((a, b) => b.startedAt.getTime() - a.startedAt.getTime());
 
         this.calculateTimeAndAmountCharged();
         
