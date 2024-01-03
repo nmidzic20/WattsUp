@@ -2,7 +2,6 @@
 
 package hr.foi.air.wattsup.screens
 
-import android.annotation.SuppressLint
 import android.content.Context
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -75,7 +73,6 @@ import hr.foi.air.wattsup.ui.component.TopAppBar
 import hr.foi.air.wattsup.viewmodels.CardViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun CardScreen(onArrowBackClick: () -> Unit, onAddCard: () -> Unit, viewModel: CardViewModel) {
     Scaffold(
@@ -90,13 +87,17 @@ fun CardScreen(onArrowBackClick: () -> Unit, onAddCard: () -> Unit, viewModel: C
             )
         },
     ) {
-        CardView(viewModel, onAddCard)
+        CardView(viewModel, onAddCard, Modifier.padding(it))
     }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CardView(viewModel: CardViewModel, onAddCard: () -> Unit, context: Context = LocalContext.current) {
+fun CardView(
+    viewModel: CardViewModel,
+    onAddCard: () -> Unit,
+    modifier: Modifier = Modifier,
+    context: Context = LocalContext.current) {
     val userId = TokenManager.getInstance(context).getId()
     val state = rememberLazyListState()
     val cards by viewModel.cards.observeAsState(emptyList())
@@ -112,7 +113,7 @@ fun CardView(viewModel: CardViewModel, onAddCard: () -> Unit, context: Context =
     }
 
     Column (
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement
             .spacedBy(space = 20.dp, alignment = Alignment.CenterVertically),
