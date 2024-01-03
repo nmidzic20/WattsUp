@@ -30,7 +30,6 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -69,6 +68,7 @@ import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.network.models.Card
 import hr.foi.air.wattsup.network.models.TokenManager
 import hr.foi.air.wattsup.ui.component.CircleButton
+import hr.foi.air.wattsup.ui.component.LoadingSpinner
 import hr.foi.air.wattsup.ui.component.TopAppBar
 import hr.foi.air.wattsup.viewmodels.CardViewModel
 
@@ -137,7 +137,7 @@ fun CardView(
         ) {
             if (showLoading) {
                 item {
-                    CircularProgressIndicator(
+                    LoadingSpinner(
                         modifier = Modifier
                             .fillMaxSize()
                             .wrapContentHeight(Alignment.CenterVertically)
