@@ -44,6 +44,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.Visibility
 import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.network.models.Card
 import hr.foi.air.wattsup.ui.component.LoadingSpinner
@@ -192,7 +193,7 @@ fun CentralView(
                 .padding(0.dp, 15.dp)
                 .width(200.dp),
             value = card?.value ?: "",
-            onValueChange = { viewModel.updateCard(Card(id = 0, value = it)) },
+            onValueChange = { viewModel.updateCard(Card(id = 0, value = it, active = true)) },
             label = { Text(stringResource(R.string.card_label)) },
             singleLine = true,
         )

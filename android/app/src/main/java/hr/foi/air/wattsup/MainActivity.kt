@@ -21,9 +21,11 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import hr.foi.air.wattsup.ble.BLEManager
 import hr.foi.air.wattsup.core.CardManager
 import hr.foi.air.wattsup.rfid.RFIDManager
+import hr.foi.air.wattsup.screens.CardScreen
 import hr.foi.air.wattsup.screens.ChargerScreen
 import hr.foi.air.wattsup.screens.HistoryScreen
 import hr.foi.air.wattsup.screens.LandingScreen
@@ -34,6 +36,7 @@ import hr.foi.air.wattsup.screens.SimulatorScreen
 import hr.foi.air.wattsup.screens.UserModeScreen
 import hr.foi.air.wattsup.ui.theme.WattsUpTheme
 import hr.foi.air.wattsup.viewmodels.AuthenticationViewModel
+import hr.foi.air.wattsup.viewmodels.CardViewModel
 import hr.foi.air.wattsup.viewmodels.ChargerViewModel
 import hr.foi.air.wattsup.viewmodels.HistoryViewModel
 import hr.foi.air.wattsup.viewmodels.ScanViewModel
@@ -46,6 +49,7 @@ class MainActivity : ComponentActivity() {
     private val chargerViewModel: ChargerViewModel by viewModels()
     private val scanViewModel: ScanViewModel by viewModels()
     private val historyViewModel: HistoryViewModel by viewModels()
+    private val cardViewModel: CardViewModel by viewModels()
     private val authenticationViewModel: AuthenticationViewModel by viewModels()
 
     var cardManagers: List<CardManager> = emptyList()
@@ -103,7 +107,13 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("addCard") {
                             val onScan = {
-                                navController.navigate("registration")
+                                navController.navigate(
+                                    navController.previousBackStackEntry?.destination?.route!!
+                                ) {
+                                    popUpTo(navController.previousBackStackEntry?.destination?.route!!) {
+                                        inclusive = true
+                                    }
+                                }
                             }
 
                             ScanScreen(
@@ -146,8 +156,9 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("userMode") {
                             val onHistoryClick = { navController.navigate("chargingHistory") }
+                            val onCardsClick = { navController.navigate("myCards") }
                             BackHandler(true) { }
-                            UserModeScreen(onHistoryClick, onArrowBackClick)
+                            UserModeScreen(onHistoryClick, onCardsClick, onArrowBackClick)
                         }
                         composable("chargingHistory") {
                             HistoryScreen(onArrowBackClick, historyViewModel)
@@ -156,6 +167,10 @@ class MainActivity : ComponentActivity() {
                             SimulatorScreen(chargerViewModel) {
                                 navController.navigate("chargerMode")
                             }
+                        }
+                        composable("myCards") {
+                            val onAddCard = { navController.navigate("addCard") }
+                            CardScreen(onArrowBackClick, onAddCard, cardViewModel)
                         }
                     }
                 }

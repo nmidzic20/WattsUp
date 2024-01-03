@@ -6,11 +6,13 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -34,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,7 +47,7 @@ import hr.foi.air.wattsup.ui.component.TopAppBar
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun UserModeScreen(onHistoryClick: () -> Unit, onArrowBackClick: () -> Unit) {
+fun UserModeScreen(onHistoryClick: () -> Unit, onCardsClick: () -> Unit, onArrowBackClick: () -> Unit) {
     val showLogoutDialog = remember { mutableStateOf(false) }
 
     Scaffold(
@@ -59,16 +62,12 @@ fun UserModeScreen(onHistoryClick: () -> Unit, onArrowBackClick: () -> Unit) {
             )
         },
     ) {
-        UserModeView(onHistoryClick, onArrowBackClick, showLogoutDialog)
+        UserModeView(onHistoryClick, onCardsClick, onArrowBackClick, showLogoutDialog)
     }
 }
 
 @Composable
-fun UserModeView(
-    onHistoryClick: () -> Unit,
-    onArrowBackClick: () -> Unit,
-    showLogoutDialog: MutableState<Boolean>,
-) {
+fun UserModeView(onHistoryClick: () -> Unit, onCardsClick: () -> Unit, onArrowBackClick: () -> Unit, showLogoutDialog: MutableState<Boolean>) {
     LogoutDialog(showLogoutDialog, onArrowBackClick)
 
     Column(
@@ -88,6 +87,21 @@ fun UserModeView(
                 text = stringResource(R.string.history),
                 style = MaterialTheme.typography.bodyLarge,
                 color = Color.White,
+                modifier = Modifier.width(150.dp),
+                textAlign = TextAlign.Center
+            )
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        ElevatedButton(
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+            onClick = onCardsClick
+        ) {
+            Text(
+                text = stringResource(R.string.cards),
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.White,
+                modifier = Modifier.width(150.dp),
+                textAlign = TextAlign.Center
             )
         }
     }
@@ -115,6 +129,7 @@ private fun LogoutDialog(openAlertDialog: MutableState<Boolean>, onArrowBackClic
                             fontSize = 20.sp,
                             text = "Would you like to log out?",
                             modifier = Modifier.padding(16.dp),
+                            color = Color.White
                         )
                         Row(
                             modifier = Modifier
@@ -128,6 +143,7 @@ private fun LogoutDialog(openAlertDialog: MutableState<Boolean>, onArrowBackClic
                                 Text(
                                     text = "Cancel",
                                     fontSize = 16.sp,
+                                    color = Color.LightGray
                                 )
                             }
                             TextButton(
@@ -135,8 +151,9 @@ private fun LogoutDialog(openAlertDialog: MutableState<Boolean>, onArrowBackClic
                                 modifier = Modifier.padding(8.dp),
                             ) {
                                 Text(
-                                    text = "Yes",
+                                    text = "Log out",
                                     fontSize = 16.sp,
+                                    color = Color.Red
                                 )
                             }
                         }
@@ -150,5 +167,5 @@ private fun LogoutDialog(openAlertDialog: MutableState<Boolean>, onArrowBackClic
 @Preview(showBackground = false)
 @Composable
 fun UserModePreview() {
-    UserModeScreen({}, {})
+    UserModeScreen({}, {}, {})
 }
