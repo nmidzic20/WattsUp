@@ -63,7 +63,7 @@ export class StationManagementComponent implements OnInit {
     let parameters = { method: 'GET', headers: header};
 
     try {
-      let response = await fetch(environment.apiUrl + "/Charger", parameters);
+      let response = await fetch(environment.apiUrl + "/Charger/web", parameters);
       let body = await response.json();
       if (response.status == 200) {
         this.stations = body.map((station: StationResponse) => this.mapStationResponseToStation(station));
