@@ -85,6 +85,7 @@ class MainActivity : ComponentActivity() {
                         navController.popBackStack()
                         Unit
                     }
+                    val onLogOutClick = { navController.navigate("landing") }
 
                     NavHost(navController = navController, startDestination = "landing") {
                         composable("landing") {
@@ -178,7 +179,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable("chargingHistory") {
-                            HistoryScreen(onArrowBackClick, historyViewModel)
+                            HistoryScreen(onArrowBackClick, onLogOutClick, historyViewModel)
                         }
                         composable("EVsimulator") {
                             SimulatorScreen(chargerViewModel) {
@@ -187,7 +188,7 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("myCards") {
                             val onAddCard = { navController.navigate("addCard") }
-                            CardScreen(onArrowBackClick, onAddCard, cardViewModel)
+                            CardScreen(onArrowBackClick, onAddCard, onLogOutClick, cardViewModel)
                         }
                     }
                 }

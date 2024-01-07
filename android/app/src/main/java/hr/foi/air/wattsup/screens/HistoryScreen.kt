@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,6 +31,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -50,6 +52,7 @@ import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.network.models.Event
 import hr.foi.air.wattsup.network.models.TokenManager
 import hr.foi.air.wattsup.ui.component.LoadingSpinner
+import hr.foi.air.wattsup.ui.component.LogoutDialog
 import hr.foi.air.wattsup.ui.component.TopAppBar
 import hr.foi.air.wattsup.viewmodels.HistoryViewModel
 import java.text.DecimalFormat
@@ -59,7 +62,13 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun HistoryScreen(onArrowBackClick: () -> Unit, viewModel: HistoryViewModel) {
+fun HistoryScreen(
+    onArrowBackClick: () -> Unit,
+    onLogOutClick: () -> Unit,
+    viewModel: HistoryViewModel,
+) {
+    val showLogoutDialog = remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -69,17 +78,23 @@ fun HistoryScreen(onArrowBackClick: () -> Unit, viewModel: HistoryViewModel) {
                         Icon(Icons.Filled.ArrowBack, null, tint = Color.White)
                     }
                 },
-
+                actionIcon = {
+                    IconButton(onClick = { showLogoutDialog.value = true }) {
+                        Icon(Icons.Filled.ExitToApp, null, tint = Color.White)
+                    }
+                },
             )
         },
     ) {
-        HistoryView(it.calculateTopPadding(), viewModel)
+        HistoryView(it.calculateTopPadding(), showLogoutDialog, onLogOutClick, viewModel)
     }
 }
 
 @Composable
 fun HistoryView(
     topPadding: Dp,
+    showLogoutDialog: MutableState<Boolean>,
+    onLogOutClick: () -> Unit,
     viewModel: HistoryViewModel,
     context: Context = LocalContext.current,
 ) {
@@ -91,6 +106,8 @@ fun HistoryView(
     LaunchedEffect(Unit) {
         viewModel.refreshHistory(context, userId)
     }
+
+    LogoutDialog(showLogoutDialog, onLogOutClick)
 
     LazyColumn(
         modifier = Modifier
@@ -290,5 +307,5 @@ private fun DetailDialog(
 @Preview(showBackground = false)
 @Composable
 fun HistoryPreview() {
-    HistoryScreen({}, HistoryViewModel())
+    HistoryScreen({}, {}, HistoryViewModel())
 }

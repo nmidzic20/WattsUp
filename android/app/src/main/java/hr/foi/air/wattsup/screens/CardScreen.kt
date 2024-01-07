@@ -27,6 +27,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -69,12 +70,20 @@ import hr.foi.air.wattsup.network.models.Card
 import hr.foi.air.wattsup.network.models.TokenManager
 import hr.foi.air.wattsup.ui.component.CircleButton
 import hr.foi.air.wattsup.ui.component.LoadingSpinner
+import hr.foi.air.wattsup.ui.component.LogoutDialog
 import hr.foi.air.wattsup.ui.component.TopAppBar
 import hr.foi.air.wattsup.viewmodels.CardViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CardScreen(onArrowBackClick: () -> Unit, onAddCard: () -> Unit, viewModel: CardViewModel) {
+fun CardScreen(
+    onArrowBackClick: () -> Unit,
+    onAddCard: () -> Unit,
+    onLogOut: () -> Unit,
+    viewModel: CardViewModel,
+) {
+    val showLogoutDialog = remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -84,10 +93,15 @@ fun CardScreen(onArrowBackClick: () -> Unit, onAddCard: () -> Unit, viewModel: C
                         Icon(Icons.Filled.ArrowBack, null, tint = Color.White)
                     }
                 },
+                actionIcon = {
+                    IconButton(onClick = { showLogoutDialog.value = true }) {
+                        Icon(Icons.Filled.ExitToApp, null, tint = Color.White)
+                    }
+                },
             )
         },
     ) {
-        CardView(viewModel, onAddCard, Modifier.padding(it))
+        CardView(viewModel, onAddCard, showLogoutDialog, onLogOut, Modifier.padding(it))
     }
 }
 
@@ -96,6 +110,8 @@ fun CardScreen(onArrowBackClick: () -> Unit, onAddCard: () -> Unit, viewModel: C
 fun CardView(
     viewModel: CardViewModel,
     onAddCard: () -> Unit,
+    showLogoutDialog: MutableState<Boolean>,
+    onLogOut: () -> Unit,
     modifier: Modifier = Modifier,
     context: Context = LocalContext.current,
 ) {
@@ -112,6 +128,8 @@ fun CardView(
     LaunchedEffect(Unit, refresh.value) {
         viewModel.refreshCards(context, userId)
     }
+
+    LogoutDialog(showLogoutDialog, onLogOut)
 
     Column(
         modifier = modifier.fillMaxSize(),
@@ -467,5 +485,5 @@ fun PageIndicatorView(
 @Preview(showBackground = false)
 @Composable
 fun CardPreview() {
-    CardScreen({}, {}, CardViewModel())
+    CardScreen({}, {}, {}, CardViewModel())
 }
