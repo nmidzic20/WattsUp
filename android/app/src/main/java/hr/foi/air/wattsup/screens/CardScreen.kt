@@ -123,10 +123,14 @@ fun CardView(
     val refresh = remember { mutableStateOf(false) }
     val currentCard = remember { derivedStateOf { state.firstVisibleItemIndex } }
 
-    AddDialog(refresh, scannedCard, userId, viewModel)
+    if (userId != null) {
+        AddDialog(refresh, scannedCard, userId, viewModel)
+    }
 
     LaunchedEffect(Unit, refresh.value) {
-        viewModel.refreshCards(context, userId)
+        if (userId != null) {
+            viewModel.refreshCards(context, userId)
+        }
     }
 
     LogoutDialog(showLogoutDialog, onLogOut)

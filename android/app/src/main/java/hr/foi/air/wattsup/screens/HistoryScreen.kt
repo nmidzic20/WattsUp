@@ -4,6 +4,7 @@ package hr.foi.air.wattsup.screens
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -104,7 +105,10 @@ fun HistoryView(
     val showLoading by viewModel.showLoading.observeAsState(true)
 
     LaunchedEffect(Unit) {
-        viewModel.refreshHistory(context, userId)
+        Log.i("USER_ID", userId.toString())
+        if (userId != null) {
+            viewModel.refreshHistory(context, userId)
+        }
     }
 
     LogoutDialog(showLogoutDialog, onLogOutClick)
