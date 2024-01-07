@@ -51,6 +51,6 @@
     <app-add-station-dialogue [isVisible]="isAddStationDialogueVisible" (closeDialogue)="isAddStationDialogueVisible=false" (refreshChargerView)="getStations($event)"></app-add-station-dialogue>
 
 </div>
-<div class="center">
-    <div class="spinner" *ngIf="loading"></div>
+<div class="center" *ngIf="loading">
+    <div class="spinner"></div>
 </div>
