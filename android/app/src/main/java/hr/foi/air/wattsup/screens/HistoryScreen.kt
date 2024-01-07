@@ -69,6 +69,7 @@ fun HistoryScreen(onArrowBackClick: () -> Unit, viewModel: HistoryViewModel) {
                         Icon(Icons.Filled.ArrowBack, null, tint = Color.White)
                     }
                 },
+
             )
         },
     ) {
@@ -82,7 +83,7 @@ fun HistoryView(
     viewModel: HistoryViewModel,
     context: Context = LocalContext.current,
 ) {
-    val userId = TokenManager.getInstance(context).getId()
+    val userId = TokenManager.getInstance(context).getUserId()
 
     val events by viewModel.events.observeAsState(emptyList())
     val showLoading by viewModel.showLoading.observeAsState(true)
@@ -104,7 +105,7 @@ fun HistoryView(
                     Modifier
                         .height(40.dp)
                         .width(40.dp)
-                        .padding(top = 320.dp)
+                        .padding(top = 320.dp),
                 )
             }
         } else if (events.isEmpty()) {
@@ -115,7 +116,7 @@ fun HistoryView(
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(top = 320.dp)
+                        .padding(top = 320.dp),
                 )
             }
         } else {

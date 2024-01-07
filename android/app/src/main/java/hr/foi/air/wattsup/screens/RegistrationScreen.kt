@@ -1,6 +1,5 @@
 package hr.foi.air.wattsup.screens
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -44,14 +43,12 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.Visibility
 import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.network.models.Card
 import hr.foi.air.wattsup.ui.component.LoadingSpinner
 import hr.foi.air.wattsup.ui.component.TopAppBar
 import hr.foi.air.wattsup.viewmodels.AuthenticationViewModel
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegistrationScreen(

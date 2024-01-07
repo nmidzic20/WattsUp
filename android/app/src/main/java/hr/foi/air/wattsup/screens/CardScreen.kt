@@ -97,8 +97,9 @@ fun CardView(
     viewModel: CardViewModel,
     onAddCard: () -> Unit,
     modifier: Modifier = Modifier,
-    context: Context = LocalContext.current) {
-    val userId = TokenManager.getInstance(context).getId()
+    context: Context = LocalContext.current,
+) {
+    val userId = TokenManager.getInstance(context).getUserId()
     val state = rememberLazyListState()
     val cards by viewModel.cards.observeAsState(emptyList())
     val showLoading by viewModel.showLoading.observeAsState(true)
@@ -112,7 +113,7 @@ fun CardView(
         viewModel.refreshCards(context, userId)
     }
 
-    Column (
+    Column(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement
@@ -133,14 +134,14 @@ fun CardView(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
             state = state,
-            flingBehavior = rememberSnapFlingBehavior(lazyListState = state)
+            flingBehavior = rememberSnapFlingBehavior(lazyListState = state),
         ) {
             if (showLoading) {
                 item {
                     LoadingSpinner(
                         modifier = Modifier
                             .fillMaxSize()
-                            .wrapContentHeight(Alignment.CenterVertically)
+                            .wrapContentHeight(Alignment.CenterVertically),
                     )
                 }
             } else if (cards.isEmpty()) {
@@ -151,7 +152,7 @@ fun CardView(
                         textAlign = TextAlign.Center,
                         modifier = Modifier
                             .fillMaxSize()
-                            .wrapContentHeight(Alignment.CenterVertically)
+                            .wrapContentHeight(Alignment.CenterVertically),
                     )
                 }
             } else {
@@ -169,7 +170,7 @@ fun CardView(
                 style = MaterialTheme.typography.bodyLarge,
                 color = Color.White,
                 modifier = Modifier.width(120.dp),
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
         }
     }
@@ -193,18 +194,18 @@ fun CardCard(refresh: MutableState<Boolean>, item: Card, viewModel: CardViewMode
         modifier = Modifier
             .padding(start = 20.dp, end = 20.dp)
             .height(200.dp)
-            .width(width)
+            .width(width),
     ) {
         Column(
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(10.dp),
                 verticalArrangement = Arrangement.SpaceBetween,
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 CircleButton(
                     onClick = { },
@@ -224,14 +225,14 @@ fun CardCard(refresh: MutableState<Boolean>, item: Card, viewModel: CardViewMode
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
-                        .padding(top = 12.dp)
+                        .padding(top = 12.dp),
                 )
                 ElevatedButton(
                     onClick = { showRemoveDialog.value = true; selectedCardId.intValue = item.id },
                     colors = ButtonDefaults.elevatedButtonColors(containerColor = Color.Red),
                     modifier = Modifier
                         .wrapContentSize()
-                        .align(Alignment.End)
+                        .align(Alignment.End),
                 ) {
                     Text(
                         text = "Remove",
@@ -251,7 +252,8 @@ private fun RemoveDialog(
     refresh: MutableState<Boolean>,
     cardId: MutableState<Int>,
     viewModel: CardViewModel,
-    context : Context = LocalContext.current) {
+    context: Context = LocalContext.current,
+) {
     when {
         openAlertDialog.value -> {
             Dialog(onDismissRequest = { openAlertDialog.value = false }) {
@@ -272,7 +274,7 @@ private fun RemoveDialog(
                             fontSize = 20.sp,
                             text = "Remove this card?",
                             modifier = Modifier.padding(16.dp),
-                            color = Color.White
+                            color = Color.White,
                         )
                         Row(
                             modifier = Modifier
@@ -286,7 +288,7 @@ private fun RemoveDialog(
                                 Text(
                                     text = "Cancel",
                                     fontSize = 16.sp,
-                                    color = Color.LightGray
+                                    color = Color.LightGray,
                                 )
                             }
                             TextButton(
@@ -300,7 +302,7 @@ private fun RemoveDialog(
                                 Text(
                                     text = "Remove",
                                     fontSize = 16.sp,
-                                    color = Color.Red
+                                    color = Color.Red,
                                 )
                             }
                         }
@@ -317,7 +319,8 @@ private fun AddDialog(
     scannedCard: Card?,
     userId: Int,
     viewModel: CardViewModel,
-    context: Context = LocalContext.current) {
+    context: Context = LocalContext.current,
+) {
     when {
         scannedCard != null -> {
             Dialog(onDismissRequest = { viewModel.updateCard(null) }) {
@@ -338,7 +341,7 @@ private fun AddDialog(
                             fontSize = 20.sp,
                             text = "Add card ${scannedCard.value}?",
                             modifier = Modifier.padding(16.dp),
-                            color = Color.White
+                            color = Color.White,
                         )
                         Row(
                             modifier = Modifier
@@ -352,7 +355,7 @@ private fun AddDialog(
                                 Text(
                                     text = "Cancel",
                                     fontSize = 16.sp,
-                                    color = Color.LightGray
+                                    color = Color.LightGray,
                                 )
                             }
                             TextButton(
@@ -380,7 +383,7 @@ fun PageIndicator(
     numberOfPages: Int,
     modifier: Modifier = Modifier,
     selectedPage: Int = 0,
-    selectedColor: Color = Color.Green,
+    selectedColor: Color = MaterialTheme.colorScheme.secondary,
     defaultColor: Color = Color.LightGray,
     defaultRadius: Dp = 20.dp,
     selectedLength: Dp = 60.dp,
@@ -416,7 +419,6 @@ fun PageIndicatorView(
     animationDurationInMillis: Int,
     modifier: Modifier = Modifier,
 ) {
-
     val color: Color by animateColorAsState(
         targetValue = if (isSelected) {
             selectedColor
@@ -425,7 +427,8 @@ fun PageIndicatorView(
         },
         animationSpec = tween(
             durationMillis = animationDurationInMillis,
-        ), label = ""
+        ),
+        label = "",
     )
     val width: Dp by animateDpAsState(
         targetValue = if (isSelected) {
@@ -435,7 +438,8 @@ fun PageIndicatorView(
         },
         animationSpec = tween(
             durationMillis = animationDurationInMillis,
-        ), label = ""
+        ),
+        label = "",
     )
 
     Canvas(

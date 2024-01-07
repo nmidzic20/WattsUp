@@ -2,7 +2,6 @@
 
 package hr.foi.air.wattsup.screens
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +16,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -35,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,12 +43,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import hr.foi.air.wattsup.R
+import hr.foi.air.wattsup.network.models.TokenManager
 import hr.foi.air.wattsup.ui.component.TopAppBar
 
 @OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun UserModeScreen(onHistoryClick: () -> Unit, onCardsClick: () -> Unit, onArrowBackClick: () -> Unit) {
+fun UserModeScreen(
+    onHistoryClick: () -> Unit,
+    onCardsClick: () -> Unit,
+    onArrowBackClick: () -> Unit,
+) {
     val showLogoutDialog = remember { mutableStateOf(false) }
 
     Scaffold(
@@ -55,6 +60,11 @@ fun UserModeScreen(onHistoryClick: () -> Unit, onCardsClick: () -> Unit, onArrow
             TopAppBar(
                 title = { Text("User Mode") },
                 navigationIcon = {
+                    IconButton(onClick = onArrowBackClick) {
+                        Icon(Icons.Filled.ArrowBack, null, tint = Color.White)
+                    }
+                },
+                actionIcon = {
                     IconButton(onClick = { showLogoutDialog.value = true }) {
                         Icon(Icons.Filled.ExitToApp, null, tint = Color.White)
                     }
@@ -62,19 +72,27 @@ fun UserModeScreen(onHistoryClick: () -> Unit, onCardsClick: () -> Unit, onArrow
             )
         },
     ) {
-        UserModeView(onHistoryClick, onCardsClick, onArrowBackClick, showLogoutDialog)
+        val modifier = Modifier.padding(it)
+
+        UserModeView(onHistoryClick, onCardsClick, onArrowBackClick, showLogoutDialog, modifier)
     }
 }
 
 @Composable
-fun UserModeView(onHistoryClick: () -> Unit, onCardsClick: () -> Unit, onArrowBackClick: () -> Unit, showLogoutDialog: MutableState<Boolean>) {
+fun UserModeView(
+    onHistoryClick: () -> Unit,
+    onCardsClick: () -> Unit,
+    onArrowBackClick: () -> Unit,
+    showLogoutDialog: MutableState<Boolean>,
+    modifier: Modifier = Modifier,
+) {
     LogoutDialog(showLogoutDialog, onArrowBackClick)
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .fillMaxHeight()
-            .padding(0.dp, 15.dp)
+            // .padding(0.dp, 15.dp)
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -88,20 +106,20 @@ fun UserModeView(onHistoryClick: () -> Unit, onCardsClick: () -> Unit, onArrowBa
                 style = MaterialTheme.typography.bodyLarge,
                 color = Color.White,
                 modifier = Modifier.width(150.dp),
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
         }
         Spacer(modifier = Modifier.height(16.dp))
         ElevatedButton(
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
-            onClick = onCardsClick
+            onClick = onCardsClick,
         ) {
             Text(
                 text = stringResource(R.string.cards),
                 style = MaterialTheme.typography.bodyLarge,
                 color = Color.White,
                 modifier = Modifier.width(150.dp),
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
         }
     }
@@ -109,6 +127,8 @@ fun UserModeView(onHistoryClick: () -> Unit, onCardsClick: () -> Unit, onArrowBa
 
 @Composable
 private fun LogoutDialog(openAlertDialog: MutableState<Boolean>, onArrowBackClick: () -> Unit) {
+    val context = LocalContext.current
+
     when {
         openAlertDialog.value -> {
             Dialog(onDismissRequest = { openAlertDialog.value = false }) {
@@ -129,7 +149,7 @@ private fun LogoutDialog(openAlertDialog: MutableState<Boolean>, onArrowBackClic
                             fontSize = 20.sp,
                             text = "Would you like to log out?",
                             modifier = Modifier.padding(16.dp),
-                            color = Color.White
+                            color = Color.White,
                         )
                         Row(
                             modifier = Modifier
@@ -143,17 +163,23 @@ private fun LogoutDialog(openAlertDialog: MutableState<Boolean>, onArrowBackClic
                                 Text(
                                     text = "Cancel",
                                     fontSize = 16.sp,
-                                    color = Color.LightGray
+                                    color = Color.LightGray,
                                 )
                             }
                             TextButton(
-                                onClick = { openAlertDialog.value = false; onArrowBackClick() },
+                                onClick = {
+                                    openAlertDialog.value = false
+                                    TokenManager.getInstance(
+                                        context,
+                                    ).setJWTToken("")
+                                    onArrowBackClick()
+                                },
                                 modifier = Modifier.padding(8.dp),
                             ) {
                                 Text(
                                     text = "Log out",
                                     fontSize = 16.sp,
-                                    color = Color.Red
+                                    color = Color.Red,
                                 )
                             }
                         }

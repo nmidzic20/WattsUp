@@ -42,10 +42,12 @@ class TokenManager private constructor(context: Context) {
         return sharedPreferences.getString("refreshTokenExpiresAt", null)
     }
 
-    fun getId(): Int {
+    fun getUserId(): Int {
         val payload = String(Base64.getUrlDecoder().decode(getJWTToken()!!.split(".")[1]))
         return payload.split(",")[0].split(":")[1].replace("\"", "").toInt()
     }
+
+    fun isLoggedIn(): Boolean = !(getJWTToken().isNullOrEmpty())
 
     companion object {
         @Volatile
