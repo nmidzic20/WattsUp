@@ -11,6 +11,7 @@ import { environment } from 'src/environments/environment';
 })
 export class LoginComponent implements OnInit {
   errorMessageBox? : HTMLElement;
+  loading = false;
 
   constructor(private router: Router, private userManagerService: UserManagerService){
 
@@ -39,6 +40,7 @@ export class LoginComponent implements OnInit {
       let parameters = {method: 'POST', headers: header, body: JSON.stringify(body)};
 
       try{
+        this.loading = true;
         let response = await fetch(environment.apiUrl + "/Users/Login", parameters);
         let body = await response.text();
         if(response.status == 200){
@@ -47,10 +49,12 @@ export class LoginComponent implements OnInit {
 
           this.router.navigate(['/map']);
         }else{
+          this.loading = false;
           let errorMessage = JSON.parse(body).message;
           this.errorMessageBox!!.innerHTML = response.status.toString() + ": " + errorMessage;
         }
       }catch (error){
+        this.loading = false;
         this.errorMessageBox!!.innerHTML = (error as Error).message
       }
     }else{
