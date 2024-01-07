@@ -1,4 +1,4 @@
-<div class="statistics">
+<div class="statistics" *ngIf="!loading">
         <div class="data">
                 <div class="graph">
                         <div class="graph-title">Weekly charging</div>
@@ -43,4 +43,8 @@
                     </tr>
                 </tbody>
             </table>
+</div>
+
+<div class="center" *ngIf="loading">
+    <div class="spinner"></div>
 </div>

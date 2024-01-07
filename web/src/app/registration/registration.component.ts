@@ -10,6 +10,7 @@ import { environment } from 'src/environments/environment';
 })
 export class RegistrationComponent implements OnInit{
   errorMessageBox? : HTMLElement;
+  loading = false;
 
   constructor(private router: Router){
 
@@ -33,15 +34,18 @@ export class RegistrationComponent implements OnInit{
       let parameters = {method: 'POST', headers: header, body: JSON.stringify(body)};
 
       try{
+        this.loading = true;
         let response = await fetch(environment.apiUrl + "/Users", parameters);
 
         if(response.status == 200){
           this.router.navigate(['/login']);
         }else{
+          this.loading = false;
           let errorMessage = JSON.parse(await response.text()).message;
           this.errorMessageBox!!.innerHTML = response.status.toString() + ": " + errorMessage;
         }
       }catch (error){
+        this.loading = false;
         this.errorMessageBox!!.innerHTML = (error as Error).message
       }
       

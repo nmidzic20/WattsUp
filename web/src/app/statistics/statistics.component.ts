@@ -16,6 +16,7 @@ export class StatisticsComponent implements OnInit {
   timeCharged: string = "";
   weekStartDate: Date = new Date();
   weekEndDate: Date = new Date();
+  loading = true;
 
   chartData: ChartConfiguration<'bar'>['data'] = {
     datasets: []
@@ -59,6 +60,7 @@ export class StatisticsComponent implements OnInit {
         this.setWeekDates(new Date());
         this.chartData = this.calculateChartData();
 
+        this.loading = false;
       } else {
         this.router.navigate(['/login']);
       }

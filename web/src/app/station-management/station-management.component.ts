@@ -17,6 +17,7 @@ export class StationManagementComponent implements OnInit {
   offlineStations = 0;
   stations: Station[] = [];
   isAddStationDialogueVisible: boolean = false;
+  loading = true;
 
   constructor(private router: Router, private userManagerService: UserManagerService, private sseService: SSEService, private cdr: ChangeDetectorRef){}
 
@@ -28,6 +29,7 @@ export class StationManagementComponent implements OnInit {
           this.router.navigate(['/map']);
         } else {
           await this.getStations(tokens.jwt);
+          this.loading = false;
           this.sseService
           .connect(environment.apiUrl + '/Charger/SSE')
           .subscribe((event: MessageEvent) => {
