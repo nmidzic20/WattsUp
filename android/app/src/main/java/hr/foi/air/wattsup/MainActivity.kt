@@ -35,6 +35,8 @@ import hr.foi.air.wattsup.screens.ScanScreen
 import hr.foi.air.wattsup.screens.SimulatorScreen
 import hr.foi.air.wattsup.screens.UserModeScreen
 import hr.foi.air.wattsup.ui.theme.WattsUpTheme
+import hr.foi.air.wattsup.utils.LastAddedCard
+import hr.foi.air.wattsup.utils.LastRegisteredCard
 import hr.foi.air.wattsup.viewmodels.AuthenticationViewModel
 import hr.foi.air.wattsup.viewmodels.CardViewModel
 import hr.foi.air.wattsup.viewmodels.ChargerViewModel
@@ -110,8 +112,31 @@ class MainActivity : ComponentActivity() {
 
                             ScanScreen(
                                 stringResource(R.string.charger_mode),
-                                false,
+                                null,
                                 { navController.navigate("landing") },
+                                onScan,
+                                scanViewModel,
+                                cardManagers,
+                            )
+                        }
+                        composable("registerCard") {
+                            val onScan = {
+                                onArrowBackClick()
+                            }
+                            /*{
+                            navController.navigate(
+                                navController.previousBackStackEntry?.destination?.route!!,
+                            ) {
+                                popUpTo(navController.previousBackStackEntry?.destination?.route!!) {
+                                    inclusive = true
+                                }
+                            }
+                        }*/
+
+                            ScanScreen(
+                                stringResource(R.string.scan_card),
+                                LastRegisteredCard,
+                                onArrowBackClick,
                                 onScan,
                                 scanViewModel,
                                 cardManagers,
@@ -133,7 +158,7 @@ class MainActivity : ComponentActivity() {
 
                             ScanScreen(
                                 stringResource(R.string.scan_card),
-                                true,
+                                LastAddedCard,
                                 onArrowBackClick,
                                 onScan,
                                 scanViewModel,
@@ -149,7 +174,7 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("registration") {
                             val onLogInClick = { navController.navigate("login") }
-                            var onAddCard = { navController.navigate("addCard") }
+                            var onAddCard = { navController.navigate("registerCard") }
                             val onArrowBackClick = { navController.navigate("landing") }
 
                             RegistrationScreen(
