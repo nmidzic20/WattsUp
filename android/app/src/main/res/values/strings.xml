@@ -17,4 +17,15 @@
     <string name="cards">My Cards</string>
     <string name="scan_card">Scan card</string>
     <string name="scanning_for_card">Scanning for card...</string>
+    <string name="user_mode_route">userMode</string>
+    <string name="charger_mode_route">chargerMode</string>
+    <string name="my_cards_route">myCards</string>
+    <string name="add_card_route">addCard</string>
+    <string name="ev_simulator_route">EVsimulator</string>
+    <string name="charging_history_route">chargingHistory</string>
+    <string name="landing_route">landing</string>
+    <string name="registration_route">registration</string>
+    <string name="register_card_route">registerCard</string>
+    <string name="login_route">login</string>
+    <string name="scan_card_route">scanCard</string>
 </resources>
