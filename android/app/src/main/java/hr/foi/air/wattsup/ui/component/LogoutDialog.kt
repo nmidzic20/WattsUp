@@ -66,10 +66,10 @@ fun LogoutDialog(openAlertDialog: MutableState<Boolean>, onArrowBackClick: () ->
                             TextButton(
                                 onClick = {
                                     openAlertDialog.value = false
+                                    onArrowBackClick()
                                     TokenManager.getInstance(
                                         context,
                                     ).setJWTToken("")
-                                    onArrowBackClick()
                                 },
                                 modifier = Modifier.padding(8.dp),
                             ) {

@@ -179,7 +179,7 @@ fun CardView(
                 }
             } else {
                 itemsIndexed(cards) { _, item ->
-                    CardCard(item!!, userId!!, viewModel)
+                    CardCard(item!!, userId, viewModel)
                 }
             }
         }
@@ -199,12 +199,14 @@ fun CardView(
 }
 
 @Composable
-fun CardCard(item: Card, userId: Int, viewModel: CardViewModel) {
+fun CardCard(item: Card, userId: Int?, viewModel: CardViewModel) {
     val width = LocalConfiguration.current.screenWidthDp.dp * 0.92f
     val showRemoveDialog = remember { mutableStateOf(false) }
     val selectedCardId = remember { mutableIntStateOf(-1) }
 
-    RemoveDialog(showRemoveDialog, userId, selectedCardId, viewModel)
+    if (userId != null) {
+        RemoveDialog(showRemoveDialog, userId, selectedCardId, viewModel)
+    }
 
     ElevatedCard(
         colors = CardDefaults.cardColors(
@@ -271,7 +273,7 @@ fun CardCard(item: Card, userId: Int, viewModel: CardViewModel) {
 @Composable
 private fun RemoveDialog(
     openAlertDialog: MutableState<Boolean>,
-    userId: Int?,
+    userId: Int,
     cardId: MutableState<Int>,
     viewModel: CardViewModel,
     context: Context = LocalContext.current,
@@ -317,7 +319,7 @@ private fun RemoveDialog(
                                 onClick = {
                                     openAlertDialog.value = false
                                     viewModel.deleteCard(cardId.value, context) {
-                                        viewModel.refreshCards(context, userId!!)
+                                        viewModel.refreshCards(context, userId)
                                     }
                                 },
                                 modifier = Modifier.padding(8.dp),
