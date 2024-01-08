@@ -163,7 +163,7 @@ class MainActivity : ComponentActivity() {
                             title = "Charger Mode",
                             selectedIcon = Icons.Filled.ElectricBolt,
                             unselectedIcon = Icons.Outlined.ElectricBolt,
-                            onClick = { navigate(getString(R.string.charger_mode_route)) },
+                            onClick = { navigate(getString(R.string.scan_card_route)) },
                         ),
                         NavDrawerItem(
                             title = getString(R.string.log_out),
@@ -203,8 +203,8 @@ class MainActivity : ComponentActivity() {
                                             onClick = {
                                                 selectedItemIndex = index
                                                 scope.launch {
-                                                    drawerItem.onClick()
                                                     navigationState.close()
+                                                    drawerItem.onClick()
                                                 }
                                             },
                                             icon = {
