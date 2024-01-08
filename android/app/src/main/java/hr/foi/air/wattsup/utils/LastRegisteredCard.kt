@@ -3,7 +3,7 @@ package hr.foi.air.wattsup.utils
 import androidx.lifecycle.MutableLiveData
 import hr.foi.air.wattsup.network.models.Card
 
-object LastAddedCard : LastNewCard {
+object LastRegisteredCard : LastNewCard {
     val userCard: MutableLiveData<Card> by lazy {
         MutableLiveData<Card>()
     }

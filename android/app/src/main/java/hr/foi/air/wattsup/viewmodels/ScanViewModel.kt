@@ -11,7 +11,7 @@ import hr.foi.air.wattsup.network.CardService
 import hr.foi.air.wattsup.network.NetworkService
 import hr.foi.air.wattsup.network.models.Card
 import hr.foi.air.wattsup.utils.HexUtils
-import hr.foi.air.wattsup.utils.LastAddedCard
+import hr.foi.air.wattsup.utils.LastNewCard
 import hr.foi.air.wattsup.utils.UserCard
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -32,16 +32,20 @@ class ScanViewModel : ViewModel() {
     private val _userMessage = MutableLiveData("")
     val userMessage: LiveData<String> get() = _userMessage
 
-    fun getStatusMessage(scanning: Boolean, addCard: Boolean, cardManager: CardManager): String =
+    fun getStatusMessage(
+        scanning: Boolean,
+        lastNewCard: LastNewCard?,
+        cardManager: CardManager,
+    ): String =
         if (!cardManager.isCardSupportAvailableOnDevice()) {
             "${cardManager.getName()} is not supported on this device"
         } else if (!cardManager.isCardSupportEnabledOnDevice()) {
             "${cardManager.getName()} is not enabled on this device"
         } else {
-            if (scanning) "No ${if (!addCard) "registered " else ""}${cardManager.getName()} card found" else "${cardManager.getName()} is supported and enabled on this device"
+            if (scanning) "No ${if (lastNewCard == null) "registered " else ""}${cardManager.getName()} card found" else "${cardManager.getName()} is supported and enabled on this device"
         }
 
-    fun startScanning(cardManager: CardManager, onScan: () -> Unit, addCard: Boolean) {
+    fun startScanning(cardManager: CardManager, onScan: () -> Unit, lastNewCard: LastNewCard?) {
         if (!cardManager.isCardSupportEnabledOnDevice()) {
             cardManager.stopScanningForCard()
             _scanning.value = false
@@ -60,13 +64,13 @@ class ScanViewModel : ViewModel() {
         cardManager.startScanningForCard(
             object : CardScanCallback {
                 override fun onScanResult(cardAddress: Any) {
-                    handleScanResult(cardAddress, onScan, cardManager, addCard)
+                    handleScanResult(cardAddress, onScan, cardManager, lastNewCard)
                 }
 
                 override fun onScanFailed(error: String) {
                     _scanning.value = false
                     _scanSuccess.value = false
-                    _userMessage.value = getStatusMessage(true, addCard, cardManager)
+                    _userMessage.value = getStatusMessage(true, lastNewCard, cardManager)
                     Log.i("SCAN", "Scanning failed, error message: $error")
                 }
 
@@ -78,7 +82,7 @@ class ScanViewModel : ViewModel() {
                             cardManager.stopScanningForCard()
                             _scanning.value = false
                             _scanSuccess.value = false
-                            _userMessage.value = getStatusMessage(true, addCard, cardManager)
+                            _userMessage.value = getStatusMessage(true, lastNewCard, cardManager)
                         }
                     }
                 }
@@ -94,20 +98,28 @@ class ScanViewModel : ViewModel() {
         result: Any,
         onScan: () -> Unit,
         cardManager: CardManager,
-        addCard: Boolean,
+        lastNewCard: LastNewCard?,
     ) {
         if (cardManager.scanResultRequiresAsyncHandling()) {
             viewModelScope.launch(Dispatchers.Main) {
-                if (addCard) {
-                    saveCardToLastAddedCard(result, onScan) { cardManager.stopScanningForCard() }
+                if (lastNewCard != null) {
+                    saveCardToLastAddedCard(
+                        lastNewCard,
+                        result,
+                        onScan,
+                    ) { cardManager.stopScanningForCard() }
                 } else {
                     checkedCardAddresses.clear()
                     handleScan(result, onScan, cardManager) { cardManager.stopScanningForCard() }
                 }
             }
         } else {
-            if (addCard) {
-                saveCardToLastAddedCard(result, onScan) { cardManager.stopScanningForCard() }
+            if (lastNewCard != null) {
+                saveCardToLastAddedCard(
+                    lastNewCard,
+                    result,
+                    onScan,
+                ) { cardManager.stopScanningForCard() }
             } else {
                 handleScan(result, onScan, cardManager) { cardManager.stopScanningForCard() }
             }
@@ -121,14 +133,14 @@ class ScanViewModel : ViewModel() {
     }
 
     private fun saveCardToLastAddedCard(
+        lastNewCard: LastNewCard,
         result: Any,
         onScan: () -> Unit,
         onCardFound: () -> Unit,
     ) {
         var deviceAddress: String = formatDeviceAddress(result)
 
-        LastAddedCard.userCard.value = Card(id = 0, value = deviceAddress, active = true)
-        Log.i("CARD_ADDED", LastAddedCard.userCard.value.toString())
+        lastNewCard.setLastNewCard(Card(id = 0, value = deviceAddress, active = true))
 
         onCardFound()
         scanTimeoutJob?.cancel()

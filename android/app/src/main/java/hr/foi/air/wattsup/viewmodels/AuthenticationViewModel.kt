@@ -15,7 +15,7 @@ import hr.foi.air.wattsup.network.models.LoginResponseBody
 import hr.foi.air.wattsup.network.models.RegistrationBody
 import hr.foi.air.wattsup.network.models.RegistrationResponseBody
 import hr.foi.air.wattsup.network.models.TokenManager
-import hr.foi.air.wattsup.utils.LastAddedCard
+import hr.foi.air.wattsup.utils.LastRegisteredCard
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -59,18 +59,18 @@ class AuthenticationViewModel : ViewModel() {
     private val _passwordVisible = MutableLiveData<Boolean>(false)
     val passwordVisible: LiveData<Boolean> = _passwordVisible
 
-    private val lastAddedCardObserver = Observer<Card> { newCard ->
+    private val lastRegisteredCardObserver = Observer<Card> { newCard ->
         updateCard(newCard)
     }
 
     init {
-        // Update card variable if LastAddedCard.userCard has a new card added
-        LastAddedCard.userCard.observeForever(lastAddedCardObserver)
+        // Update card variable if LastRegisteredCard.userCard has a new card added
+        LastRegisteredCard.userCard.observeForever(lastRegisteredCardObserver)
     }
 
     override fun onCleared() {
         super.onCleared()
-        LastAddedCard.userCard.removeObserver(lastAddedCardObserver)
+        LastRegisteredCard.userCard.removeObserver(lastRegisteredCardObserver)
     }
 
     fun togglePasswordVisibility() {
