@@ -20,13 +20,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.ElectricBolt
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.outlined.ElectricBolt
 import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -127,46 +127,66 @@ class MainActivity : ComponentActivity() {
                         mutableIntStateOf(0)
                     }
 
+                    val navController = rememberNavController()
+                    val navigate = { route: String ->
+                        navController.navigate(route)
+                    }
+                    val onLogOut =
+                        { navController.navigate(getString(R.string.landing_route)) }
+
                     val items = listOf(
                         NavDrawerItem(
                             title = "Home",
                             selectedIcon = Icons.Filled.Home,
                             unselectedIcon = Icons.Outlined.Home,
+                            onClick = { navigate(getString(R.string.landing_route)) },
                         ),
                         NavDrawerItem(
-                            title = "Notification",
-                            selectedIcon = Icons.Filled.Info,
-                            unselectedIcon = Icons.Outlined.Info,
-                            badgeCount = 45,
+                            title = "User Mode",
+                            selectedIcon = Icons.Filled.Person,
+                            unselectedIcon = Icons.Outlined.Person,
+                            onClick = { navigate(getString(R.string.user_mode_route)) },
                         ),
                         NavDrawerItem(
-                            title = "Favorites",
-                            selectedIcon = Icons.Filled.Favorite,
-                            unselectedIcon = Icons.Outlined.FavoriteBorder,
+                            title = "Charger Mode",
+                            selectedIcon = Icons.Filled.ElectricBolt,
+                            unselectedIcon = Icons.Outlined.ElectricBolt,
+                            onClick = { navigate(getString(R.string.charger_mode_route)) },
                         ),
+                        /*NavDrawerItem(
+                            title = "Log Out",
+                            selectedIcon = Icons.Filled.Logout,
+                            unselectedIcon = Icons.Outlined.Logout,
+                            onClick = onLogOut,
+                        ),*/
                     )
 
                     ModalNavigationDrawer(
                         drawerContent = {
-                            ModalDrawerSheet {
+                            ModalDrawerSheet(drawerContainerColor = MaterialTheme.colorScheme.background) {
                                 Spacer(modifier = Modifier.height(26.dp))
                                 Image(
                                     painter = painterResource(id = R.drawable.logo_text_white),
                                     contentDescription = "",
                                     modifier = Modifier
-                                        .size(150.dp)
+                                        .size(100.dp)
                                         .fillMaxWidth()
                                         .align(CenterHorizontally),
                                 )
                                 Spacer(modifier = Modifier.height(26.dp))
                                 items.forEachIndexed { index, drawerItem ->
                                     NavigationDrawerItem(
+                                        colors = NavigationDrawerItemDefaults.colors(
+                                            selectedContainerColor = MaterialTheme.colorScheme.secondary,
+                                            unselectedContainerColor = MaterialTheme.colorScheme.background,
+                                        ),
                                         label = {
                                             Text(text = drawerItem.title)
                                         },
                                         selected = index == selectedItemIndex,
                                         onClick = {
                                             selectedItemIndex = index
+                                            drawerItem.onClick()
                                             scope.launch {
                                                 navigationState.close()
                                             }
@@ -180,11 +200,6 @@ class MainActivity : ComponentActivity() {
                                                 },
                                                 contentDescription = drawerItem.title,
                                             )
-                                        },
-                                        badge = {
-                                            drawerItem.badgeCount?.let {
-                                                Text(text = drawerItem.badgeCount.toString())
-                                            }
                                         },
                                         modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                                     )
@@ -209,13 +224,6 @@ class MainActivity : ComponentActivity() {
                                 }
                             })
                         }) {
-                            val navController = rememberNavController()
-                            val navigate = { route: String ->
-                                navController.navigate(route)
-                            }
-                            val onLogOut =
-                                { navController.navigate(getString(R.string.landing_route)) }
-
                             NavHost(
                                 navController = navController,
                                 startDestination = getString(R.string.landing_route),
