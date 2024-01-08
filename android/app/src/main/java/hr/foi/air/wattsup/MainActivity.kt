@@ -21,9 +21,9 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import hr.foi.air.wattsup.ble.BLEManager
 import hr.foi.air.wattsup.core.CardManager
+import hr.foi.air.wattsup.network.models.TokenManager
 import hr.foi.air.wattsup.rfid.RFIDManager
 import hr.foi.air.wattsup.screens.CardScreen
 import hr.foi.air.wattsup.screens.ChargerScreen
@@ -35,6 +35,8 @@ import hr.foi.air.wattsup.screens.ScanScreen
 import hr.foi.air.wattsup.screens.SimulatorScreen
 import hr.foi.air.wattsup.screens.UserModeScreen
 import hr.foi.air.wattsup.ui.theme.WattsUpTheme
+import hr.foi.air.wattsup.utils.LastAddedCard
+import hr.foi.air.wattsup.utils.LastRegisteredCard
 import hr.foi.air.wattsup.viewmodels.AuthenticationViewModel
 import hr.foi.air.wattsup.viewmodels.CardViewModel
 import hr.foi.air.wattsup.viewmodels.ChargerViewModel
@@ -52,8 +54,9 @@ class MainActivity : ComponentActivity() {
     private val cardViewModel: CardViewModel by viewModels()
     private val authenticationViewModel: AuthenticationViewModel by viewModels()
 
-    var cardManagers: List<CardManager> = emptyList()
-    var receivers: MutableList<BroadcastReceiver> = emptyList<BroadcastReceiver>().toMutableList()
+    private var cardManagers: List<CardManager> = emptyList()
+    private var receivers: MutableList<BroadcastReceiver> =
+        emptyList<BroadcastReceiver>().toMutableList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,62 +83,84 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background,
                 ) {
                     val navController = rememberNavController()
-                    val onArrowBackClick = {
-                        navController.popBackStack()
-                        Unit
+                    val navigate = { route: String ->
+                        navController.navigate(route)
                     }
+                    val onLogOut = { navController.navigate(getString(R.string.landing_route)) }
 
-                    NavHost(navController = navController, startDestination = "landing") {
-                        composable("landing") {
-                            val onChargerModeClick = { navController.navigate("scanCard") }
-                            val onUserModeClick = { navController.navigate("login") }
+                    NavHost(
+                        navController = navController,
+                        startDestination = getString(R.string.landing_route),
+                    ) {
+                        composable(getString(R.string.landing_route)) {
+                            val onChargerModeClick =
+                                { navigate(getString(R.string.scan_card_route)) }
+                            val onUserModeClick = {
+                                val isLoggedIn =
+                                    TokenManager.getInstance(this@MainActivity).isLoggedIn()
+
+                                if (isLoggedIn) {
+                                    navigate(getString(R.string.user_mode_route))
+                                } else {
+                                    navigate(getString(R.string.login_route))
+                                }
+                            }
+
                             BackHandler(true) { }
 
                             LandingScreen(onChargerModeClick, onUserModeClick)
                         }
-                        composable("scanCard") {
-                            val onScan = { navController.navigate("chargerMode") }
+                        composable(getString(R.string.scan_card_route)) {
+                            val onScan = { navigate(getString(R.string.charger_mode_route)) }
 
                             ScanScreen(
                                 stringResource(R.string.charger_mode),
-                                false,
-                                { navController.navigate("landing") },
+                                null,
+                                { navigate(getString(R.string.landing_route)) },
                                 onScan,
                                 scanViewModel,
                                 cardManagers,
                             )
                         }
-                        composable("addCard") {
+                        composable(getString(R.string.register_card_route)) {
                             val onScan = {
-                                navController.navigate(
-                                    navController.previousBackStackEntry?.destination?.route!!
-                                ) {
-                                    popUpTo(navController.previousBackStackEntry?.destination?.route!!) {
-                                        inclusive = true
-                                    }
-                                }
+                                navigate(getString(R.string.registration_route))
                             }
 
                             ScanScreen(
                                 stringResource(R.string.scan_card),
-                                true,
-                                onArrowBackClick,
+                                LastRegisteredCard,
+                                { navigate(getString(R.string.registration_route)) },
                                 onScan,
                                 scanViewModel,
                                 cardManagers,
                             )
                         }
-                        composable("chargerMode") {
+                        composable(getString(R.string.add_card_route)) {
+                            val onScan = {
+                                navigate(getString(R.string.my_cards_route))
+                            }
+
+                            ScanScreen(
+                                stringResource(R.string.scan_card),
+                                LastAddedCard,
+                                { navigate(getString(R.string.my_cards_route)) },
+                                onScan,
+                                scanViewModel,
+                                cardManagers,
+                            )
+                        }
+                        composable(getString(R.string.charger_mode_route)) {
                             ChargerScreen({
-                                navController.navigate("scanCard")
+                                navigate(getString(R.string.scan_card_route))
                             }, {
-                                navController.navigate("EVsimulator")
+                                navigate(getString(R.string.ev_simulator_route))
                             }, chargerViewModel)
                         }
-                        composable("registration") {
-                            val onLogInClick = { navController.navigate("login") }
-                            var onAddCard = { navController.navigate("addCard") }
-                            val onArrowBackClick = { navController.navigate("landing") }
+                        composable(getString(R.string.registration_route)) {
+                            val onLogInClick = { navigate(getString(R.string.login_route)) }
+                            var onAddCard = { navigate(getString(R.string.register_card_route)) }
+                            val onArrowBackClick = { navigate(getString(R.string.landing_route)) }
 
                             RegistrationScreen(
                                 onArrowBackClick,
@@ -144,33 +169,45 @@ class MainActivity : ComponentActivity() {
                                 authenticationViewModel,
                             )
                         }
-                        composable("login") {
-                            val onRegisterClick = { navController.navigate("registration") }
-                            val onLogin = { navController.navigate("userMode") }
+                        composable(getString(R.string.login_route)) {
+                            val onRegisterClick =
+                                { navigate(getString(R.string.registration_route)) }
+                            val onLogin = { navigate(getString(R.string.user_mode_route)) }
                             LoginScreen(
                                 onRegisterClick,
                                 onLogin,
-                                onArrowBackClick,
+                                { navigate(getString(R.string.landing_route)) },
                                 authenticationViewModel,
                             )
                         }
-                        composable("userMode") {
-                            val onHistoryClick = { navController.navigate("chargingHistory") }
-                            val onCardsClick = { navController.navigate("myCards") }
+                        composable(getString(R.string.user_mode_route)) {
+                            val onHistoryClick =
+                                { navigate(getString(R.string.charging_history_route)) }
+                            val onCardsClick = { navigate(getString(R.string.my_cards_route)) }
+                            val onArrowBackClick = { navigate(getString(R.string.landing_route)) }
+
                             BackHandler(true) { }
-                            UserModeScreen(onHistoryClick, onCardsClick, onArrowBackClick)
+                            UserModeScreen(
+                                onHistoryClick,
+                                onCardsClick,
+                                onArrowBackClick,
+                            )
                         }
-                        composable("chargingHistory") {
-                            HistoryScreen(onArrowBackClick, historyViewModel)
+                        composable(getString(R.string.charging_history_route)) {
+                            HistoryScreen({
+                                navigate(getString(R.string.user_mode_route))
+                            }, onLogOut, historyViewModel)
                         }
-                        composable("EVsimulator") {
+                        composable(getString(R.string.ev_simulator_route)) {
                             SimulatorScreen(chargerViewModel) {
-                                navController.navigate("chargerMode")
+                                navigate(getString(R.string.charger_mode_route))
                             }
                         }
-                        composable("myCards") {
-                            val onAddCard = { navController.navigate("addCard") }
-                            CardScreen(onArrowBackClick, onAddCard, cardViewModel)
+                        composable(getString(R.string.my_cards_route)) {
+                            val onAddCard = { navigate(getString(R.string.add_card_route)) }
+                            CardScreen({
+                                navigate(getString(R.string.user_mode_route))
+                            }, onAddCard, onLogOut, cardViewModel)
                         }
                     }
                 }

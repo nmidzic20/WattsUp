@@ -40,6 +40,7 @@ import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.core.CardManager
 import hr.foi.air.wattsup.ui.component.CircleButton
 import hr.foi.air.wattsup.ui.component.TopAppBar
+import hr.foi.air.wattsup.utils.LastNewCard
 import hr.foi.air.wattsup.viewmodels.ScanViewModel
 import kotlinx.coroutines.launch
 
@@ -47,7 +48,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ScanScreen(
     title: String,
-    addCard: Boolean,
+    lastNewCard: LastNewCard?,
     onArrowBackClick: () -> Unit,
     onScan: () -> Unit,
     viewModel: ScanViewModel,
@@ -60,7 +61,7 @@ fun ScanScreen(
 
     val cardStatusMessageList = remember {
         cardManagers.map { cardManager ->
-            mutableStateOf(viewModel.getStatusMessage(false, addCard, cardManager))
+            mutableStateOf(viewModel.getStatusMessage(false, lastNewCard, cardManager))
         }.toMutableList()
     }
 
@@ -114,7 +115,7 @@ fun ScanScreen(
                     viewModel.startScanning(
                         cardManager,
                         onScan,
-                        addCard,
+                        lastNewCard,
                     )
                 },
                 onScan,
@@ -130,7 +131,7 @@ fun ScanScreen(
                     viewModel.startScanning(
                         cardManager,
                         onScan,
-                        addCard,
+                        lastNewCard,
                     )
                 },
                 onScan,

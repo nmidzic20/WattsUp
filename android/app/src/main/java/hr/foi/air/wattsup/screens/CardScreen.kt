@@ -27,6 +27,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -69,12 +70,20 @@ import hr.foi.air.wattsup.network.models.Card
 import hr.foi.air.wattsup.network.models.TokenManager
 import hr.foi.air.wattsup.ui.component.CircleButton
 import hr.foi.air.wattsup.ui.component.LoadingSpinner
+import hr.foi.air.wattsup.ui.component.LogoutDialog
 import hr.foi.air.wattsup.ui.component.TopAppBar
 import hr.foi.air.wattsup.viewmodels.CardViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CardScreen(onArrowBackClick: () -> Unit, onAddCard: () -> Unit, viewModel: CardViewModel) {
+fun CardScreen(
+    onArrowBackClick: () -> Unit,
+    onAddCard: () -> Unit,
+    onLogOut: () -> Unit,
+    viewModel: CardViewModel,
+) {
+    val showLogoutDialog = remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -84,10 +93,15 @@ fun CardScreen(onArrowBackClick: () -> Unit, onAddCard: () -> Unit, viewModel: C
                         Icon(Icons.Filled.ArrowBack, null, tint = Color.White)
                     }
                 },
+                actionIcon = {
+                    IconButton(onClick = { showLogoutDialog.value = true }) {
+                        Icon(Icons.Filled.ExitToApp, null, tint = Color.White)
+                    }
+                },
             )
         },
     ) {
-        CardView(viewModel, onAddCard, Modifier.padding(it))
+        CardView(viewModel, onAddCard, showLogoutDialog, onLogOut, Modifier.padding(it))
     }
 }
 
@@ -96,23 +110,32 @@ fun CardScreen(onArrowBackClick: () -> Unit, onAddCard: () -> Unit, viewModel: C
 fun CardView(
     viewModel: CardViewModel,
     onAddCard: () -> Unit,
+    showLogoutDialog: MutableState<Boolean>,
+    onLogOut: () -> Unit,
     modifier: Modifier = Modifier,
-    context: Context = LocalContext.current) {
-    val userId = TokenManager.getInstance(context).getId()
+    context: Context = LocalContext.current,
+) {
+    val userId = TokenManager.getInstance(context).getUserId()
     val state = rememberLazyListState()
     val cards by viewModel.cards.observeAsState(emptyList())
     val showLoading by viewModel.showLoading.observeAsState(true)
     val scannedCard by viewModel.card.observeAsState()
-    val refresh = remember { mutableStateOf(false) }
+    // val refresh = remember { mutableStateOf(false) }
     val currentCard = remember { derivedStateOf { state.firstVisibleItemIndex } }
 
-    AddDialog(refresh, scannedCard, userId, viewModel)
-
-    LaunchedEffect(Unit, refresh.value) {
-        viewModel.refreshCards(context, userId)
+    if (userId != null) {
+        AddDialog(scannedCard, userId, viewModel)
     }
 
-    Column (
+    LaunchedEffect(Unit) {
+        if (userId != null) {
+            viewModel.refreshCards(context, userId)
+        }
+    }
+
+    LogoutDialog(showLogoutDialog, onLogOut)
+
+    Column(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement
@@ -133,14 +156,14 @@ fun CardView(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
             state = state,
-            flingBehavior = rememberSnapFlingBehavior(lazyListState = state)
+            flingBehavior = rememberSnapFlingBehavior(lazyListState = state),
         ) {
             if (showLoading) {
                 item {
                     LoadingSpinner(
                         modifier = Modifier
                             .fillMaxSize()
-                            .wrapContentHeight(Alignment.CenterVertically)
+                            .wrapContentHeight(Alignment.CenterVertically),
                     )
                 }
             } else if (cards.isEmpty()) {
@@ -151,12 +174,12 @@ fun CardView(
                         textAlign = TextAlign.Center,
                         modifier = Modifier
                             .fillMaxSize()
-                            .wrapContentHeight(Alignment.CenterVertically)
+                            .wrapContentHeight(Alignment.CenterVertically),
                     )
                 }
             } else {
                 itemsIndexed(cards) { _, item ->
-                    CardCard(refresh, item!!, viewModel)
+                    CardCard(item!!, userId, viewModel)
                 }
             }
         }
@@ -169,19 +192,21 @@ fun CardView(
                 style = MaterialTheme.typography.bodyLarge,
                 color = Color.White,
                 modifier = Modifier.width(120.dp),
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
         }
     }
 }
 
 @Composable
-fun CardCard(refresh: MutableState<Boolean>, item: Card, viewModel: CardViewModel) {
+fun CardCard(item: Card, userId: Int?, viewModel: CardViewModel) {
     val width = LocalConfiguration.current.screenWidthDp.dp * 0.92f
     val showRemoveDialog = remember { mutableStateOf(false) }
     val selectedCardId = remember { mutableIntStateOf(-1) }
 
-    RemoveDialog(showRemoveDialog, refresh, selectedCardId, viewModel)
+    if (userId != null) {
+        RemoveDialog(showRemoveDialog, userId, selectedCardId, viewModel)
+    }
 
     ElevatedCard(
         colors = CardDefaults.cardColors(
@@ -193,18 +218,18 @@ fun CardCard(refresh: MutableState<Boolean>, item: Card, viewModel: CardViewMode
         modifier = Modifier
             .padding(start = 20.dp, end = 20.dp)
             .height(200.dp)
-            .width(width)
+            .width(width),
     ) {
         Column(
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(10.dp),
                 verticalArrangement = Arrangement.SpaceBetween,
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 CircleButton(
                     onClick = { },
@@ -224,14 +249,14 @@ fun CardCard(refresh: MutableState<Boolean>, item: Card, viewModel: CardViewMode
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
-                        .padding(top = 12.dp)
+                        .padding(top = 12.dp),
                 )
                 ElevatedButton(
                     onClick = { showRemoveDialog.value = true; selectedCardId.intValue = item.id },
                     colors = ButtonDefaults.elevatedButtonColors(containerColor = Color.Red),
                     modifier = Modifier
                         .wrapContentSize()
-                        .align(Alignment.End)
+                        .align(Alignment.End),
                 ) {
                     Text(
                         text = "Remove",
@@ -248,10 +273,11 @@ fun CardCard(refresh: MutableState<Boolean>, item: Card, viewModel: CardViewMode
 @Composable
 private fun RemoveDialog(
     openAlertDialog: MutableState<Boolean>,
-    refresh: MutableState<Boolean>,
+    userId: Int,
     cardId: MutableState<Int>,
     viewModel: CardViewModel,
-    context : Context = LocalContext.current) {
+    context: Context = LocalContext.current,
+) {
     when {
         openAlertDialog.value -> {
             Dialog(onDismissRequest = { openAlertDialog.value = false }) {
@@ -272,7 +298,7 @@ private fun RemoveDialog(
                             fontSize = 20.sp,
                             text = "Remove this card?",
                             modifier = Modifier.padding(16.dp),
-                            color = Color.White
+                            color = Color.White,
                         )
                         Row(
                             modifier = Modifier
@@ -286,21 +312,22 @@ private fun RemoveDialog(
                                 Text(
                                     text = "Cancel",
                                     fontSize = 16.sp,
-                                    color = Color.LightGray
+                                    color = Color.LightGray,
                                 )
                             }
                             TextButton(
                                 onClick = {
                                     openAlertDialog.value = false
-                                    viewModel.deleteCard(cardId.value, context)
-                                    refresh.value = !refresh.value
+                                    viewModel.deleteCard(cardId.value, context) {
+                                        viewModel.refreshCards(context, userId)
+                                    }
                                 },
                                 modifier = Modifier.padding(8.dp),
                             ) {
                                 Text(
                                     text = "Remove",
                                     fontSize = 16.sp,
-                                    color = Color.Red
+                                    color = Color.Red,
                                 )
                             }
                         }
@@ -313,11 +340,12 @@ private fun RemoveDialog(
 
 @Composable
 private fun AddDialog(
-    refresh: MutableState<Boolean>,
+
     scannedCard: Card?,
     userId: Int,
     viewModel: CardViewModel,
-    context: Context = LocalContext.current) {
+    context: Context = LocalContext.current,
+) {
     when {
         scannedCard != null -> {
             Dialog(onDismissRequest = { viewModel.updateCard(null) }) {
@@ -338,7 +366,7 @@ private fun AddDialog(
                             fontSize = 20.sp,
                             text = "Add card ${scannedCard.value}?",
                             modifier = Modifier.padding(16.dp),
-                            color = Color.White
+                            color = Color.White,
                         )
                         Row(
                             modifier = Modifier
@@ -352,13 +380,14 @@ private fun AddDialog(
                                 Text(
                                     text = "Cancel",
                                     fontSize = 16.sp,
-                                    color = Color.LightGray
+                                    color = Color.LightGray,
                                 )
                             }
                             TextButton(
                                 onClick = {
-                                    viewModel.addCard(userId, context)
-                                    refresh.value = !refresh.value
+                                    viewModel.addCard(userId, context) {
+                                        viewModel.refreshCards(context, userId)
+                                    }
                                 },
                                 modifier = Modifier.padding(8.dp),
                             ) {
@@ -380,7 +409,7 @@ fun PageIndicator(
     numberOfPages: Int,
     modifier: Modifier = Modifier,
     selectedPage: Int = 0,
-    selectedColor: Color = Color.Green,
+    selectedColor: Color = MaterialTheme.colorScheme.secondary,
     defaultColor: Color = Color.LightGray,
     defaultRadius: Dp = 20.dp,
     selectedLength: Dp = 60.dp,
@@ -416,7 +445,6 @@ fun PageIndicatorView(
     animationDurationInMillis: Int,
     modifier: Modifier = Modifier,
 ) {
-
     val color: Color by animateColorAsState(
         targetValue = if (isSelected) {
             selectedColor
@@ -425,7 +453,8 @@ fun PageIndicatorView(
         },
         animationSpec = tween(
             durationMillis = animationDurationInMillis,
-        ), label = ""
+        ),
+        label = "",
     )
     val width: Dp by animateDpAsState(
         targetValue = if (isSelected) {
@@ -435,7 +464,8 @@ fun PageIndicatorView(
         },
         animationSpec = tween(
             durationMillis = animationDurationInMillis,
-        ), label = ""
+        ),
+        label = "",
     )
 
     Canvas(
@@ -463,5 +493,5 @@ fun PageIndicatorView(
 @Preview(showBackground = false)
 @Composable
 fun CardPreview() {
-    CardScreen({}, {}, CardViewModel())
+    CardScreen({}, {}, {}, CardViewModel())
 }
