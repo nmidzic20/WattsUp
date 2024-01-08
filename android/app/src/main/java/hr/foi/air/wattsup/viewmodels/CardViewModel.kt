@@ -15,8 +15,6 @@ import hr.foi.air.wattsup.utils.LastAddedCard
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 class CardViewModel : ViewModel() {
     private val cardService = NetworkService.cardService
@@ -24,7 +22,7 @@ class CardViewModel : ViewModel() {
     private val _cards = MutableLiveData<List<Card?>>()
     val cards: LiveData<List<Card?>> = _cards
 
-    private val _showLoading = MutableLiveData<Boolean>()
+    private val _showLoading = MutableLiveData<Boolean>(true)
     val showLoading: LiveData<Boolean> = _showLoading
 
     private val _card = MutableLiveData<Card?>(null)
@@ -48,43 +46,43 @@ class CardViewModel : ViewModel() {
         _card.value = value
     }
 
-    suspend fun refreshCards(context: Context, userId: Int) {
+    fun refreshCards(context: Context, userId: Int) {
         _showLoading.value = true
         _cards.value = emptyList()
         fetchCards(context, userId)
     }
 
-    private suspend fun fetchCards(context: Context, userId: Int) {
-        _cards.value = getCards(context, userId)
-        _showLoading.value = false
+    private fun fetchCards(context: Context, userId: Int) {
+        getCards(context, userId)
     }
 
-    private suspend fun getCards(context: Context, userId: Int): List<Card?> {
+    private fun getCards(context: Context, userId: Int) {
         val auth = "Bearer " + TokenManager.getInstance(context).getJWTToken()
 
-        return suspendCoroutine { continuation ->
-            cardService.getCardsForUser(userId, auth).enqueue(object : Callback<List<Card?>> {
-                override fun onResponse(call: Call<List<Card?>>, response: Response<List<Card?>>) {
-                    if (response.isSuccessful) {
-                        continuation.resume(response.body() ?: emptyList())
-                        Log.d("CardView", "Cards: ${response.body()}")
-                    } else {
-                        Log.d("CardView", "Error: ${response.errorBody()}")
-                        toast(context, "Error: ${response.errorBody()}")
-                        continuation.resume(emptyList())
-                    }
+        cardService.getCardsForUser(userId, auth).enqueue(object : Callback<List<Card?>> {
+            override fun onResponse(call: Call<List<Card?>>, response: Response<List<Card?>>) {
+                if (response.isSuccessful) {
+                    Log.d("CardView", "Cards: ${response.body()}")
+                    _cards.value = response.body() ?: emptyList()
+                    _showLoading.value = false
+                } else {
+                    Log.d("CardView", "Error: ${response.errorBody()}")
+                    toast(context, "Error: ${response.errorBody()}")
+                    _cards.value = emptyList()
+                    _showLoading.value = false
                 }
+            }
 
-                override fun onFailure(call: Call<List<Card?>>, t: Throwable) {
-                    Log.d("CardView", "Failure: ${t.message}")
-                    continuation.resume(emptyList())
-                    toast(context, "Failure: ${t.message}")
-                }
-            })
-        }
+            override fun onFailure(call: Call<List<Card?>>, t: Throwable) {
+                Log.d("CardView", "Failure: ${t.message}")
+                toast(context, "Failure: ${t.message}")
+                _cards.value = emptyList()
+                _showLoading.value = false
+            }
+        })
     }
 
-    fun addCard(userId: Int, context: Context) {
+    fun addCard(userId: Int, context: Context, callback: () -> Unit) {
         val auth = "Bearer " + TokenManager.getInstance(context).getJWTToken()
 
         cardService.addCard(CardPOSTBody(userId, card.value!!.value), auth).enqueue(
@@ -97,7 +95,8 @@ class CardViewModel : ViewModel() {
 
                     if (response.isSuccessful) {
                         toast(context, "Card added!")
-                    } else if (response.code() == 409){
+                        callback.invoke()
+                    } else if (response.code() == 409) {
                         toast(context, "Card already exists!")
                     } else {
                         toast(context, "Error adding card!")
@@ -113,7 +112,7 @@ class CardViewModel : ViewModel() {
         updateCard(null)
     }
 
-    fun deleteCard(cardId: Int, context: Context) {
+    fun deleteCard(cardId: Int, context: Context, callback: () -> Unit) {
         val auth = "Bearer " + TokenManager.getInstance(context).getJWTToken()
 
         cardService.deleteCard(cardId, auth).enqueue(
@@ -125,7 +124,8 @@ class CardViewModel : ViewModel() {
                     Log.i("CardView", response.toString())
                     if (response.isSuccessful) {
                         toast(context, "Card deleted!")
-                    } else if (response.code() == 409){
+                        callback.invoke()
+                    } else if (response.code() == 409) {
                         toast(context, "Card not found!")
                     } else {
                         toast(context, "Error deleting card!")

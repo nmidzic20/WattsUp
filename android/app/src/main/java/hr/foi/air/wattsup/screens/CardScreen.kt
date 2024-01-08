@@ -120,14 +120,14 @@ fun CardView(
     val cards by viewModel.cards.observeAsState(emptyList())
     val showLoading by viewModel.showLoading.observeAsState(true)
     val scannedCard by viewModel.card.observeAsState()
-    val refresh = remember { mutableStateOf(false) }
+    // val refresh = remember { mutableStateOf(false) }
     val currentCard = remember { derivedStateOf { state.firstVisibleItemIndex } }
 
     if (userId != null) {
-        AddDialog(refresh, scannedCard, userId, viewModel)
+        AddDialog(scannedCard, userId, viewModel)
     }
 
-    LaunchedEffect(Unit, refresh.value) {
+    LaunchedEffect(Unit) {
         if (userId != null) {
             viewModel.refreshCards(context, userId)
         }
@@ -179,7 +179,7 @@ fun CardView(
                 }
             } else {
                 itemsIndexed(cards) { _, item ->
-                    CardCard(refresh, item!!, viewModel)
+                    CardCard(item!!, userId!!, viewModel)
                 }
             }
         }
@@ -199,12 +199,12 @@ fun CardView(
 }
 
 @Composable
-fun CardCard(refresh: MutableState<Boolean>, item: Card, viewModel: CardViewModel) {
+fun CardCard(item: Card, userId: Int, viewModel: CardViewModel) {
     val width = LocalConfiguration.current.screenWidthDp.dp * 0.92f
     val showRemoveDialog = remember { mutableStateOf(false) }
     val selectedCardId = remember { mutableIntStateOf(-1) }
 
-    RemoveDialog(showRemoveDialog, refresh, selectedCardId, viewModel)
+    RemoveDialog(showRemoveDialog, userId, selectedCardId, viewModel)
 
     ElevatedCard(
         colors = CardDefaults.cardColors(
@@ -271,7 +271,7 @@ fun CardCard(refresh: MutableState<Boolean>, item: Card, viewModel: CardViewMode
 @Composable
 private fun RemoveDialog(
     openAlertDialog: MutableState<Boolean>,
-    refresh: MutableState<Boolean>,
+    userId: Int?,
     cardId: MutableState<Int>,
     viewModel: CardViewModel,
     context: Context = LocalContext.current,
@@ -316,8 +316,9 @@ private fun RemoveDialog(
                             TextButton(
                                 onClick = {
                                     openAlertDialog.value = false
-                                    viewModel.deleteCard(cardId.value, context)
-                                    refresh.value = !refresh.value
+                                    viewModel.deleteCard(cardId.value, context) {
+                                        viewModel.refreshCards(context, userId!!)
+                                    }
                                 },
                                 modifier = Modifier.padding(8.dp),
                             ) {
@@ -337,7 +338,7 @@ private fun RemoveDialog(
 
 @Composable
 private fun AddDialog(
-    refresh: MutableState<Boolean>,
+
     scannedCard: Card?,
     userId: Int,
     viewModel: CardViewModel,
@@ -382,8 +383,9 @@ private fun AddDialog(
                             }
                             TextButton(
                                 onClick = {
-                                    viewModel.addCard(userId, context)
-                                    refresh.value = !refresh.value
+                                    viewModel.addCard(userId, context) {
+                                        viewModel.refreshCards(context, userId)
+                                    }
                                 },
                                 modifier = Modifier.padding(8.dp),
                             ) {
