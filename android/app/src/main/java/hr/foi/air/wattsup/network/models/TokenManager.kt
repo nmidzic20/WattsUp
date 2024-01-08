@@ -2,6 +2,7 @@ package hr.foi.air.wattsup.network.models
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import java.util.Base64
 
 class TokenManager private constructor(context: Context) {
@@ -45,13 +46,20 @@ class TokenManager private constructor(context: Context) {
     fun getUserId(): Int? {
         return try {
             val payload = String(Base64.getUrlDecoder().decode(getJWTToken()!!.split(".")[1]))
-            payload.split(",")[0].split(":")[1].replace("\"", "").toInt()
+            val id = payload.split(",")[0].split(":")[1].replace("\"", "").toInt()
+            Log.i("USER_ID", id.toString())
+            id
         } catch (e: Exception) {
             null
         }
     }
 
-    fun isLoggedIn(): Boolean = !(getJWTToken().isNullOrEmpty())
+    fun isLoggedIn(): Boolean {
+        val isTokenNullOrEmpty = getJWTToken().isNullOrEmpty()
+        Log.i("USER_ID", isTokenNullOrEmpty.toString())
+        Log.i("USER_ID", getJWTToken().toString())
+        return !isTokenNullOrEmpty
+    }
 
     companion object {
         @Volatile

@@ -119,14 +119,17 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("addCard") {
                             val onScan = {
-                                navController.navigate(
-                                    navController.previousBackStackEntry?.destination?.route!!,
-                                ) {
-                                    popUpTo(navController.previousBackStackEntry?.destination?.route!!) {
-                                        inclusive = true
-                                    }
+                                onArrowBackClick()
+                            }
+                            /*{
+                            navController.navigate(
+                                navController.previousBackStackEntry?.destination?.route!!,
+                            ) {
+                                popUpTo(navController.previousBackStackEntry?.destination?.route!!) {
+                                    inclusive = true
                                 }
                             }
+                        }*/
 
                             ScanScreen(
                                 stringResource(R.string.scan_card),
