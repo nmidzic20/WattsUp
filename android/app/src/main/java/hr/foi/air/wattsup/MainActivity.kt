@@ -22,10 +22,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ElectricBolt
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.ElectricBolt
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Logout
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -47,6 +49,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -145,7 +148,16 @@ class MainActivity : ComponentActivity() {
                             title = "User Mode",
                             selectedIcon = Icons.Filled.Person,
                             unselectedIcon = Icons.Outlined.Person,
-                            onClick = { navigate(getString(R.string.user_mode_route)) },
+                            onClick = {
+                                val isLoggedIn =
+                                    TokenManager.getInstance(this@MainActivity).isLoggedIn()
+
+                                if (isLoggedIn) {
+                                    navigate(getString(R.string.user_mode_route))
+                                } else {
+                                    navigate(getString(R.string.login_route))
+                                }
+                            },
                         ),
                         NavDrawerItem(
                             title = "Charger Mode",
@@ -153,12 +165,12 @@ class MainActivity : ComponentActivity() {
                             unselectedIcon = Icons.Outlined.ElectricBolt,
                             onClick = { navigate(getString(R.string.charger_mode_route)) },
                         ),
-                        /*NavDrawerItem(
-                            title = "Log Out",
+                        NavDrawerItem(
+                            title = getString(R.string.log_out),
                             selectedIcon = Icons.Filled.Logout,
                             unselectedIcon = Icons.Outlined.Logout,
                             onClick = onLogOut,
-                        ),*/
+                        ),
                     )
 
                     ModalNavigationDrawer(
@@ -175,34 +187,39 @@ class MainActivity : ComponentActivity() {
                                 )
                                 Spacer(modifier = Modifier.height(26.dp))
                                 items.forEachIndexed { index, drawerItem ->
-                                    NavigationDrawerItem(
-                                        colors = NavigationDrawerItemDefaults.colors(
-                                            selectedContainerColor = MaterialTheme.colorScheme.secondary,
-                                            unselectedContainerColor = MaterialTheme.colorScheme.background,
-                                        ),
-                                        label = {
-                                            Text(text = drawerItem.title)
-                                        },
-                                        selected = index == selectedItemIndex,
-                                        onClick = {
-                                            selectedItemIndex = index
-                                            drawerItem.onClick()
-                                            scope.launch {
-                                                navigationState.close()
-                                            }
-                                        },
-                                        icon = {
-                                            Icon(
-                                                imageVector = if (index == selectedItemIndex) {
-                                                    drawerItem.selectedIcon
-                                                } else {
-                                                    drawerItem.unselectedIcon
-                                                },
-                                                contentDescription = drawerItem.title,
-                                            )
-                                        },
-                                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
-                                    )
+                                    if (drawerItem.title != getString(R.string.log_out) || TokenManager.getInstance(
+                                            LocalContext.current,
+                                        ).isLoggedIn()
+                                    ) {
+                                        NavigationDrawerItem(
+                                            colors = NavigationDrawerItemDefaults.colors(
+                                                selectedContainerColor = MaterialTheme.colorScheme.secondary,
+                                                unselectedContainerColor = MaterialTheme.colorScheme.background,
+                                            ),
+                                            label = {
+                                                Text(text = drawerItem.title)
+                                            },
+                                            selected = index == selectedItemIndex,
+                                            onClick = {
+                                                selectedItemIndex = index
+                                                scope.launch {
+                                                    drawerItem.onClick()
+                                                    navigationState.close()
+                                                }
+                                            },
+                                            icon = {
+                                                Icon(
+                                                    imageVector = if (index == selectedItemIndex) {
+                                                        drawerItem.selectedIcon
+                                                    } else {
+                                                        drawerItem.unselectedIcon
+                                                    },
+                                                    contentDescription = drawerItem.title,
+                                                )
+                                            },
+                                            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+                                        )
+                                    }
                                 }
                             }
                         },
