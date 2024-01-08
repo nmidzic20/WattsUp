@@ -1,5 +1,6 @@
 package hr.foi.air.wattsup
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -11,11 +12,44 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationDrawerItemDefaults
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.navigation.compose.NavHost
@@ -34,14 +68,17 @@ import hr.foi.air.wattsup.screens.RegistrationScreen
 import hr.foi.air.wattsup.screens.ScanScreen
 import hr.foi.air.wattsup.screens.SimulatorScreen
 import hr.foi.air.wattsup.screens.UserModeScreen
+import hr.foi.air.wattsup.ui.component.TopAppBar
 import hr.foi.air.wattsup.ui.theme.WattsUpTheme
 import hr.foi.air.wattsup.utils.LastAddedCard
 import hr.foi.air.wattsup.utils.LastRegisteredCard
+import hr.foi.air.wattsup.utils.NavDrawerItem
 import hr.foi.air.wattsup.viewmodels.AuthenticationViewModel
 import hr.foi.air.wattsup.viewmodels.CardViewModel
 import hr.foi.air.wattsup.viewmodels.ChargerViewModel
 import hr.foi.air.wattsup.viewmodels.HistoryViewModel
 import hr.foi.air.wattsup.viewmodels.ScanViewModel
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
@@ -58,6 +95,8 @@ class MainActivity : ComponentActivity() {
     private var receivers: MutableList<BroadcastReceiver> =
         emptyList<BroadcastReceiver>().toMutableList()
 
+    @OptIn(ExperimentalMaterial3Api::class)
+    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -82,132 +121,228 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background,
                 ) {
-                    val navController = rememberNavController()
-                    val navigate = { route: String ->
-                        navController.navigate(route)
+                    val navigationState = rememberDrawerState(initialValue = DrawerValue.Closed)
+                    val scope = rememberCoroutineScope()
+                    var selectedItemIndex by rememberSaveable {
+                        mutableIntStateOf(0)
                     }
-                    val onLogOut = { navController.navigate(getString(R.string.landing_route)) }
 
-                    NavHost(
-                        navController = navController,
-                        startDestination = getString(R.string.landing_route),
-                    ) {
-                        composable(getString(R.string.landing_route)) {
-                            val onChargerModeClick =
-                                { navigate(getString(R.string.scan_card_route)) }
-                            val onUserModeClick = {
-                                val isLoggedIn =
-                                    TokenManager.getInstance(this@MainActivity).isLoggedIn()
+                    val items = listOf(
+                        NavDrawerItem(
+                            title = "Home",
+                            selectedIcon = Icons.Filled.Home,
+                            unselectedIcon = Icons.Outlined.Home,
+                        ),
+                        NavDrawerItem(
+                            title = "Notification",
+                            selectedIcon = Icons.Filled.Info,
+                            unselectedIcon = Icons.Outlined.Info,
+                            badgeCount = 45,
+                        ),
+                        NavDrawerItem(
+                            title = "Favorites",
+                            selectedIcon = Icons.Filled.Favorite,
+                            unselectedIcon = Icons.Outlined.FavoriteBorder,
+                        ),
+                    )
 
-                                if (isLoggedIn) {
-                                    navigate(getString(R.string.user_mode_route))
-                                } else {
-                                    navigate(getString(R.string.login_route))
+                    ModalNavigationDrawer(
+                        drawerContent = {
+                            ModalDrawerSheet {
+                                Spacer(modifier = Modifier.height(26.dp))
+                                Image(
+                                    painter = painterResource(id = R.drawable.logo_text_white),
+                                    contentDescription = "",
+                                    modifier = Modifier
+                                        .size(150.dp)
+                                        .fillMaxWidth()
+                                        .align(CenterHorizontally),
+                                )
+                                Spacer(modifier = Modifier.height(26.dp))
+                                items.forEachIndexed { index, drawerItem ->
+                                    NavigationDrawerItem(
+                                        label = {
+                                            Text(text = drawerItem.title)
+                                        },
+                                        selected = index == selectedItemIndex,
+                                        onClick = {
+                                            selectedItemIndex = index
+                                            scope.launch {
+                                                navigationState.close()
+                                            }
+                                        },
+                                        icon = {
+                                            Icon(
+                                                imageVector = if (index == selectedItemIndex) {
+                                                    drawerItem.selectedIcon
+                                                } else {
+                                                    drawerItem.unselectedIcon
+                                                },
+                                                contentDescription = drawerItem.title,
+                                            )
+                                        },
+                                        badge = {
+                                            drawerItem.badgeCount?.let {
+                                                Text(text = drawerItem.badgeCount.toString())
+                                            }
+                                        },
+                                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+                                    )
                                 }
                             }
-
-                            BackHandler(true) { }
-
-                            LandingScreen(onChargerModeClick, onUserModeClick)
-                        }
-                        composable(getString(R.string.scan_card_route)) {
-                            val onScan = { navigate(getString(R.string.charger_mode_route)) }
-
-                            ScanScreen(
-                                stringResource(R.string.charger_mode),
-                                null,
-                                { navigate(getString(R.string.landing_route)) },
-                                onScan,
-                                scanViewModel,
-                                cardManagers,
-                            )
-                        }
-                        composable(getString(R.string.register_card_route)) {
-                            val onScan = {
-                                navigate(getString(R.string.registration_route))
+                        },
+                        drawerState = navigationState,
+                    ) {
+                        Scaffold(topBar = {
+                            TopAppBar(title = {
+                                Text(text = "My App")
+                            }, navigationIcon = {
+                                IconButton(onClick = {
+                                    scope.launch {
+                                        navigationState.open()
+                                    }
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Menu,
+                                        contentDescription = "Menu",
+                                    )
+                                }
+                            })
+                        }) {
+                            val navController = rememberNavController()
+                            val navigate = { route: String ->
+                                navController.navigate(route)
                             }
+                            val onLogOut =
+                                { navController.navigate(getString(R.string.landing_route)) }
 
-                            ScanScreen(
-                                stringResource(R.string.scan_card),
-                                LastRegisteredCard,
-                                { navigate(getString(R.string.registration_route)) },
-                                onScan,
-                                scanViewModel,
-                                cardManagers,
-                            )
-                        }
-                        composable(getString(R.string.add_card_route)) {
-                            val onScan = {
-                                navigate(getString(R.string.my_cards_route))
+                            NavHost(
+                                navController = navController,
+                                startDestination = getString(R.string.landing_route),
+                            ) {
+                                composable(getString(R.string.landing_route)) {
+                                    val onChargerModeClick =
+                                        { navigate(getString(R.string.scan_card_route)) }
+                                    val onUserModeClick = {
+                                        val isLoggedIn =
+                                            TokenManager.getInstance(this@MainActivity).isLoggedIn()
+
+                                        if (isLoggedIn) {
+                                            navigate(getString(R.string.user_mode_route))
+                                        } else {
+                                            navigate(getString(R.string.login_route))
+                                        }
+                                    }
+
+                                    BackHandler(true) { }
+
+                                    LandingScreen(onChargerModeClick, onUserModeClick)
+                                }
+                                composable(getString(R.string.scan_card_route)) {
+                                    val onScan =
+                                        { navigate(getString(R.string.charger_mode_route)) }
+
+                                    ScanScreen(
+                                        stringResource(R.string.charger_mode),
+                                        null,
+                                        { navigate(getString(R.string.landing_route)) },
+                                        onScan,
+                                        scanViewModel,
+                                        cardManagers,
+                                    )
+                                }
+                                composable(getString(R.string.register_card_route)) {
+                                    val onScan = {
+                                        navigate(getString(R.string.registration_route))
+                                    }
+
+                                    ScanScreen(
+                                        stringResource(R.string.scan_card),
+                                        LastRegisteredCard,
+                                        { navigate(getString(R.string.registration_route)) },
+                                        onScan,
+                                        scanViewModel,
+                                        cardManagers,
+                                    )
+                                }
+                                composable(getString(R.string.add_card_route)) {
+                                    val onScan = {
+                                        navigate(getString(R.string.my_cards_route))
+                                    }
+
+                                    ScanScreen(
+                                        stringResource(R.string.scan_card),
+                                        LastAddedCard,
+                                        { navigate(getString(R.string.my_cards_route)) },
+                                        onScan,
+                                        scanViewModel,
+                                        cardManagers,
+                                    )
+                                }
+                                composable(getString(R.string.charger_mode_route)) {
+                                    ChargerScreen({
+                                        navigate(getString(R.string.scan_card_route))
+                                    }, {
+                                        navigate(getString(R.string.ev_simulator_route))
+                                    }, chargerViewModel)
+                                }
+                                composable(getString(R.string.registration_route)) {
+                                    val onLogInClick = { navigate(getString(R.string.login_route)) }
+                                    var onAddCard =
+                                        { navigate(getString(R.string.register_card_route)) }
+                                    val onArrowBackClick =
+                                        { navigate(getString(R.string.landing_route)) }
+
+                                    RegistrationScreen(
+                                        onArrowBackClick,
+                                        onLogInClick,
+                                        onAddCard,
+                                        authenticationViewModel,
+                                    )
+                                }
+                                composable(getString(R.string.login_route)) {
+                                    val onRegisterClick =
+                                        { navigate(getString(R.string.registration_route)) }
+                                    val onLogin = { navigate(getString(R.string.user_mode_route)) }
+                                    LoginScreen(
+                                        onRegisterClick,
+                                        onLogin,
+                                        { navigate(getString(R.string.landing_route)) },
+                                        authenticationViewModel,
+                                    )
+                                }
+                                composable(getString(R.string.user_mode_route)) {
+                                    val onHistoryClick =
+                                        { navigate(getString(R.string.charging_history_route)) }
+                                    val onCardsClick =
+                                        { navigate(getString(R.string.my_cards_route)) }
+                                    val onArrowBackClick =
+                                        { navigate(getString(R.string.landing_route)) }
+
+                                    BackHandler(true) { }
+                                    UserModeScreen(
+                                        onHistoryClick,
+                                        onCardsClick,
+                                        onArrowBackClick,
+                                    )
+                                }
+                                composable(getString(R.string.charging_history_route)) {
+                                    HistoryScreen({
+                                        navigate(getString(R.string.user_mode_route))
+                                    }, onLogOut, historyViewModel)
+                                }
+                                composable(getString(R.string.ev_simulator_route)) {
+                                    SimulatorScreen(chargerViewModel) {
+                                        navigate(getString(R.string.charger_mode_route))
+                                    }
+                                }
+                                composable(getString(R.string.my_cards_route)) {
+                                    val onAddCard = { navigate(getString(R.string.add_card_route)) }
+                                    CardScreen({
+                                        navigate(getString(R.string.user_mode_route))
+                                    }, onAddCard, onLogOut, cardViewModel)
+                                }
                             }
-
-                            ScanScreen(
-                                stringResource(R.string.scan_card),
-                                LastAddedCard,
-                                { navigate(getString(R.string.my_cards_route)) },
-                                onScan,
-                                scanViewModel,
-                                cardManagers,
-                            )
-                        }
-                        composable(getString(R.string.charger_mode_route)) {
-                            ChargerScreen({
-                                navigate(getString(R.string.scan_card_route))
-                            }, {
-                                navigate(getString(R.string.ev_simulator_route))
-                            }, chargerViewModel)
-                        }
-                        composable(getString(R.string.registration_route)) {
-                            val onLogInClick = { navigate(getString(R.string.login_route)) }
-                            var onAddCard = { navigate(getString(R.string.register_card_route)) }
-                            val onArrowBackClick = { navigate(getString(R.string.landing_route)) }
-
-                            RegistrationScreen(
-                                onArrowBackClick,
-                                onLogInClick,
-                                onAddCard,
-                                authenticationViewModel,
-                            )
-                        }
-                        composable(getString(R.string.login_route)) {
-                            val onRegisterClick =
-                                { navigate(getString(R.string.registration_route)) }
-                            val onLogin = { navigate(getString(R.string.user_mode_route)) }
-                            LoginScreen(
-                                onRegisterClick,
-                                onLogin,
-                                { navigate(getString(R.string.landing_route)) },
-                                authenticationViewModel,
-                            )
-                        }
-                        composable(getString(R.string.user_mode_route)) {
-                            val onHistoryClick =
-                                { navigate(getString(R.string.charging_history_route)) }
-                            val onCardsClick = { navigate(getString(R.string.my_cards_route)) }
-                            val onArrowBackClick = { navigate(getString(R.string.landing_route)) }
-
-                            BackHandler(true) { }
-                            UserModeScreen(
-                                onHistoryClick,
-                                onCardsClick,
-                                onArrowBackClick,
-                            )
-                        }
-                        composable(getString(R.string.charging_history_route)) {
-                            HistoryScreen({
-                                navigate(getString(R.string.user_mode_route))
-                            }, onLogOut, historyViewModel)
-                        }
-                        composable(getString(R.string.ev_simulator_route)) {
-                            SimulatorScreen(chargerViewModel) {
-                                navigate(getString(R.string.charger_mode_route))
-                            }
-                        }
-                        composable(getString(R.string.my_cards_route)) {
-                            val onAddCard = { navigate(getString(R.string.add_card_route)) }
-                            CardScreen({
-                                navigate(getString(R.string.user_mode_route))
-                            }, onAddCard, onLogOut, cardViewModel)
                         }
                     }
                 }
