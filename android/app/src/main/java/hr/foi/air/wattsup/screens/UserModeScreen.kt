@@ -2,6 +2,7 @@
 
 package hr.foi.air.wattsup.screens
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -29,6 +30,7 @@ import androidx.compose.ui.res.stringResource
 import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.ui.component.LogoutDialog
 import hr.foi.air.wattsup.ui.component.TopAppBar
+import hr.foi.air.wattsup.ui.theme.colorDarkGray
 import hr.foi.air.wattsup.viewmodels.CardViewModel
 import hr.foi.air.wattsup.viewmodels.HistoryViewModel
 
@@ -77,12 +79,16 @@ fun UserModeScreen(
         },
         bottomBar = {
             BottomAppBar(
-                contentColor = Color.White,
+                containerColor = if (isSystemInDarkTheme()) Color.White else colorDarkGray,
+                contentColor = if (isSystemInDarkTheme()) colorDarkGray else Color.White,
                 content = {
                     NavigationBarItem(
                         colors = NavigationBarItemDefaults
                             .colors(
-                                indicatorColor = MaterialTheme.colorScheme.secondary, // surfaceColorAtElevation(LocalAbsoluteTonalElevation.current)
+                                indicatorColor = MaterialTheme.colorScheme.primary,
+                                selectedTextColor = if (isSystemInDarkTheme()) colorDarkGray else Color.White,
+                                unselectedIconColor = if (isSystemInDarkTheme()) colorDarkGray else Color.White,
+                                unselectedTextColor = if (isSystemInDarkTheme()) colorDarkGray else Color.White,
                             ),
                         icon = {
                             Icon(
@@ -98,7 +104,10 @@ fun UserModeScreen(
                     NavigationBarItem(
                         colors = NavigationBarItemDefaults
                             .colors(
-                                indicatorColor = MaterialTheme.colorScheme.secondary, // surfaceColorAtElevation(LocalAbsoluteTonalElevation.current)
+                                indicatorColor = MaterialTheme.colorScheme.secondary,
+                                selectedTextColor = if (isSystemInDarkTheme()) colorDarkGray else Color.White,
+                                unselectedIconColor = if (isSystemInDarkTheme()) colorDarkGray else Color.White,
+                                unselectedTextColor = if (isSystemInDarkTheme()) colorDarkGray else Color.White,
                             ),
                         icon = {
                             Icon(

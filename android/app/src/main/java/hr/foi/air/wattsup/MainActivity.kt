@@ -59,6 +59,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import hr.foi.air.wattsup.ble.BLEManager
 import hr.foi.air.wattsup.core.CardManager
+import hr.foi.air.wattsup.navigation.CustomNavDrawerItem
 import hr.foi.air.wattsup.network.models.TokenManager
 import hr.foi.air.wattsup.rfid.RFIDManager
 import hr.foi.air.wattsup.screens.ChargerScreen
@@ -72,7 +73,6 @@ import hr.foi.air.wattsup.ui.component.LogoutDialog
 import hr.foi.air.wattsup.ui.theme.WattsUpTheme
 import hr.foi.air.wattsup.utils.LastAddedCard
 import hr.foi.air.wattsup.utils.LastRegisteredCard
-import hr.foi.air.wattsup.utils.NavDrawerItem
 import hr.foi.air.wattsup.viewmodels.AuthenticationViewModel
 import hr.foi.air.wattsup.viewmodels.CardViewModel
 import hr.foi.air.wattsup.viewmodels.ChargerViewModel
@@ -123,12 +123,13 @@ class MainActivity : ComponentActivity() {
                     val navigationState = rememberDrawerState(initialValue = DrawerValue.Closed)
                     val scope = rememberCoroutineScope()
                     var selectedItemIndex by rememberSaveable {
-                        mutableIntStateOf(0)
+                        mutableIntStateOf(R.string.landing_route)
                     }
 
                     val navController = rememberNavController()
-                    val navigate = { route: String ->
-                        navController.navigate(route)
+                    val navigate = { routeId: Int ->
+                        navController.navigate(getString(routeId))
+                        selectedItemIndex = routeId
                     }
 
                     val showLogoutDialog = remember { mutableStateOf(false) }
@@ -140,7 +141,7 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     val onLogOut = {
-                        navigate("landing")
+                        navigate(R.string.landing_route)
                         showLogoutNavDrawerItem.value = false
                     }
                     LogoutDialog(
@@ -149,13 +150,14 @@ class MainActivity : ComponentActivity() {
                     )
 
                     val items = listOf(
-                        NavDrawerItem(
+                        CustomNavDrawerItem(
                             title = "Home",
                             selectedIcon = Icons.Filled.Home,
                             unselectedIcon = Icons.Outlined.Home,
-                            onClick = { navigate(getString(R.string.landing_route)) },
+                            onClick = { navigate(R.string.landing_route) },
+                            id = R.string.landing_route,
                         ),
-                        NavDrawerItem(
+                        CustomNavDrawerItem(
                             title = "User Mode",
                             selectedIcon = Icons.Filled.Person,
                             unselectedIcon = Icons.Outlined.Person,
@@ -164,23 +166,26 @@ class MainActivity : ComponentActivity() {
                                     TokenManager.getInstance(this@MainActivity).isLoggedIn()
 
                                 if (isLoggedIn) {
-                                    navigate(getString(R.string.user_mode_route))
+                                    navigate(R.string.user_mode_route)
                                 } else {
-                                    navigate(getString(R.string.login_route))
+                                    navigate(R.string.login_route)
                                 }
                             },
+                            id = R.string.user_mode_route,
                         ),
-                        NavDrawerItem(
+                        CustomNavDrawerItem(
                             title = "Charger Mode",
                             selectedIcon = Icons.Filled.ElectricBolt,
                             unselectedIcon = Icons.Outlined.ElectricBolt,
-                            onClick = { navigate(getString(R.string.scan_card_route)) },
+                            onClick = { navigate(R.string.scan_card_route) },
+                            id = R.string.scan_card_route,
                         ),
-                        NavDrawerItem(
+                        CustomNavDrawerItem(
                             title = getString(R.string.log_out),
                             selectedIcon = Icons.Filled.Logout,
                             unselectedIcon = Icons.Outlined.Logout,
                             onClick = { showLogoutDialog.value = true },
+                            id = R.string.log_out,
                         ),
                     )
 
@@ -202,7 +207,7 @@ class MainActivity : ComponentActivity() {
                                         .align(CenterHorizontally),
                                 )
                                 Spacer(modifier = Modifier.height(26.dp))
-                                items.forEachIndexed { index, drawerItem ->
+                                items.forEach { drawerItem ->
                                     if (drawerItem.title != getString(R.string.log_out) || showLogoutNavDrawerItem.value) {
                                         NavigationDrawerItem(
                                             colors = NavigationDrawerItemDefaults.colors(
@@ -212,9 +217,9 @@ class MainActivity : ComponentActivity() {
                                             label = {
                                                 Text(text = drawerItem.title)
                                             },
-                                            selected = index == selectedItemIndex,
+                                            selected = drawerItem.id == selectedItemIndex,
                                             onClick = {
-                                                selectedItemIndex = index
+                                                selectedItemIndex = drawerItem.id
                                                 scope.launch {
                                                     navigationState.close()
                                                     drawerItem.onClick()
@@ -222,7 +227,7 @@ class MainActivity : ComponentActivity() {
                                             },
                                             icon = {
                                                 Icon(
-                                                    imageVector = if (index == selectedItemIndex) {
+                                                    imageVector = if (drawerItem.id == selectedItemIndex) {
                                                         drawerItem.selectedIcon
                                                     } else {
                                                         drawerItem.unselectedIcon
@@ -244,15 +249,15 @@ class MainActivity : ComponentActivity() {
                         ) {
                             composable(getString(R.string.landing_route)) {
                                 val onChargerModeClick =
-                                    { navigate(getString(R.string.scan_card_route)) }
+                                    { navigate(R.string.scan_card_route) }
                                 val onUserModeClick = {
                                     val isLoggedIn =
                                         TokenManager.getInstance(this@MainActivity).isLoggedIn()
 
                                     if (isLoggedIn) {
-                                        navigate(getString(R.string.user_mode_route))
+                                        navigate(R.string.user_mode_route)
                                     } else {
-                                        navigate(getString(R.string.login_route))
+                                        navigate(R.string.login_route)
                                     }
                                 }
 
@@ -262,12 +267,12 @@ class MainActivity : ComponentActivity() {
                             }
                             composable(getString(R.string.scan_card_route)) {
                                 val onScan =
-                                    { navigate(getString(R.string.charger_mode_route)) }
+                                    { navigate(R.string.charger_mode_route) }
 
                                 ScanScreen(
                                     stringResource(R.string.charger_mode),
                                     null,
-                                    { navigate(getString(R.string.landing_route)) },
+                                    { navigate(R.string.landing_route) },
                                     onScan,
                                     scanViewModel,
                                     cardManagers,
@@ -275,13 +280,13 @@ class MainActivity : ComponentActivity() {
                             }
                             composable(getString(R.string.register_card_route)) {
                                 val onScan = {
-                                    navigate(getString(R.string.registration_route))
+                                    navigate(R.string.registration_route)
                                 }
 
                                 ScanScreen(
                                     stringResource(R.string.scan_card),
                                     LastRegisteredCard,
-                                    { navigate(getString(R.string.registration_route)) },
+                                    { navigate(R.string.registration_route) },
                                     onScan,
                                     scanViewModel,
                                     cardManagers,
@@ -289,13 +294,13 @@ class MainActivity : ComponentActivity() {
                             }
                             composable(getString(R.string.add_card_route)) {
                                 val onScan = {
-                                    navigate(getString(R.string.user_mode_route))
+                                    navigate(R.string.user_mode_route)
                                 }
 
                                 ScanScreen(
                                     stringResource(R.string.scan_card),
                                     LastAddedCard,
-                                    { navigate(getString(R.string.my_cards_route)) },
+                                    { navigate(R.string.my_cards_route) },
                                     onScan,
                                     scanViewModel,
                                     cardManagers,
@@ -303,17 +308,17 @@ class MainActivity : ComponentActivity() {
                             }
                             composable(getString(R.string.charger_mode_route)) {
                                 ChargerScreen({
-                                    navigate(getString(R.string.scan_card_route))
+                                    navigate(R.string.scan_card_route)
                                 }, {
-                                    navigate(getString(R.string.ev_simulator_route))
+                                    navigate(R.string.ev_simulator_route)
                                 }, chargerViewModel)
                             }
                             composable(getString(R.string.registration_route)) {
-                                val onLogInClick = { navigate(getString(R.string.login_route)) }
+                                val onLogInClick = { navigate(R.string.login_route) }
                                 var onAddCard =
-                                    { navigate(getString(R.string.register_card_route)) }
+                                    { navigate(R.string.register_card_route) }
                                 val onArrowBackClick =
-                                    { navigate(getString(R.string.landing_route)) }
+                                    { navigate(R.string.landing_route) }
 
                                 RegistrationScreen(
                                     onArrowBackClick,
@@ -324,26 +329,22 @@ class MainActivity : ComponentActivity() {
                             }
                             composable(getString(R.string.login_route)) {
                                 val onRegisterClick =
-                                    { navigate(getString(R.string.registration_route)) }
+                                    { navigate(R.string.registration_route) }
                                 val onLogin = {
-                                    navigate(getString(R.string.user_mode_route))
+                                    navigate(R.string.user_mode_route)
                                     showLogoutNavDrawerItem.value = true
                                 }
                                 LoginScreen(
                                     onRegisterClick,
                                     onLogin,
-                                    { navigate(getString(R.string.landing_route)) },
+                                    { navigate(R.string.landing_route) },
                                     authenticationViewModel,
                                 )
                             }
                             composable(getString(R.string.user_mode_route)) {
-                                val onHistoryClick =
-                                    { navigate(getString(R.string.charging_history_route)) }
-                                val onCardsClick =
-                                    { navigate(getString(R.string.my_cards_route)) }
                                 val onArrowBackClick =
-                                    { navigate(getString(R.string.landing_route)) }
-                                val onAddCard = { navigate(getString(R.string.add_card_route)) }
+                                    { navigate(R.string.landing_route) }
+                                val onAddCard = { navigate(R.string.add_card_route) }
 
                                 BackHandler(true) { }
                                 UserModeScreen(
@@ -354,22 +355,11 @@ class MainActivity : ComponentActivity() {
                                     onAddCard,
                                 )
                             }
-                            /*composable(getString(R.string.charging_history_route)) {
-                                HistoryScreen({
-                                    navigate(getString(R.string.user_mode_route))
-                                }, onLogOut, historyViewModel)
-                            }*/
                             composable(getString(R.string.ev_simulator_route)) {
                                 SimulatorScreen(chargerViewModel) {
-                                    navigate(getString(R.string.charger_mode_route))
+                                    navigate(R.string.charger_mode_route)
                                 }
                             }
-                            /*composable(getString(R.string.my_cards_route)) {
-                                val onAddCard = { navigate(getString(R.string.add_card_route)) }
-                                CardScreen({
-                                    navigate(getString(R.string.user_mode_route))
-                                }, onAddCard, onLogOut, cardViewModel)
-                            }*/
                         }
                     }
                 }
