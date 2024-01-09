@@ -27,6 +27,7 @@ export class MapPageComponent implements OnInit{
   private vectorLayer: VectorLayer<VectorSource> = new VectorLayer({
     source: this.vectorSource,
   });
+  loading = true;
 
   constructor(private router: Router, private userManagerService: UserManagerService) { }
 
@@ -36,6 +37,7 @@ export class MapPageComponent implements OnInit{
       if (await this.userManagerService.validTokens(tokens)) {
           await this.getStations(tokens.jwt);
           this.drawMap();
+          this.loading = false;
       } else {
         this.router.navigate(['/login']);
       }

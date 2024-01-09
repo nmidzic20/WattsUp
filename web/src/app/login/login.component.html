@@ -1,6 +1,7 @@
 <div id="formContainer">
     <h1>Login</h1>
     <div id="message"></div>
+    <div *ngIf="loading" class="spinner"></div>
     <form #loginForm="ngForm" (ngSubmit)="submitLogin(loginForm)" novalidate>
         <div class="form-group">
             <label for="email">Email:</label>
