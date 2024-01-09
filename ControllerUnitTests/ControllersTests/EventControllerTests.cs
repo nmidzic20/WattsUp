@@ -2,6 +2,7 @@
 using backend.Data;
 using backend.Models.Entities;
 using backend.Models.Requests;
+using backend.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,7 +35,7 @@ namespace ControllerUnitTests.ControllersTests
         {
             // Arrange
             using var context = new DatabaseContext(_options);
-            EventController eventController = new(context, new HttpClient());
+            EventController eventController = new(context, new HttpClient(),new SSEService());
 
             // Act
             var result = (await eventController.GetEvents()).Result as ObjectResult;
@@ -48,7 +49,7 @@ namespace ControllerUnitTests.ControllersTests
         {
             // Arrange
             using var context = new DatabaseContext(_options);
-            EventController eventController = new(context, new HttpClient());
+            EventController eventController = new(context, new HttpClient(), new SSEService());
             context.Event.Add(new Event { Id = 1, CardId = 1, ChargerId = 1, StartedAt = DateTime.Now, EndedAt = DateTime.MaxValue });
             context.Event.Add(new Event { Id = 2, CardId = 2, ChargerId = 2, StartedAt = DateTime.Now, EndedAt = DateTime.MaxValue });
             context.SaveChanges();
@@ -65,7 +66,7 @@ namespace ControllerUnitTests.ControllersTests
         {
             // Arrange
             using var context = new DatabaseContext(_options);
-            EventController eventController = new(context, new HttpClient());
+            EventController eventController = new(context, new HttpClient(), new SSEService());
             context.Event.Add(new Event { Id = 1, CardId = 1, ChargerId = 1, StartedAt = DateTime.Now, EndedAt = DateTime.MaxValue });
             context.Event.Add(new Event { Id = 2, CardId = 2, ChargerId = 2, StartedAt = DateTime.Now, EndedAt = DateTime.MaxValue });
             context.SaveChanges();
@@ -82,7 +83,7 @@ namespace ControllerUnitTests.ControllersTests
         {
             // Arrange
             using var context = new DatabaseContext(_options);
-            EventController eventController = new(context, new HttpClient());
+            EventController eventController = new(context, new HttpClient(), new SSEService());
             context.Card.Add(new Card
             {
                 Id = 1,
@@ -114,7 +115,7 @@ namespace ControllerUnitTests.ControllersTests
         {
             // Arrange
             using var context = new DatabaseContext(_options);
-            EventController eventController = new(context, new HttpClient());
+            EventController eventController = new(context, new HttpClient(), new SSEService());
             context.Event.Add(new Event { Id = 1, CardId = 1, ChargerId = 1, StartedAt = DateTime.Now, EndedAt = DateTime.MaxValue });
             context.Event.Add(new Event { Id = 2, CardId = 2, ChargerId = 2, StartedAt = DateTime.Now, EndedAt = DateTime.MaxValue });
             context.SaveChanges();
@@ -131,7 +132,7 @@ namespace ControllerUnitTests.ControllersTests
         {
             // Arrange
             using var context = new DatabaseContext(_options);
-            EventController eventController = new(context, new HttpClient());
+            EventController eventController = new(context, new HttpClient(), new SSEService());
             context.Charger.Add(new Charger
             {
                 Active = true,
@@ -164,7 +165,7 @@ namespace ControllerUnitTests.ControllersTests
         {
             // Arrange
             using var context = new DatabaseContext(_options);
-            EventController eventController = new(context, new HttpClient());
+            EventController eventController = new(context, new HttpClient(), new SSEService());
             context.Event.Add(new Event { Id = 1, CardId = 1, ChargerId = 1, StartedAt = DateTime.Today, EndedAt = DateTime.Now });
             context.Event.Add(new Event { Id = 2, CardId = 2, ChargerId = 2, StartedAt = DateTime.Now, EndedAt = DateTime.MaxValue });
             context.SaveChanges();
@@ -181,7 +182,7 @@ namespace ControllerUnitTests.ControllersTests
         {
             // Arrange
             using var context = new DatabaseContext(_options);
-            EventController eventController = new(context, new HttpClient());
+            EventController eventController = new(context, new HttpClient(), new SSEService());
             context.Charger.Add(new Charger
             {
                 Active = true,
@@ -233,7 +234,7 @@ namespace ControllerUnitTests.ControllersTests
         {
             // Arrange
             using var context = new DatabaseContext(_options);
-            EventController eventController = new(context, new HttpClient());
+            EventController eventController = new(context, new HttpClient(), new SSEService());
             
             context.Charger.Add(new Charger
             {

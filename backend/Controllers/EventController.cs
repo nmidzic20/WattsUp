@@ -15,11 +15,13 @@ namespace backend.Controllers
     {
         private readonly DatabaseContext _dbContext;
         private readonly HttpClient _client;
+        private readonly SSEService _sseService;
 
-        public EventController(DatabaseContext dbContext, HttpClient httpClient)
+        public EventController(DatabaseContext dbContext, HttpClient httpClient, SSEService sseService)
         {
             _dbContext = dbContext;
             _client = httpClient;
+            _sseService=sseService;
         }
 
         [Authorize(Policy = "Admin")]
@@ -138,8 +140,7 @@ namespace backend.Controllers
 
         private async Task<bool> UpdateChargerState(bool state, long id)
         {
-            var sseService = new SSEService();
-            var chargerController = new ChargerController(_dbContext, _client, sseService);
+            var chargerController = new ChargerController(_dbContext, _client, _sseService);
             var result = (await chargerController.GetChargerByID(id)).Result as ObjectResult;
 
             if (result.Value is not Charger charger)
