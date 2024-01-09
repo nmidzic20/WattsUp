@@ -42,12 +42,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -67,6 +68,7 @@ import hr.foi.air.wattsup.screens.RegistrationScreen
 import hr.foi.air.wattsup.screens.ScanScreen
 import hr.foi.air.wattsup.screens.SimulatorScreen
 import hr.foi.air.wattsup.screens.UserModeScreen
+import hr.foi.air.wattsup.ui.component.LogoutDialog
 import hr.foi.air.wattsup.ui.theme.WattsUpTheme
 import hr.foi.air.wattsup.utils.LastAddedCard
 import hr.foi.air.wattsup.utils.LastRegisteredCard
@@ -128,8 +130,23 @@ class MainActivity : ComponentActivity() {
                     val navigate = { route: String ->
                         navController.navigate(route)
                     }
-                    val onLogOut =
-                        { navController.navigate(getString(R.string.landing_route)) }
+
+                    val showLogoutDialog = remember { mutableStateOf(false) }
+                    var showLogoutNavDrawerItem = remember {
+                        mutableStateOf(
+                            TokenManager.getInstance(
+                                this,
+                            ).isLoggedIn(),
+                        )
+                    }
+                    val onLogOut = {
+                        navigate("landing")
+                        showLogoutNavDrawerItem.value = false
+                    }
+                    LogoutDialog(
+                        showLogoutDialog,
+                        onLogOut,
+                    )
 
                     val items = listOf(
                         NavDrawerItem(
@@ -163,7 +180,7 @@ class MainActivity : ComponentActivity() {
                             title = getString(R.string.log_out),
                             selectedIcon = Icons.Filled.Logout,
                             unselectedIcon = Icons.Outlined.Logout,
-                            onClick = onLogOut,
+                            onClick = { showLogoutDialog.value = true },
                         ),
                     )
 
@@ -186,10 +203,7 @@ class MainActivity : ComponentActivity() {
                                 )
                                 Spacer(modifier = Modifier.height(26.dp))
                                 items.forEachIndexed { index, drawerItem ->
-                                    if (drawerItem.title != getString(R.string.log_out) || TokenManager.getInstance(
-                                            LocalContext.current,
-                                        ).isLoggedIn()
-                                    ) {
+                                    if (drawerItem.title != getString(R.string.log_out) || showLogoutNavDrawerItem.value) {
                                         NavigationDrawerItem(
                                             colors = NavigationDrawerItemDefaults.colors(
                                                 selectedContainerColor = MaterialTheme.colorScheme.secondary,
@@ -311,7 +325,10 @@ class MainActivity : ComponentActivity() {
                             composable(getString(R.string.login_route)) {
                                 val onRegisterClick =
                                     { navigate(getString(R.string.registration_route)) }
-                                val onLogin = { navigate(getString(R.string.user_mode_route)) }
+                                val onLogin = {
+                                    navigate(getString(R.string.user_mode_route))
+                                    showLogoutNavDrawerItem.value = true
+                                }
                                 LoginScreen(
                                     onRegisterClick,
                                     onLogin,
@@ -333,6 +350,7 @@ class MainActivity : ComponentActivity() {
                                     historyViewModel,
                                     cardViewModel,
                                     onArrowBackClick,
+                                    onLogOut,
                                     onAddCard,
                                 )
                             }

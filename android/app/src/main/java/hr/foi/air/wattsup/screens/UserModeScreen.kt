@@ -38,17 +38,22 @@ fun UserModeScreen(
     historyViewModel: HistoryViewModel,
     cardsViewModel: CardViewModel,
     onArrowBackClick: () -> Unit,
+    onLogOut: () -> Unit,
     onAddCard: () -> Unit,
 ) {
     val showLogoutDialog = remember { mutableStateOf(false) }
     val selectedRoute = remember { mutableIntStateOf(R.string.cards) }
 
-    val onArrowBack = {
-        onArrowBackClick()
-
+    val resetUserScreenData = {
         // To ensure API calls for events and cards are performed upon returning to UserModeView
         historyViewModel.resetEvents()
         cardsViewModel.resetCards()
+    }
+
+    val onLogOutFromUserMode = {
+        onLogOut()
+
+        resetUserScreenData()
     }
 
     Scaffold(
@@ -56,7 +61,10 @@ fun UserModeScreen(
             TopAppBar(
                 title = { Text("User Mode") },
                 navigationIcon = {
-                    IconButton(onClick = onArrowBack) {
+                    IconButton(onClick = {
+                        onArrowBackClick()
+                        resetUserScreenData()
+                    }) {
                         Icon(Icons.Filled.ArrowBack, null, tint = Color.White)
                     }
                 },
@@ -111,7 +119,7 @@ fun UserModeScreen(
 
         UserModeView(
             selectedRoute,
-            onArrowBack,
+            onLogOutFromUserMode,
             showLogoutDialog,
             historyViewModel,
             cardsViewModel,
@@ -124,7 +132,7 @@ fun UserModeScreen(
 @Composable
 fun UserModeView(
     selectedRoute: MutableIntState,
-    onArrowBackClick: () -> Unit,
+    onLogOut: () -> Unit,
     showLogoutDialog: MutableState<Boolean>,
     historyViewModel: HistoryViewModel,
     cardsViewModel: CardViewModel,
@@ -133,7 +141,7 @@ fun UserModeView(
 ) {
     LogoutDialog(
         showLogoutDialog,
-        onArrowBackClick,
+        onLogOut,
     )
 
     when (selectedRoute.value) {
