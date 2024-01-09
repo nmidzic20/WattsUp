@@ -60,9 +60,7 @@ import hr.foi.air.wattsup.ble.BLEManager
 import hr.foi.air.wattsup.core.CardManager
 import hr.foi.air.wattsup.network.models.TokenManager
 import hr.foi.air.wattsup.rfid.RFIDManager
-import hr.foi.air.wattsup.screens.CardScreen
 import hr.foi.air.wattsup.screens.ChargerScreen
-import hr.foi.air.wattsup.screens.HistoryScreen
 import hr.foi.air.wattsup.screens.LandingScreen
 import hr.foi.air.wattsup.screens.LoginScreen
 import hr.foi.air.wattsup.screens.RegistrationScreen
@@ -277,7 +275,7 @@ class MainActivity : ComponentActivity() {
                             }
                             composable(getString(R.string.add_card_route)) {
                                 val onScan = {
-                                    navigate(getString(R.string.my_cards_route))
+                                    navigate(getString(R.string.user_mode_route))
                                 }
 
                                 ScanScreen(
@@ -328,30 +326,32 @@ class MainActivity : ComponentActivity() {
                                     { navigate(getString(R.string.my_cards_route)) }
                                 val onArrowBackClick =
                                     { navigate(getString(R.string.landing_route)) }
+                                val onAddCard = { navigate(getString(R.string.add_card_route)) }
 
                                 BackHandler(true) { }
                                 UserModeScreen(
-                                    onHistoryClick,
-                                    onCardsClick,
+                                    historyViewModel,
+                                    cardViewModel,
                                     onArrowBackClick,
+                                    onAddCard,
                                 )
                             }
-                            composable(getString(R.string.charging_history_route)) {
+                            /*composable(getString(R.string.charging_history_route)) {
                                 HistoryScreen({
                                     navigate(getString(R.string.user_mode_route))
                                 }, onLogOut, historyViewModel)
-                            }
+                            }*/
                             composable(getString(R.string.ev_simulator_route)) {
                                 SimulatorScreen(chargerViewModel) {
                                     navigate(getString(R.string.charger_mode_route))
                                 }
                             }
-                            composable(getString(R.string.my_cards_route)) {
+                            /*composable(getString(R.string.my_cards_route)) {
                                 val onAddCard = { navigate(getString(R.string.add_card_route)) }
                                 CardScreen({
                                     navigate(getString(R.string.user_mode_route))
                                 }, onAddCard, onLogOut, cardViewModel)
-                            }
+                            }*/
                         }
                     }
                 }

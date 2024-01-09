@@ -19,42 +19,28 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.network.models.Event
 import hr.foi.air.wattsup.network.models.TokenManager
 import hr.foi.air.wattsup.ui.component.LoadingSpinner
-import hr.foi.air.wattsup.ui.component.LogoutDialog
-import hr.foi.air.wattsup.ui.component.TopAppBar
 import hr.foi.air.wattsup.viewmodels.HistoryViewModel
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -64,11 +50,12 @@ import java.util.Locale
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun HistoryScreen(
-    onArrowBackClick: () -> Unit,
-    onLogOutClick: () -> Unit,
+    /*onArrowBackClick: () -> Unit,
+    onLogOutClick: () -> Unit,*/
     viewModel: HistoryViewModel,
+    modifier: Modifier = Modifier,
 ) {
-    val showLogoutDialog = remember { mutableStateOf(false) }
+    /*val showLogoutDialog = remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -86,17 +73,18 @@ fun HistoryScreen(
                 },
             )
         },
-    ) {
-        HistoryView(it.calculateTopPadding(), showLogoutDialog, onLogOutClick, viewModel)
-    }
+    ) {*/
+    HistoryView(viewModel, modifier)
+    // }
 }
 
 @Composable
 fun HistoryView(
-    topPadding: Dp,
+    /*topPadding: Dp,
     showLogoutDialog: MutableState<Boolean>,
-    onLogOutClick: () -> Unit,
+    onLogOutClick: () -> Unit,*/
     viewModel: HistoryViewModel,
+    modifier: Modifier = Modifier,
     context: Context = LocalContext.current,
 ) {
     val userId = TokenManager.getInstance(context).getUserId()
@@ -106,17 +94,19 @@ fun HistoryView(
 
     LaunchedEffect(Unit) {
         Log.i("USER_ID", userId.toString())
-        if (userId != null) {
+        // prevent initial API call if events is not empty, which it may not be due use of bottom bar
+        // and having still active viewmodel when switching to myCards and back
+        if (userId != null && events.isEmpty()) {
             viewModel.refreshHistory(context, userId)
         }
     }
 
-    LogoutDialog(showLogoutDialog, onLogOutClick)
+    // LogoutDialog(showLogoutDialog, onLogOutClick)
 
     LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(top = topPadding + 15.dp),
+        modifier = modifier
+            .fillMaxSize(),
+        // .padding(top = topPadding + 15.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -306,10 +296,4 @@ private fun DetailDialog(
             }
         }
     }
-}
-
-@Preview(showBackground = false)
-@Composable
-fun HistoryPreview() {
-    HistoryScreen({}, {}, HistoryViewModel())
 }

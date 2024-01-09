@@ -25,19 +25,13 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -57,32 +51,28 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.network.models.Card
 import hr.foi.air.wattsup.network.models.TokenManager
 import hr.foi.air.wattsup.ui.component.CircleButton
 import hr.foi.air.wattsup.ui.component.LoadingSpinner
-import hr.foi.air.wattsup.ui.component.LogoutDialog
-import hr.foi.air.wattsup.ui.component.TopAppBar
 import hr.foi.air.wattsup.viewmodels.CardViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CardScreen(
-    onArrowBackClick: () -> Unit,
+    // onArrowBackClick: () -> Unit,
     onAddCard: () -> Unit,
-    onLogOut: () -> Unit,
+    // onLogOut: () -> Unit,
     viewModel: CardViewModel,
+    modifier: Modifier = Modifier,
 ) {
-    val showLogoutDialog = remember { mutableStateOf(false) }
+    /*val showLogoutDialog = remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -100,9 +90,9 @@ fun CardScreen(
                 },
             )
         },
-    ) {
-        CardView(viewModel, onAddCard, showLogoutDialog, onLogOut, Modifier.padding(it))
-    }
+    ) {*/
+    CardView(viewModel, onAddCard, modifier)
+    // }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -110,8 +100,8 @@ fun CardScreen(
 fun CardView(
     viewModel: CardViewModel,
     onAddCard: () -> Unit,
-    showLogoutDialog: MutableState<Boolean>,
-    onLogOut: () -> Unit,
+    // showLogoutDialog: MutableState<Boolean>,
+    // onLogOut: () -> Unit,
     modifier: Modifier = Modifier,
     context: Context = LocalContext.current,
 ) {
@@ -128,12 +118,14 @@ fun CardView(
     }
 
     LaunchedEffect(Unit) {
-        if (userId != null) {
+        // prevent initial API call if cards is not empty, which it may not be due use of bottom bar
+        // and having still active viewmodel when switching to chargingHistory and back
+        if (userId != null && cards.isEmpty()) {
             viewModel.refreshCards(context, userId)
         }
     }
 
-    LogoutDialog(showLogoutDialog, onLogOut)
+    // LogoutDialog(showLogoutDialog, onLogOut)
 
     Column(
         modifier = modifier.fillMaxSize(),
@@ -488,10 +480,4 @@ fun PageIndicatorView(
             ),
         )
     }
-}
-
-@Preview(showBackground = false)
-@Composable
-fun CardPreview() {
-    CardScreen({}, {}, {}, CardViewModel())
 }

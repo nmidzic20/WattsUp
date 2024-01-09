@@ -52,6 +52,10 @@ class CardViewModel : ViewModel() {
         fetchCards(context, userId)
     }
 
+    fun resetCards() {
+        _cards.value = emptyList()
+    }
+
     private fun fetchCards(context: Context, userId: Int) {
         getCards(context, userId)
     }
