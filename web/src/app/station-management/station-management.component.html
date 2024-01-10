@@ -57,7 +57,7 @@
     </table>
     
     <button class="floating-button" (click)="openAddStationDialogue()">Add station</button>
-    <app-add-station-dialogue [isVisible]="isAddStationDialogueVisible" (closeDialogue)="isAddStationDialogueVisible=false" (refreshChargerView)="getStations($event)"></app-add-station-dialogue>
+    <app-add-station-dialogue [isUpdateMode]="stationUpdate"  [isVisible]="isAddStationDialogueVisible" (closeDialogue)="isAddStationDialogueVisible=false" (refreshChargerView)="getStations($event)"></app-add-station-dialogue>
 
 </div>
 <div class="center" *ngIf="loading">

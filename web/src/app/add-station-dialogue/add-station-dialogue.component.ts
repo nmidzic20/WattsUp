@@ -14,6 +14,7 @@ import Style from 'ol/style/Style';
 import Icon from 'ol/style/Icon';
 import { Coordinate } from 'ol/coordinate';
 import { environment } from 'src/environments/environment';
+import { Station } from '../interfaces/Station';
 
 @Component({
   selector: 'app-add-station-dialogue',
@@ -22,6 +23,7 @@ import { environment } from 'src/environments/environment';
 })
 export class AddStationDialogueComponent {
   @Input() isVisible: boolean = false;
+  @Input() isUpdateMode: Station | null = null;
   @Output() closeDialogue: EventEmitter<void> = new EventEmitter<void>();
   @Output() refreshChargerView = new EventEmitter<string>();
   stationNameInput?: HTMLInputElement;

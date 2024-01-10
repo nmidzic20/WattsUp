@@ -18,6 +18,7 @@ export class StationManagementComponent implements OnInit {
   stations: Station[] = [];
   isAddStationDialogueVisible: boolean = false;
   loading = true;
+  stationUpdate: Station | null = null;
 
   constructor(private router: Router, private userManagerService: UserManagerService, private sseService: SSEService, private cdr: ChangeDetectorRef){}
 
@@ -55,6 +56,7 @@ export class StationManagementComponent implements OnInit {
   }
 
   openAddStationDialogue() {
+    this.stationUpdate = null;
     this.isAddStationDialogueVisible = true;
   }
 
@@ -135,7 +137,8 @@ export class StationManagementComponent implements OnInit {
   }
 
   updateStation(station: Station) {
-
+    this.stationUpdate = station;
+    this.isAddStationDialogueVisible = true;
   }
 
   async deleteStation(station: Station) {

@@ -1,6 +1,7 @@
 <div *ngIf="isVisible" class="dialogue-container">
     <div class="dialogue-content">
-        <h2>ADD NEW CHARGING STATION</h2>
+        <h2 *ngIf="!isUpdateMode">ADD NEW CHARGING STATION</h2>
+        <h2 *ngIf="isUpdateMode">UPDATE CHARGING STATION</h2>
         <div *ngIf="dialogueInputContainerIsVisible" class="dialogue-input-container">
             <div class="dialogue-input">
                 <label for="name">Station name:</label>
