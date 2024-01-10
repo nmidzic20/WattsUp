@@ -122,6 +122,7 @@ fun CentralView(
         onValueChange = { viewModel.updateFirstName(it) },
         label = { Text(stringResource(R.string.first_name_label)) },
         singleLine = true,
+
     )
 
     OutlinedTextField(
@@ -130,6 +131,7 @@ fun CentralView(
         onValueChange = { viewModel.updateLastName(it) },
         label = { Text(stringResource(R.string.last_name_label)) },
         singleLine = true,
+
     )
 
     OutlinedTextField(
@@ -193,6 +195,7 @@ fun CentralView(
             onValueChange = { viewModel.updateCard(Card(id = 0, value = it, active = true)) },
             label = { Text(stringResource(R.string.card_label)) },
             singleLine = true,
+
         )
 
         Spacer(modifier = Modifier.width(4.dp))
@@ -224,6 +227,8 @@ fun CentralView(
             viewModel.updateInvalidPassword(!Regex("^.{6,}\$").matches(password!!))
             if (invalidPassword == true || invalidEmail == true) {
                 viewModel.showToast(context, "Invalid e-mail or password")
+            } else if (firstName.isNullOrEmpty() || lastName.isNullOrEmpty() || email.isNullOrEmpty() || password.isNullOrEmpty()) {
+                viewModel.showToast(context, "Fill all required fields")
             } else {
                 viewModel.registerUser(
                     firstName!!,

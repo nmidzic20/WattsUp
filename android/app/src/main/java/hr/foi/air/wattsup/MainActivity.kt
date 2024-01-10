@@ -136,13 +136,7 @@ class MainActivity : ComponentActivity() {
                     }
 
                     val showLogoutDialog = remember { mutableStateOf(false) }
-                    var showLogoutNavDrawerItem = remember {
-                        mutableStateOf(
-                            TokenManager.getInstance(
-                                this,
-                            ).isLoggedIn(),
-                        )
-                    }
+                    var showLogoutNavDrawerItem = remember { mutableStateOf(false) }
                     val onLogOut = {
                         navigate(R.string.landing_route)
                         showLogoutNavDrawerItem.value = false
