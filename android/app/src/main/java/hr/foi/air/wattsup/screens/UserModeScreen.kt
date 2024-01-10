@@ -6,9 +6,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.ExitToApp
-import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -28,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import hr.foi.air.wattsup.R
+import hr.foi.air.wattsup.navigation.bottomAppBarItems
 import hr.foi.air.wattsup.ui.component.LogoutDialog
 import hr.foi.air.wattsup.ui.component.TopAppBar
 import hr.foi.air.wattsup.ui.theme.colorDarkGray
@@ -83,7 +82,28 @@ fun UserModeScreen(
                 containerColor = if (isSystemInDarkTheme()) Color.White else colorGray,
                 contentColor = if (isSystemInDarkTheme()) colorDarkGray else Color.White,
                 content = {
-                    NavigationBarItem(
+                    bottomAppBarItems.forEach { item ->
+                        NavigationBarItem(
+                            colors = NavigationBarItemDefaults
+                                .colors(
+                                    indicatorColor = MaterialTheme.colorScheme.primary,
+                                    selectedTextColor = if (isSystemInDarkTheme()) colorDarkGray else Color.White,
+                                    unselectedIconColor = if (isSystemInDarkTheme()) colorDarkGray else Color.White,
+                                    unselectedTextColor = if (isSystemInDarkTheme()) colorDarkGray else Color.White,
+                                ),
+                            icon = {
+                                Icon(
+                                    imageVector = item.icon,
+                                    contentDescription = stringResource(id = item.labelResId),
+
+                                )
+                            },
+                            label = { Text(text = stringResource(item.labelResId)) },
+                            onClick = { selectedRoute.value = item.labelResId },
+                            selected = selectedRoute.value == item.labelResId,
+                        )
+                    }
+                    /*NavigationBarItem(
                         colors = NavigationBarItemDefaults
                             .colors(
                                 indicatorColor = MaterialTheme.colorScheme.primary,
@@ -120,7 +140,7 @@ fun UserModeScreen(
                         label = { Text(text = stringResource(R.string.history)) },
                         onClick = { selectedRoute.value = R.string.history },
                         selected = selectedRoute.value == R.string.history,
-                    )
+                    )*/
                 },
             )
         },
