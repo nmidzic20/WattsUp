@@ -12,6 +12,7 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -49,6 +50,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -71,6 +73,7 @@ import hr.foi.air.wattsup.screens.SimulatorScreen
 import hr.foi.air.wattsup.screens.UserModeScreen
 import hr.foi.air.wattsup.ui.component.LogoutDialog
 import hr.foi.air.wattsup.ui.theme.WattsUpTheme
+import hr.foi.air.wattsup.ui.theme.colorDarkGray
 import hr.foi.air.wattsup.utils.LastAddedCard
 import hr.foi.air.wattsup.utils.LastRegisteredCard
 import hr.foi.air.wattsup.viewmodels.AuthenticationViewModel
@@ -149,6 +152,17 @@ class MainActivity : ComponentActivity() {
                         onLogOut,
                     )
 
+                    val onUserModeClick = {
+                        val isLoggedIn =
+                            TokenManager.getInstance(this@MainActivity).isLoggedIn()
+
+                        if (isLoggedIn) {
+                            navigate(R.string.user_mode_route)
+                        } else {
+                            navigate(R.string.login_route)
+                        }
+                    }
+
                     val items = listOf(
                         CustomNavDrawerItem(
                             title = "Home",
@@ -161,16 +175,7 @@ class MainActivity : ComponentActivity() {
                             title = "User Mode",
                             selectedIcon = Icons.Filled.Person,
                             unselectedIcon = Icons.Outlined.Person,
-                            onClick = {
-                                val isLoggedIn =
-                                    TokenManager.getInstance(this@MainActivity).isLoggedIn()
-
-                                if (isLoggedIn) {
-                                    navigate(R.string.user_mode_route)
-                                } else {
-                                    navigate(R.string.login_route)
-                                }
-                            },
+                            onClick = onUserModeClick,
                             id = R.string.user_mode_route,
                         ),
                         CustomNavDrawerItem(
@@ -211,7 +216,9 @@ class MainActivity : ComponentActivity() {
                                     if (drawerItem.title != getString(R.string.log_out) || showLogoutNavDrawerItem.value) {
                                         NavigationDrawerItem(
                                             colors = NavigationDrawerItemDefaults.colors(
-                                                selectedContainerColor = MaterialTheme.colorScheme.secondary,
+                                                selectedIconColor = if (isSystemInDarkTheme()) colorDarkGray else Color.White,
+                                                selectedTextColor = if (isSystemInDarkTheme()) colorDarkGray else Color.White,
+                                                selectedContainerColor = if (isSystemInDarkTheme()) Color.White else MaterialTheme.colorScheme.secondary,
                                                 unselectedContainerColor = MaterialTheme.colorScheme.background,
                                             ),
                                             label = {

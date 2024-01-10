@@ -28,4 +28,8 @@ object HexUtils {
         }
         return stringBuilder.toString()
     }
+
+    fun formatToDatabase(deviceAddress: String) = "0" +
+        deviceAddress.substring(1, 2).lowercase() + deviceAddress.uppercase()
+            .substring(2)
 }

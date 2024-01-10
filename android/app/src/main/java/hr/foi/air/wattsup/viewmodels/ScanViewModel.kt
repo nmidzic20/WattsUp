@@ -199,9 +199,8 @@ class ScanViewModel : ViewModel() {
             }
         }
 
-        val cardAddress = "0" +
-            deviceAddress.substring(1, 2).lowercase() + deviceAddress.uppercase()
-                .substring(2)
+        val cardAddress = HexUtils.formatToDatabase(deviceAddress)
+
         Log.i(
             "CARD_BEFORE_RES",
             cardAddress,

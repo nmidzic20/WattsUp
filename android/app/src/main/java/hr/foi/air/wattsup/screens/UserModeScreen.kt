@@ -31,6 +31,7 @@ import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.ui.component.LogoutDialog
 import hr.foi.air.wattsup.ui.component.TopAppBar
 import hr.foi.air.wattsup.ui.theme.colorDarkGray
+import hr.foi.air.wattsup.ui.theme.colorGray
 import hr.foi.air.wattsup.viewmodels.CardViewModel
 import hr.foi.air.wattsup.viewmodels.HistoryViewModel
 
@@ -79,7 +80,7 @@ fun UserModeScreen(
         },
         bottomBar = {
             BottomAppBar(
-                containerColor = if (isSystemInDarkTheme()) Color.White else colorDarkGray,
+                containerColor = if (isSystemInDarkTheme()) Color.White else colorGray,
                 contentColor = if (isSystemInDarkTheme()) colorDarkGray else Color.White,
                 content = {
                     NavigationBarItem(
@@ -104,7 +105,7 @@ fun UserModeScreen(
                     NavigationBarItem(
                         colors = NavigationBarItemDefaults
                             .colors(
-                                indicatorColor = MaterialTheme.colorScheme.secondary,
+                                indicatorColor = MaterialTheme.colorScheme.primary,
                                 selectedTextColor = if (isSystemInDarkTheme()) colorDarkGray else Color.White,
                                 unselectedIconColor = if (isSystemInDarkTheme()) colorDarkGray else Color.White,
                                 unselectedTextColor = if (isSystemInDarkTheme()) colorDarkGray else Color.White,
