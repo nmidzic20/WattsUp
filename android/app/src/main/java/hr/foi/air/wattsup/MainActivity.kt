@@ -156,13 +156,21 @@ class MainActivity : ComponentActivity() {
                             navigate(R.string.login_route)
                         }
                     }
+                    val resetUserScreenData = {
+                        // To ensure API calls for events and cards are performed upon returning to UserModeView
+                        historyViewModel.resetEvents()
+                        cardViewModel.resetCards()
+                    }
 
                     val items = listOf(
                         CustomNavDrawerItem(
                             title = "Home",
                             selectedIcon = Icons.Filled.Home,
                             unselectedIcon = Icons.Outlined.Home,
-                            onClick = { navigate(R.string.landing_route) },
+                            onClick = {
+                                navigate(R.string.landing_route)
+                                resetUserScreenData()
+                            },
                             id = R.string.landing_route,
                         ),
                         CustomNavDrawerItem(
@@ -176,14 +184,20 @@ class MainActivity : ComponentActivity() {
                             title = "Charger Mode",
                             selectedIcon = Icons.Filled.ElectricBolt,
                             unselectedIcon = Icons.Outlined.ElectricBolt,
-                            onClick = { navigate(R.string.scan_card_route) },
+                            onClick = {
+                                navigate(R.string.scan_card_route)
+                                resetUserScreenData()
+                            },
                             id = R.string.scan_card_route,
                         ),
                         CustomNavDrawerItem(
                             title = getString(R.string.log_out),
                             selectedIcon = Icons.Filled.Logout,
                             unselectedIcon = Icons.Outlined.Logout,
-                            onClick = { showLogoutDialog.value = true },
+                            onClick = {
+                                resetUserScreenData()
+                                showLogoutDialog.value = true
+                            },
                             id = R.string.log_out,
                         ),
                     )
@@ -360,6 +374,7 @@ class MainActivity : ComponentActivity() {
                                     onArrowBackClick,
                                     onLogOut,
                                     onAddCard,
+                                    resetUserScreenData,
                                 )
                             }
                             composable(getString(R.string.ev_simulator_route)) {

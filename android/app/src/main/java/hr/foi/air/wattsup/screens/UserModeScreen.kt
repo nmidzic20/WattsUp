@@ -42,15 +42,10 @@ fun UserModeScreen(
     onArrowBackClick: () -> Unit,
     onLogOut: () -> Unit,
     onAddCard: () -> Unit,
+    resetUserScreenData: () -> Unit,
 ) {
     val showLogoutDialog = remember { mutableStateOf(false) }
     val selectedRoute = remember { mutableIntStateOf(R.string.cards) }
-
-    val resetUserScreenData = {
-        // To ensure API calls for events and cards are performed upon returning to UserModeView
-        historyViewModel.resetEvents()
-        cardsViewModel.resetCards()
-    }
 
     val onLogOutFromUserMode = {
         onLogOut()
@@ -103,44 +98,6 @@ fun UserModeScreen(
                             selected = selectedRoute.value == item.labelResId,
                         )
                     }
-                    /*NavigationBarItem(
-                        colors = NavigationBarItemDefaults
-                            .colors(
-                                indicatorColor = MaterialTheme.colorScheme.primary,
-                                selectedTextColor = if (isSystemInDarkTheme()) colorDarkGray else Color.White,
-                                unselectedIconColor = if (isSystemInDarkTheme()) colorDarkGray else Color.White,
-                                unselectedTextColor = if (isSystemInDarkTheme()) colorDarkGray else Color.White,
-                            ),
-                        icon = {
-                            Icon(
-                                imageVector = Icons.Default.CreditCard,
-                                contentDescription = stringResource(id = R.string.cards),
-
-                            )
-                        },
-                        label = { Text(text = stringResource(R.string.cards)) },
-                        onClick = { selectedRoute.value = R.string.cards },
-                        selected = selectedRoute.value == R.string.cards,
-                    )
-                    NavigationBarItem(
-                        colors = NavigationBarItemDefaults
-                            .colors(
-                                indicatorColor = MaterialTheme.colorScheme.primary,
-                                selectedTextColor = if (isSystemInDarkTheme()) colorDarkGray else Color.White,
-                                unselectedIconColor = if (isSystemInDarkTheme()) colorDarkGray else Color.White,
-                                unselectedTextColor = if (isSystemInDarkTheme()) colorDarkGray else Color.White,
-                            ),
-                        icon = {
-                            Icon(
-                                imageVector = Icons.Default.History,
-                                contentDescription = stringResource(id = R.string.history),
-
-                            )
-                        },
-                        label = { Text(text = stringResource(R.string.history)) },
-                        onClick = { selectedRoute.value = R.string.history },
-                        selected = selectedRoute.value == R.string.history,
-                    )*/
                 },
             )
         },
