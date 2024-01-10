@@ -63,6 +63,8 @@ class CardViewModel : ViewModel() {
     private fun getCards(context: Context, userId: Int) {
         val auth = "Bearer " + TokenManager.getInstance(context).getJWTToken()
 
+        Log.i("CardView", "AUTH " + auth)
+
         cardService.getCardsForUser(userId, auth).enqueue(object : Callback<List<Card?>> {
             override fun onResponse(call: Call<List<Card?>>, response: Response<List<Card?>>) {
                 if (response.isSuccessful) {
@@ -70,6 +72,7 @@ class CardViewModel : ViewModel() {
                     _cards.value = response.body() ?: emptyList()
                     _showLoading.value = false
                 } else {
+                    Log.d("CardView", response.toString())
                     Log.d("CardView", "Error: ${response.errorBody()}")
                     toast(context, "Error: ${response.errorBody()}")
                     _cards.value = emptyList()

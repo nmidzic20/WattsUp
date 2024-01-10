@@ -194,6 +194,12 @@ class MainActivity : ComponentActivity() {
                         ),
                     )
 
+                    // upon starting ensure that user is logged out to prevent unauthorized responses when sending
+                    // API requests with old token
+                    if (TokenManager.getInstance(this@MainActivity).isLoggedIn()) {
+                        TokenManager.getInstance(this@MainActivity).setJWTToken("")
+                    }
+
                     ModalNavigationDrawer(
                         drawerContent = {
                             ModalDrawerSheet(
