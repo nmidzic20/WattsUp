@@ -132,4 +132,12 @@ export class StationManagementComponent implements OnInit {
         return '';
     }
   }
+
+  updateStation(station: any) {
+    console.log('Update station:', station);
+  }
+
+  deleteStation(station: any) {
+    console.log('Delete station:', station);
+  }
 }

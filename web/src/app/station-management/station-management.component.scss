@@ -84,7 +84,7 @@ table {
     th,
     td {
         font-size: large;
-        padding: 15px 20px;
+        padding: 13px 20px;
         text-align: left;
         border-bottom: 1px solid $green-background;
     }
@@ -121,5 +121,25 @@ table {
     .yellow {
     background-color: $yellow-background;
     color: $yellow-text;
+    }
+
+    .first-button {
+        margin-right: 20px;
+
+        &:hover {
+            background-color: #c9ffdc;
+        }
+    }
+
+    button {
+        padding: 10px;
+        cursor: pointer;
+        border-radius: 1000px;
+        border: 0;
+        background-color: white;
+
+        &:hover {
+            background-color: #ffccc9;
+        }
     }
 }
