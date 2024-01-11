@@ -145,39 +145,4 @@ fun UserModeView(
             modifier = modifier,
         )
     }
-
-    /*Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
-            .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        ElevatedButton(
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
-            onClick = onHistoryClick,
-        ) {
-            Text(
-                text = stringResource(R.string.history),
-                style = MaterialTheme.typography.bodyLarge,
-                color = Color.White,
-                modifier = Modifier.width(150.dp),
-                textAlign = TextAlign.Center,
-            )
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        ElevatedButton(
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
-            onClick = onCardsClick,
-        ) {
-            Text(
-                text = stringResource(R.string.cards),
-                style = MaterialTheme.typography.bodyLarge,
-                color = Color.White,
-                modifier = Modifier.width(150.dp),
-                textAlign = TextAlign.Center,
-            )
-        }
-    }*/
 }

@@ -141,10 +141,17 @@ class MainActivity : ComponentActivity() {
                         navigate(R.string.landing_route)
                         showLogoutNavDrawerItem.value = false
                     }
+                    val resetUserScreenData = {
+                        // To ensure API calls for events and cards are performed upon returning to UserModeView
+                        historyViewModel.resetEvents()
+                        cardViewModel.resetCards()
+                    }
                     LogoutDialog(
                         showLogoutDialog,
-                        onLogOut,
-                    )
+                    ) {
+                        onLogOut()
+                        resetUserScreenData()
+                    }
 
                     val onUserModeClick = {
                         val isLoggedIn =
@@ -155,11 +162,6 @@ class MainActivity : ComponentActivity() {
                         } else {
                             navigate(R.string.login_route)
                         }
-                    }
-                    val resetUserScreenData = {
-                        // To ensure API calls for events and cards are performed upon returning to UserModeView
-                        historyViewModel.resetEvents()
-                        cardViewModel.resetCards()
                     }
 
                     val items = listOf(
@@ -195,7 +197,6 @@ class MainActivity : ComponentActivity() {
                             selectedIcon = Icons.Filled.Logout,
                             unselectedIcon = Icons.Outlined.Logout,
                             onClick = {
-                                resetUserScreenData()
                                 showLogoutDialog.value = true
                             },
                             id = R.string.log_out,
