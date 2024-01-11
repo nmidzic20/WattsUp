@@ -68,31 +68,11 @@ import hr.foi.air.wattsup.viewmodels.CardViewModel
 fun CardScreen(
     // onArrowBackClick: () -> Unit,
     onAddCard: () -> Unit,
-    // onLogOut: () -> Unit,
+    onLogOut: () -> Unit,
     viewModel: CardViewModel,
     modifier: Modifier = Modifier,
 ) {
-    /*val showLogoutDialog = remember { mutableStateOf(false) }
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.cards)) },
-                navigationIcon = {
-                    IconButton(onClick = { onArrowBackClick() }) {
-                        Icon(Icons.Filled.ArrowBack, null, tint = Color.White)
-                    }
-                },
-                actionIcon = {
-                    IconButton(onClick = { showLogoutDialog.value = true }) {
-                        Icon(Icons.Filled.ExitToApp, null, tint = Color.White)
-                    }
-                },
-            )
-        },
-    ) {*/
-    CardView(viewModel, onAddCard, modifier)
-    // }
+    CardView(viewModel, onAddCard, onLogOut, modifier)
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -101,7 +81,7 @@ fun CardView(
     viewModel: CardViewModel,
     onAddCard: () -> Unit,
     // showLogoutDialog: MutableState<Boolean>,
-    // onLogOut: () -> Unit,
+    onLogOut: () -> Unit,
     modifier: Modifier = Modifier,
     context: Context = LocalContext.current,
 ) {
@@ -113,15 +93,20 @@ fun CardView(
     // val refresh = remember { mutableStateOf(false) }
     val currentCard = remember { derivedStateOf { state.firstVisibleItemIndex } }
 
+    val onExpiredToken = {
+        onLogOut()
+        TokenManager.getInstance(context).setJWTToken("")
+    }
+
     if (userId != null) {
-        AddDialog(scannedCard, userId, viewModel)
+        AddDialog(scannedCard, userId, onExpiredToken, viewModel)
     }
 
     LaunchedEffect(Unit) {
         // prevent initial API call if cards is not empty, which it may not be due use of bottom bar
         // and having still active viewmodel when switching to chargingHistory and back
         if (userId != null && cards.isEmpty()) {
-            viewModel.refreshCards(context, userId)
+            viewModel.refreshCards(context, userId, onExpiredToken)
         }
     }
 
@@ -171,7 +156,7 @@ fun CardView(
                 }
             } else {
                 itemsIndexed(cards) { _, item ->
-                    CardCard(item!!, userId, viewModel)
+                    CardCard(item!!, userId, onExpiredToken, viewModel)
                 }
             }
         }
@@ -191,13 +176,13 @@ fun CardView(
 }
 
 @Composable
-fun CardCard(item: Card, userId: Int?, viewModel: CardViewModel) {
+fun CardCard(item: Card, userId: Int?, onExpiredToken: () -> Unit, viewModel: CardViewModel) {
     val width = LocalConfiguration.current.screenWidthDp.dp * 0.92f
     val showRemoveDialog = remember { mutableStateOf(false) }
     val selectedCardId = remember { mutableIntStateOf(-1) }
 
     if (userId != null) {
-        RemoveDialog(showRemoveDialog, userId, selectedCardId, viewModel)
+        RemoveDialog(showRemoveDialog, userId, selectedCardId, onExpiredToken, viewModel)
     }
 
     ElevatedCard(
@@ -267,6 +252,7 @@ private fun RemoveDialog(
     openAlertDialog: MutableState<Boolean>,
     userId: Int,
     cardId: MutableState<Int>,
+    onExpiredToken: () -> Unit,
     viewModel: CardViewModel,
     context: Context = LocalContext.current,
 ) {
@@ -311,7 +297,7 @@ private fun RemoveDialog(
                                 onClick = {
                                     openAlertDialog.value = false
                                     viewModel.deleteCard(cardId.value, context) {
-                                        viewModel.refreshCards(context, userId)
+                                        viewModel.refreshCards(context, userId, onExpiredToken)
                                     }
                                 },
                                 modifier = Modifier.padding(8.dp),
@@ -332,9 +318,9 @@ private fun RemoveDialog(
 
 @Composable
 private fun AddDialog(
-
     scannedCard: Card?,
     userId: Int,
+    onExpiredToken: () -> Unit,
     viewModel: CardViewModel,
     context: Context = LocalContext.current,
 ) {
@@ -378,7 +364,7 @@ private fun AddDialog(
                             TextButton(
                                 onClick = {
                                     viewModel.addCard(userId, context) {
-                                        viewModel.refreshCards(context, userId)
+                                        viewModel.refreshCards(context, userId, onExpiredToken)
                                     }
                                 },
                                 modifier = Modifier.padding(8.dp),

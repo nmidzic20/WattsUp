@@ -41,6 +41,7 @@ import androidx.compose.ui.window.Dialog
 import hr.foi.air.wattsup.network.models.Event
 import hr.foi.air.wattsup.network.models.TokenManager
 import hr.foi.air.wattsup.ui.component.LoadingSpinner
+import hr.foi.air.wattsup.ui.theme.colorSilver
 import hr.foi.air.wattsup.viewmodels.HistoryViewModel
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -157,7 +158,7 @@ fun EventCard(event: Event) {
             showDetails.value = !showDetails.value
         },
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            containerColor = colorSilver,
             contentColor = MaterialTheme.colorScheme.onSurface,
         ),
         shape = RoundedCornerShape(12.dp),

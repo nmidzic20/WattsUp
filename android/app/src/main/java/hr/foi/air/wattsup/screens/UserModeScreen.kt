@@ -141,6 +141,7 @@ fun UserModeView(
         R.string.cards -> CardScreen(
             onAddCard = onAddCard,
             viewModel = cardsViewModel,
+            onLogOut = onLogOut,
             modifier = modifier,
         )
     }

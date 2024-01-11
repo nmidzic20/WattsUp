@@ -46,21 +46,21 @@ class CardViewModel : ViewModel() {
         _card.value = value
     }
 
-    fun refreshCards(context: Context, userId: Int) {
+    fun refreshCards(context: Context, userId: Int, onExpiredToken: () -> Unit) {
         _showLoading.value = true
         _cards.value = emptyList()
-        fetchCards(context, userId)
+        fetchCards(context, userId, onExpiredToken)
     }
 
     fun resetCards() {
         _cards.value = emptyList()
     }
 
-    private fun fetchCards(context: Context, userId: Int) {
-        getCards(context, userId)
+    private fun fetchCards(context: Context, userId: Int, onExpiredToken: () -> Unit) {
+        getCards(context, userId, onExpiredToken)
     }
 
-    private fun getCards(context: Context, userId: Int) {
+    private fun getCards(context: Context, userId: Int, onExpiredToken: () -> Unit) {
         val auth = "Bearer " + TokenManager.getInstance(context).getJWTToken()
 
         Log.i("CardView", "AUTH " + auth)
@@ -74,9 +74,15 @@ class CardViewModel : ViewModel() {
                 } else {
                     Log.d("CardView", response.toString())
                     Log.d("CardView", "Error: ${response.errorBody()}")
-                    toast(context, "Error: ${response.errorBody()}")
-                    _cards.value = emptyList()
-                    _showLoading.value = false
+
+                    if (response.code() == 401) {
+                        onExpiredToken()
+                        toast(context, "Token expired, please log in again")
+                    } else {
+                        toast(context, "Error: ${response.errorBody()}")
+                        _cards.value = emptyList()
+                        _showLoading.value = false
+                    }
                 }
             }
 
