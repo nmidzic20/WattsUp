@@ -8,7 +8,7 @@ val colorPrimary = Color(0xff11CB54) // green
 val colorSecondary = Color(0xfff0b402) // dark yellow
 val colorIterativeView = Color(0xff26D465) // lighter green
 
-val colorBackground = Color(0xfff0f8ff) // alice blue
+val colorBackground = Color.White // white
 
 val colorBackgroundDark = Color(0xff303030) // almost black
 val colorPrimaryDark = colorPrimary

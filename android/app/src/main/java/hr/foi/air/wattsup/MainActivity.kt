@@ -208,6 +208,9 @@ class MainActivity : ComponentActivity() {
                         TokenManager.getInstance(this@MainActivity).setJWTToken("")
                     }
 
+                    val navDrawerImageId =
+                        if (isSystemInDarkTheme()) R.drawable.logo_text_white else R.drawable.logo_text_green
+
                     ModalNavigationDrawer(
                         drawerContent = {
                             ModalDrawerSheet(
@@ -218,7 +221,7 @@ class MainActivity : ComponentActivity() {
                             ) {
                                 Spacer(modifier = Modifier.height(26.dp))
                                 Image(
-                                    painter = painterResource(id = R.drawable.logo_text_white),
+                                    painter = painterResource(id = navDrawerImageId),
                                     contentDescription = "",
                                     modifier = Modifier
                                         .size(100.dp)
