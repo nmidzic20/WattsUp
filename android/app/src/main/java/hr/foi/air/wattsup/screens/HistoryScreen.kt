@@ -6,6 +6,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -41,6 +42,7 @@ import androidx.compose.ui.window.Dialog
 import hr.foi.air.wattsup.network.models.Event
 import hr.foi.air.wattsup.network.models.TokenManager
 import hr.foi.air.wattsup.ui.component.LoadingSpinner
+import hr.foi.air.wattsup.ui.theme.colorDarkSilver
 import hr.foi.air.wattsup.ui.theme.colorSilver
 import hr.foi.air.wattsup.viewmodels.HistoryViewModel
 import java.text.DecimalFormat
@@ -158,7 +160,7 @@ fun EventCard(event: Event) {
             showDetails.value = !showDetails.value
         },
         colors = CardDefaults.cardColors(
-            containerColor = colorSilver,
+            containerColor = if (isSystemInDarkTheme()) colorDarkSilver else colorSilver,
             contentColor = MaterialTheme.colorScheme.onSurface,
         ),
         shape = RoundedCornerShape(12.dp),
