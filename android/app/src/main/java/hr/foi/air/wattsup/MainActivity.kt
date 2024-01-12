@@ -325,7 +325,7 @@ class MainActivity : ComponentActivity() {
                                 ScanScreen(
                                     stringResource(R.string.scan_card),
                                     LastAddedCard,
-                                    { navigate(R.string.my_cards_route) },
+                                    { navigate(R.string.user_mode_route) },
                                     onScan,
                                     scanViewModel,
                                     cardManagers,
