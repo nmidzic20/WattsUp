@@ -25,19 +25,13 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -57,52 +51,28 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.network.models.Card
 import hr.foi.air.wattsup.network.models.TokenManager
 import hr.foi.air.wattsup.ui.component.CircleButton
 import hr.foi.air.wattsup.ui.component.LoadingSpinner
-import hr.foi.air.wattsup.ui.component.LogoutDialog
-import hr.foi.air.wattsup.ui.component.TopAppBar
 import hr.foi.air.wattsup.viewmodels.CardViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CardScreen(
-    onArrowBackClick: () -> Unit,
+    // onArrowBackClick: () -> Unit,
     onAddCard: () -> Unit,
     onLogOut: () -> Unit,
     viewModel: CardViewModel,
+    modifier: Modifier = Modifier,
 ) {
-    val showLogoutDialog = remember { mutableStateOf(false) }
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.cards)) },
-                navigationIcon = {
-                    IconButton(onClick = { onArrowBackClick() }) {
-                        Icon(Icons.Filled.ArrowBack, null, tint = Color.White)
-                    }
-                },
-                actionIcon = {
-                    IconButton(onClick = { showLogoutDialog.value = true }) {
-                        Icon(Icons.Filled.ExitToApp, null, tint = Color.White)
-                    }
-                },
-            )
-        },
-    ) {
-        CardView(viewModel, onAddCard, showLogoutDialog, onLogOut, Modifier.padding(it))
-    }
+    CardView(viewModel, onAddCard, onLogOut, modifier)
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -110,7 +80,7 @@ fun CardScreen(
 fun CardView(
     viewModel: CardViewModel,
     onAddCard: () -> Unit,
-    showLogoutDialog: MutableState<Boolean>,
+    // showLogoutDialog: MutableState<Boolean>,
     onLogOut: () -> Unit,
     modifier: Modifier = Modifier,
     context: Context = LocalContext.current,
@@ -123,17 +93,24 @@ fun CardView(
     // val refresh = remember { mutableStateOf(false) }
     val currentCard = remember { derivedStateOf { state.firstVisibleItemIndex } }
 
+    val onExpiredToken = {
+        onLogOut()
+        TokenManager.getInstance(context).setJWTToken("")
+    }
+
     if (userId != null) {
-        AddDialog(scannedCard, userId, viewModel)
+        AddDialog(scannedCard, userId, onExpiredToken, viewModel)
     }
 
     LaunchedEffect(Unit) {
-        if (userId != null) {
-            viewModel.refreshCards(context, userId)
+        // prevent initial API call if cards is not empty, which it may not be due use of bottom bar
+        // and having still active viewmodel when switching to chargingHistory and back
+        if (userId != null && cards.isEmpty()) {
+            viewModel.refreshCards(context, userId, onExpiredToken)
         }
     }
 
-    LogoutDialog(showLogoutDialog, onLogOut)
+    // LogoutDialog(showLogoutDialog, onLogOut)
 
     Column(
         modifier = modifier.fillMaxSize(),
@@ -179,7 +156,7 @@ fun CardView(
                 }
             } else {
                 itemsIndexed(cards) { _, item ->
-                    CardCard(item!!, userId, viewModel)
+                    CardCard(item!!, userId, onExpiredToken, viewModel)
                 }
             }
         }
@@ -199,13 +176,13 @@ fun CardView(
 }
 
 @Composable
-fun CardCard(item: Card, userId: Int?, viewModel: CardViewModel) {
+fun CardCard(item: Card, userId: Int?, onExpiredToken: () -> Unit, viewModel: CardViewModel) {
     val width = LocalConfiguration.current.screenWidthDp.dp * 0.92f
     val showRemoveDialog = remember { mutableStateOf(false) }
     val selectedCardId = remember { mutableIntStateOf(-1) }
 
     if (userId != null) {
-        RemoveDialog(showRemoveDialog, userId, selectedCardId, viewModel)
+        RemoveDialog(showRemoveDialog, userId, selectedCardId, onExpiredToken, viewModel)
     }
 
     ElevatedCard(
@@ -275,6 +252,7 @@ private fun RemoveDialog(
     openAlertDialog: MutableState<Boolean>,
     userId: Int,
     cardId: MutableState<Int>,
+    onExpiredToken: () -> Unit,
     viewModel: CardViewModel,
     context: Context = LocalContext.current,
 ) {
@@ -319,7 +297,7 @@ private fun RemoveDialog(
                                 onClick = {
                                     openAlertDialog.value = false
                                     viewModel.deleteCard(cardId.value, context) {
-                                        viewModel.refreshCards(context, userId)
+                                        viewModel.refreshCards(context, userId, onExpiredToken)
                                     }
                                 },
                                 modifier = Modifier.padding(8.dp),
@@ -340,9 +318,9 @@ private fun RemoveDialog(
 
 @Composable
 private fun AddDialog(
-
     scannedCard: Card?,
     userId: Int,
+    onExpiredToken: () -> Unit,
     viewModel: CardViewModel,
     context: Context = LocalContext.current,
 ) {
@@ -386,7 +364,7 @@ private fun AddDialog(
                             TextButton(
                                 onClick = {
                                     viewModel.addCard(userId, context) {
-                                        viewModel.refreshCards(context, userId)
+                                        viewModel.refreshCards(context, userId, onExpiredToken)
                                     }
                                 },
                                 modifier = Modifier.padding(8.dp),
@@ -488,10 +466,4 @@ fun PageIndicatorView(
             ),
         )
     }
-}
-
-@Preview(showBackground = false)
-@Composable
-fun CardPreview() {
-    CardScreen({}, {}, {}, CardViewModel())
 }

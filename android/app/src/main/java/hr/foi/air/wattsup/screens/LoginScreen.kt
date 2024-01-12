@@ -101,6 +101,7 @@ fun LoginView(
             onValueChange = { viewModel.updateEmail(it) },
             label = { Text(stringResource(R.string.emailLabel)) },
             singleLine = true,
+
         )
 
         OutlinedTextField(
@@ -123,11 +124,16 @@ fun LoginView(
                     Icon(imageVector = image, description)
                 }
             },
+
         )
 
         ElevatedButton(
             onClick = {
-                viewModel.loginUser(email!!, password!!, context, onLogin)
+                if (email.isNullOrEmpty() || password.isNullOrEmpty()) {
+                    viewModel.showToast(context, "Fill all required fields")
+                } else {
+                    viewModel.loginUser(email!!, password!!, context, onLogin)
+                }
             },
             modifier = Modifier.padding(0.dp, 25.dp, 0.dp, 0.dp),
             contentPadding = PaddingValues(122.dp, 0.dp),

@@ -100,9 +100,12 @@ class ChargerViewModel : ViewModel() {
         _currentChargeVolume.value = 0f
         viewModelScope.launch {
             launch {
-                val eventPOSTBody =
-                    EventPOSTBody(selectedChargerId.value!!, UserCard.userCard.value!!.id)
-                startEvent(eventPOSTBody)
+                if (selectedChargerId.value != null && UserCard.userCard.value != null) {
+                    val eventPOSTBody =
+                        EventPOSTBody(selectedChargerId.value!!, UserCard.userCard.value!!.id)
+
+                    startEvent(eventPOSTBody)
+                }
             }
             while (_charging.value == true) {
                 if (_percentageChargedUntilFull.value!! < _amountNecessaryForFullCharge.value!!) {
@@ -143,12 +146,14 @@ class ChargerViewModel : ViewModel() {
 
         _lastSelectedInitialChargeValue.value = (_currentChargeAmount.value!! * 100).toInt()
 
-        val eventPUTBody = EventPUTBody(
-            CurrentEvent.currentEvent.value!!.id,
-            currentChargeVolume.value!!,
-        )
         viewModelScope.launch {
-            stopEvent(eventPUTBody)
+            if (CurrentEvent.currentEvent.value != null && currentChargeVolume.value != null) {
+                val eventPUTBody = EventPUTBody(
+                    CurrentEvent.currentEvent.value!!.id,
+                    currentChargeVolume.value!!,
+                )
+                stopEvent(eventPUTBody)
+            }
         }
     }
 

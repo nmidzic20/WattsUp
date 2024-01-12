@@ -23,7 +23,7 @@ import androidx.compose.ui.window.Dialog
 import hr.foi.air.wattsup.network.models.TokenManager
 
 @Composable
-fun LogoutDialog(openAlertDialog: MutableState<Boolean>, onArrowBackClick: () -> Unit) {
+fun LogoutDialog(openAlertDialog: MutableState<Boolean>, onLogOut: () -> Unit) {
     val context = LocalContext.current
 
     when {
@@ -66,7 +66,7 @@ fun LogoutDialog(openAlertDialog: MutableState<Boolean>, onArrowBackClick: () ->
                             TextButton(
                                 onClick = {
                                     openAlertDialog.value = false
-                                    onArrowBackClick()
+                                    onLogOut()
                                     TokenManager.getInstance(
                                         context,
                                     ).setJWTToken("")

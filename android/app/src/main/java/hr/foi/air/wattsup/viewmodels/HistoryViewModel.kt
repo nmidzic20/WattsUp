@@ -32,6 +32,10 @@ class HistoryViewModel : ViewModel() {
         fetchChargingHistory(context, userId)
     }
 
+    fun resetEvents() {
+        _events.value = emptyList()
+    }
+
     private suspend fun fetchChargingHistory(context: Context, userId: Int) {
         _cards.value = getCards(context, userId)
         for (card in _cards.value!!) {
