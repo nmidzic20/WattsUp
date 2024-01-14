@@ -34,5 +34,5 @@ class ScanViewModelTest {
         Dispatchers.resetMain()
     }
 
-    // TODO
+    // TODO test
 }
