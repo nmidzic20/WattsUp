@@ -20,10 +20,7 @@ class ScanViewModelTest {
     val rule = InstantTaskExecutorRule()
 
     @Mock
-    lateinit var booleanObserver: Observer<Boolean>
-
     private lateinit var viewModel: ScanViewModel
-    private lateinit var cardManager: CardManager
 
     @Before
     fun setup() {
@@ -36,4 +33,6 @@ class ScanViewModelTest {
     fun tearDown() {
         Dispatchers.resetMain()
     }
+
+    // TODO
 }
