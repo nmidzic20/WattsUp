@@ -19,6 +19,7 @@ namespace backend.Services
 
             var response = chargers.Select(charger => new ChargersResponse
             {
+                id = charger.Id,
                 name = charger.Name,
                 latitude = charger.Latitude,
                 longitude = charger.Longitude,

@@ -148,9 +148,13 @@ namespace backend.Controllers
                 return false;
             }
 
-            charger.Active = state;
-            charger.LastSyncAt = DateTime.UtcNow;
-            var response = await chargerController.UpdateChargerByID(id, charger);
+            var response = await chargerController.UpdateChargerByID(id, new ChargerUpdateRequest
+            {
+                Active = state,
+                Latitude = charger.Latitude,
+                Longitude = charger.Longitude,
+                Name = charger.Name
+            });
 
             return response.Result is OkObjectResult;
         }
