@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 
 @Component({
@@ -6,8 +6,19 @@ import { NgForm } from '@angular/forms';
   templateUrl: './password-reset.component.html',
   styleUrls: ['./password-reset.component.scss']
 })
-export class PasswordResetComponent {
-  async submitEmail(form: NgForm){
+export class PasswordResetComponent implements OnInit {
+  errorMessageBox? : HTMLElement;
 
+  ngOnInit(): void {
+    this.errorMessageBox = document.getElementById("message") as HTMLElement;
+  }
+
+  async submitEmail(form: NgForm){
+    if(form.valid){
+      this.errorMessageBox!!.innerHTML = ""
+
+    }else{
+      this.errorMessageBox!!.innerHTML = "Neispravno unesena e-mail adresa."
+    }
   }
 }
