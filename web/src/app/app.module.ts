@@ -11,6 +11,7 @@ import { AddStationDialogueComponent } from './add-station-dialogue/add-station-
 import { MapPageComponent } from './map-page/map-page.component';
 import { StatisticsComponent } from './statistics/statistics.component';
 import { NgChartsModule } from 'ng2-charts';
+import { PasswordResetComponent } from './password-reset/password-reset.component';
 
 @NgModule({
   declarations: [
@@ -21,7 +22,8 @@ import { NgChartsModule } from 'ng2-charts';
     StationManagementComponent,
     AddStationDialogueComponent,
     MapPageComponent,
-    StatisticsComponent
+    StatisticsComponent,
+    PasswordResetComponent
   ],
   imports: [
     BrowserModule,
