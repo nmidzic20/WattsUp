@@ -6,6 +6,7 @@ import { LoginComponent } from './login/login.component';
 import { StationManagementComponent } from './station-management/station-management.component';
 import { MapPageComponent } from './map-page/map-page.component';
 import { StatisticsComponent } from './statistics/statistics.component';
+import { PasswordResetComponent } from './password-reset/password-reset.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -13,6 +14,7 @@ const routes: Routes = [
   { path: 'station-management', component: StationManagementComponent },
   { path: 'map', component: MapPageComponent },
   { path: 'statistics', component: StatisticsComponent },
+  { path: 'passwordReset', component: PasswordResetComponent },
   { path: '', component: LoginComponent},
   { path: '**', component: NotFoundComponent }
 ];
