@@ -99,6 +99,42 @@ export class AddStationDialogueComponent {
     }
   }
 
+  async updateStation() {
+    await this.checkTokenValidity();
+
+    if (this.checkFields()) {
+      this.stationNameInput = document.getElementById("stationName") as HTMLInputElement;
+      this.longitudeInput = document.getElementById("longitude") as HTMLInputElement;
+      this.latitudeInput = document.getElementById("latitude") as HTMLInputElement;
+      let stationName = this.stationNameInput?.value;
+      let longitude = this.longitudeInput?.value;
+      let latitude = this.latitudeInput?.value;
+
+      let header = new Headers();
+      header.set("Content-Type", "application/json");
+      header.set("accept", "text/plain");
+      header.set("Authorization", "Bearer " + this.userManagerService.getTokens()?.jwt);
+      let body = { name: stationName, latitude: latitude, longitude: longitude, active: false};
+      console.log(body)
+      let parameters = { method: 'PUT', headers: header, body: JSON.stringify(body) };
+
+      try {
+        let response = await fetch(environment.apiUrl + "/Charger/" + this.isUpdateMode?.id, parameters);
+        let body = await response.text();
+        if (response.status == 200) {
+          this.close();
+        } else {
+          let errorMessage = JSON.parse(body).message;
+          window.alert(response.status.toString() + ": " + errorMessage);
+        }
+      } catch (error) {
+        window.alert((error as Error).message);
+      }
+    } else {
+      window.alert("Check field values!");
+    }
+  }
+
   openMap() {
     this.saveInputValues()
     this.dialogueInputContainerIsVisible = false;

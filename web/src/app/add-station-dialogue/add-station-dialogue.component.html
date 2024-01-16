@@ -5,17 +5,20 @@
         <div *ngIf="dialogueInputContainerIsVisible" class="dialogue-input-container">
             <div class="dialogue-input">
                 <label for="name">Station name:</label>
-                <input type="text" name="name" id="stationName">
+                <input *ngIf="!isUpdateMode" type="text" name="name" id="stationName">
+                <input *ngIf="isUpdateMode" type="text" name="name" id="stationName" value={{isUpdateMode.name}}>
             </div>
             <div class="longitude-latitude-container">
                 <div>
                     <div class="dialogue-input">
                         <label for="longitude">Longitude:</label>
-                        <input type="text" name="longitude" id="longitude">
+                        <input *ngIf="!isUpdateMode" type="text" name="longitude" id="longitude">
+                        <input *ngIf="isUpdateMode" type="text" name="longitude" id="longitude" value={{isUpdateMode.longitude}}>
                     </div>
                     <div class="dialogue-input">
                         <label for="latitude">Latitude:</label>
-                        <input type="text" name="latitude" id="latitude">
+                        <input *ngIf="!isUpdateMode" type="text" name="latitude" id="latitude">
+                        <input *ngIf="isUpdateMode" type="text" name="latitude" id="latitude" value={{isUpdateMode.latitude}}>
                     </div>
                 </div>
                 <button id="map-button" (click)="openMap()"><img src="../../assets/map_location_icon.png" alt="Map Location"></button>
@@ -23,7 +26,8 @@
 
             <div class="dialogue-buttons">
                 <button id="close-button" (click)="close()">Close</button>
-                <button (click)="addStation()">Add</button>
+                <button *ngIf="!isUpdateMode" (click)="addStation()">Add</button>
+                <button *ngIf="isUpdateMode" (click)="updateStation()">Update</button>
             </div>
         </div>
         <div *ngIf="dialogueMapIsVisible" class="dialogue-map-container">

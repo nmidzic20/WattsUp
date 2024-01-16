@@ -51,6 +51,11 @@ export class StationManagementComponent implements OnInit {
     }
   }
 
+  refresh() {
+    this.isAddStationDialogueVisible = false;
+    this.ngOnInit();
+  }
+
   ngOnDestroy(): void {
     this.sseService.closeConnection();
   }
