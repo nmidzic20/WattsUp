@@ -13,5 +13,6 @@
         public virtual Role Role { get; set; }
         public int? RefreshTokenId { get; set; }
         public virtual RefreshToken? RefreshToken { get; set; }
+        public string? PasswordResetToken { get; set; }
     }
 }
