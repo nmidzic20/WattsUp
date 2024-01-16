@@ -18,6 +18,7 @@ export class StationManagementComponent implements OnInit {
   stations: Station[] = [];
   isAddStationDialogueVisible: boolean = false;
   loading = true;
+  stationUpdate: Station | null = null;
 
   constructor(private router: Router, private userManagerService: UserManagerService, private sseService: SSEService, private cdr: ChangeDetectorRef){}
 
@@ -50,11 +51,17 @@ export class StationManagementComponent implements OnInit {
     }
   }
 
+  refresh() {
+    this.isAddStationDialogueVisible = false;
+    this.ngOnInit();
+  }
+
   ngOnDestroy(): void {
     this.sseService.closeConnection();
   }
 
   openAddStationDialogue() {
+    this.stationUpdate = null;
     this.isAddStationDialogueVisible = true;
   }
 
@@ -80,6 +87,7 @@ export class StationManagementComponent implements OnInit {
 
   private mapStationResponseToStation(stationResponse: StationResponse): Station {
     return {
+      id: stationResponse.id,
       name: stationResponse.name,
       latitude: stationResponse.latitude,
       longitude: stationResponse.longitude,
@@ -131,5 +139,50 @@ export class StationManagementComponent implements OnInit {
       default:
         return '';
     }
+  }
+
+  updateStation(station: Station) {
+    this.stationUpdate = station;
+    this.isAddStationDialogueVisible = true;
+  }
+
+  async deleteStation(station: Station) {
+    const result = window.confirm('Are you sure you want to delete this station?');
+
+    if (result) {
+      let jwt = await this.checkTokenValidity();
+      let header = new Headers();
+      header.set("Accept", "application/json");
+      header.set("Authorization", "Bearer " + jwt);
+      let parameters = { method: 'DELETE', headers: header};
+  
+      try {
+        let response = await fetch(environment.apiUrl + "/Charger/" + station.id, parameters);
+        let body = await response.json();
+        if (response.status != 200) {
+          console.error(body.message);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  }
+
+  async checkTokenValidity() {
+    let tokens = this.userManagerService.getTokens();
+    if (tokens) {
+      if (await this.userManagerService.validTokens(tokens)) {
+        if (tokens.jwtInfo?.role != 'Admin') {
+          this.router.navigate(['/map']);
+        } else {
+          return tokens.jwt;
+        }
+      } else {
+        this.router.navigate(['/login']);
+      }
+    } else {
+      this.router.navigate(['/login']);
+    }
+    return null;
   }
 }

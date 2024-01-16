@@ -124,6 +124,7 @@ export class MapPageComponent implements OnInit{
 
   private mapStationResponseToStation(stationResponse: StationResponse): Station {
     return {
+      id: stationResponse.id,
       name: stationResponse.name,
       latitude: stationResponse.latitude,
       longitude: stationResponse.longitude,

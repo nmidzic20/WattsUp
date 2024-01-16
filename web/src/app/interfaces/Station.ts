@@ -1,4 +1,5 @@
 export interface Station {
+    id: string;
     name: string;
     latitude: number;
     longitude: number;
@@ -9,6 +10,7 @@ export interface Station {
 }
 
 export interface StationResponse {
+    id: string;
     name: string;
     latitude: number;
     longitude: number;
