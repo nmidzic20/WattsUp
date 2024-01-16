@@ -19,7 +19,7 @@ namespace backend.Services {
         public async Task<string> SendForgotMyPasswordEmail(User user)
         {
             string userToken = GenerateTokenForUser();
-            string passwordResetMessage = "Please click on the following link to reset your password: \n" +
+            string passwordResetMessage = "Please click on the following link to reset your password: \n" + 
                 "wattsup.onrender.com/passwordReset?usertoken=" + userToken;
             MailMessage mailMessage = new MailMessage("Wattsup@mailingservice.com", user.Email, "Password reset", passwordResetMessage);
             try {
