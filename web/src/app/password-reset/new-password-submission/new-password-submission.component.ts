@@ -17,6 +17,9 @@ export class NewPasswordSubmissionComponent implements OnInit {
 
   async submitNewPassword(form: NgForm){
     if(form.valid){
+      if(!this.checkPasswordConfirmation(form)){
+        return;
+      }
       this.errorMessageBox!!.innerHTML = ""
 
       let header = new Headers();
@@ -41,7 +44,17 @@ export class NewPasswordSubmissionComponent implements OnInit {
         this.errorMessageBox!!.innerHTML = (error as Error).message
       }
     }else{
-      this.errorMessageBox!!.innerHTML = "Invalid password."
+      this.errorMessageBox!!.innerHTML = "Invalid password. Password must be at least 6 characters long."
     }
+  }
+
+  checkPasswordConfirmation(form: NgForm){
+    let password = form.controls['password'].value;
+    let confirmPassword = form.controls['passwordConfirm'].value;
+    if(password != confirmPassword){
+      this.errorMessageBox!!.innerHTML = "Password and password confirmation do not match!";
+      return false;
+    }
+    return true;
   }
 }
