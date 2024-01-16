@@ -123,7 +123,7 @@ namespace backend.Controllers
 
         [Authorize(Policy = "Admin")]
         [HttpPut("{id}")]
-        public async Task<ActionResult<Charger>> UpdateChargerByID(long id, Charger _charger)
+        public async Task<ActionResult<Charger>> UpdateChargerByID(long id, ChargerUpdateRequest _charger)
         {
             var charger = await _dbContext.Charger
                 .Where(c => c.Id == id)

@@ -270,13 +270,12 @@ namespace ControllerUnitTests.ControllersTests
             ChargerController chargerController = new(context, new HttpClient(), new SSEService());
 
             // Act
-            var chargers = await chargerController.UpdateChargerByID(9999, new Charger
+            var chargers = await chargerController.UpdateChargerByID(9999, new ChargerUpdateRequest
             {
                 Active = false,
                 Latitude = 1.0,
                 Longitude = 1.0,
-                Name = "Test Charger 1",
-                CreatedById = 1
+                Name = "Test Charger 1"
             });
 
             var result = chargers.Result as StatusCodeResult;
@@ -303,13 +302,12 @@ namespace ControllerUnitTests.ControllersTests
             context.SaveChanges();
 
             // Act
-            await chargerController.UpdateChargerByID(1, new Charger
+            await chargerController.UpdateChargerByID(1, new ChargerUpdateRequest
             {
                 Active = false,
                 Latitude = 1.0,
                 Longitude = 1.0,
-                Name = "TESTNOW",
-                CreatedById = 1
+                Name = "TESTNOW"
             });
 
             // Assert
