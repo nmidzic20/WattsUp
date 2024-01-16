@@ -98,7 +98,7 @@ namespace backend.Controllers {
         //POST: api/Users/ResetPassword/Email
         [HttpPost("ResetPassword/Email")]
         public async Task<ActionResult<User>> ResetUserPasswordRequest(UserResetPasswordEmailRequest userRequest) {
-            User user = await _userService.GetUserAsync(userRequest.Email);
+            User user = await _userService. GetUserAsync(userRequest.Email);
             if (user == null) {
                 return NotFound(new { message = "No users with specified Email exist." });
             } else {
