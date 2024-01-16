@@ -12,6 +12,8 @@ import { MapPageComponent } from './map-page/map-page.component';
 import { StatisticsComponent } from './statistics/statistics.component';
 import { NgChartsModule } from 'ng2-charts';
 import { PasswordResetComponent } from './password-reset/password-reset.component';
+import { EmailSubmissionComponent } from './password-reset/email-submission/email-submission.component';
+import { NewPasswordSubmissionComponent } from './password-reset/new-password-submission/new-password-submission.component';
 
 @NgModule({
   declarations: [
@@ -23,7 +25,9 @@ import { PasswordResetComponent } from './password-reset/password-reset.componen
     AddStationDialogueComponent,
     MapPageComponent,
     StatisticsComponent,
-    PasswordResetComponent
+    PasswordResetComponent,
+    EmailSubmissionComponent,
+    NewPasswordSubmissionComponent
   ],
   imports: [
     BrowserModule,
