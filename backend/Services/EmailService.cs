@@ -20,7 +20,7 @@ namespace backend.Services {
         {
             string userToken = GenerateTokenForUser();
             string passwordResetMessage = "Please click on the following link to reset your password: \n" + 
-                "Tu bu trebalo deti link na frontu za reset/" + userToken;
+                "localhost:4200/passwordReset?usertoken=" + userToken;
             MailMessage mailMessage = new MailMessage("Wattsup@mailingservice.com", user.Email, "Password reset", passwordResetMessage);
             try {
                 await _mailingClient.SendMailAsync(mailMessage);
