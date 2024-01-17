@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { environment } from 'src/environments/environment';
 
@@ -9,10 +9,14 @@ import { environment } from 'src/environments/environment';
 })
 export class NewPasswordSubmissionComponent implements OnInit {
   loading = false;
+  isSubmitAvalible = true;
   errorMessageBox? : HTMLElement;
+  instructionMessage? : HTMLElement;
+  @Input() resetToken?: string | null;
 
   ngOnInit(): void {
     this.errorMessageBox = document.getElementById("message") as HTMLElement;
+    this.instructionMessage = document.getElementById("instructionMessage") as HTMLElement;
   }
 
   async submitNewPassword(form: NgForm){
@@ -25,15 +29,18 @@ export class NewPasswordSubmissionComponent implements OnInit {
       let header = new Headers();
       header.set("Content-Type", "application/json");
       header.set("accept", "text/plain");
-      let body = {} // make valid body
+      let password = form.controls['password'].value;
+      let body = {password: password, token: this.resetToken}
       let parameters = {method: 'POST', headers: header, body: JSON.stringify(body)};
 
       try{
         this.loading = true;
-        let response = await fetch(environment.apiUrl + "/", parameters); // make correct url
+        let response = await fetch(environment.apiUrl + "/Users/ResetPassword/Reset", parameters);
 
         if(response.status == 200){
-          
+          this.loading = false;
+          this.isSubmitAvalible = false;
+          this.instructionMessage!!.innerHTML = "Your password has been reset successfully. You can now close this page."
         }else{
           this.loading = false;
           let errorMessage = JSON.parse(await response.text()).message;
