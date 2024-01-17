@@ -11,27 +11,22 @@ using System.Text;
 
 namespace backend.Services
 {
-    public class UserService
-    {
+    public class UserService {
         private readonly DatabaseContext _context;
         private readonly IConfiguration _configuration;
 
-        public UserService(DatabaseContext context, IConfiguration configuration)
-        {
+        public UserService(DatabaseContext context, IConfiguration configuration) {
             _context = context;
             _configuration = configuration;
         }
 
-        public async Task<User> CreateUserAsync(UserCreateRequest userRequest)
-        {
+        public async Task<User> CreateUserAsync(UserCreateRequest userRequest) {
             var existingUser = await _context.User.FirstOrDefaultAsync(u => u.Email == userRequest.Email);
-            if (existingUser != null)
-            {
+            if (existingUser != null) {
                 return null;
             }
 
-            User newUser = new User
-            {
+            User newUser = new User {
                 FirstName = userRequest.FirstName,
                 LastName = userRequest.LastName,
                 Email = userRequest.Email,
@@ -46,39 +41,33 @@ namespace backend.Services
             return newUser;
         }
 
-        private User HashPassword(User newUser)
-        {
+        private User HashPassword(User newUser) {
             var passwordHasher = new PasswordHasher<User>();
             string hashedPassword = passwordHasher.HashPassword(newUser, newUser.Password);
             newUser.Password = hashedPassword;
             return newUser;
         }
 
-        private PasswordVerificationResult VerifyHashedPassword(User user, string password)
-        {
+        private PasswordVerificationResult VerifyHashedPassword(User user, string password) {
             var passwordHasher = new PasswordHasher<User>();
             return passwordHasher.VerifyHashedPassword(user, user.Password, password);
         }
 
-        public async Task<LoginResponse> LoginAsync(UserLoginRequest userRequest)
-        {
+        public async Task<LoginResponse> LoginAsync(UserLoginRequest userRequest) {
             var user = await _context.User.Include(r => r.Role).Include(t => t.RefreshToken).FirstOrDefaultAsync(u => u.Email == userRequest.Email);
-            if (user == null)
-            {
+            if (user == null) {
                 throw new Exception("User not found.");
             }
 
             var passwordVerification = VerifyHashedPassword(user, userRequest.Password);
-            if(passwordVerification == PasswordVerificationResult.Failed)
-            {
+            if (passwordVerification == PasswordVerificationResult.Failed) {
                 throw new InvalidDataException("Incorrect password.");
             }
 
             string jwt = GenerateJwtToken(user);
             RefreshToken refreshToken = await GenerateRefreshToken(user);
 
-            LoginResponse loginResponse = new LoginResponse
-            {
+            LoginResponse loginResponse = new LoginResponse {
                 JWT = jwt,
                 RefreshToken = refreshToken.Token,
                 RefreshTokenExpiresAt = refreshToken.ExpiresAt
@@ -87,16 +76,13 @@ namespace backend.Services
             return loginResponse;
         }
 
-        private async Task<RefreshToken> GenerateRefreshToken(User user)
-        {
+        private async Task<RefreshToken> GenerateRefreshToken(User user) {
             var refreshToken = await _context.RefreshToken.FindAsync(user.RefreshTokenId);
-            if(refreshToken != null)
-            {
+            if (refreshToken != null) {
                 _context.RefreshToken.Remove(refreshToken);
             }
 
-            var newRefreshToken = new RefreshToken
-            {
+            var newRefreshToken = new RefreshToken {
                 Token = Guid.NewGuid().ToString(),
                 ExpiresAt = DateTime.UtcNow.AddHours(5)
             };
@@ -104,16 +90,14 @@ namespace backend.Services
             user.RefreshToken = newRefreshToken;
             _context.User.Update(user);
             _context.SaveChanges();
-            
+
             return newRefreshToken;
         }
 
-        private string GenerateJwtToken(User user)
-        {
+        private string GenerateJwtToken(User user) {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_configuration.GetSection("JWT:Key").Value);
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
+            var tokenDescriptor = new SecurityTokenDescriptor {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                     new Claim("id",user.Id.ToString()),
@@ -133,29 +117,61 @@ namespace backend.Services
             return tokenHandler.WriteToken(token);
         }
 
-        public async Task<LoginResponse> TokenRefreshAsync(TokenRefreshRequest tokenRefreshRequest)
-        {
+        public async Task<LoginResponse> TokenRefreshAsync(TokenRefreshRequest tokenRefreshRequest) {
             var handler = new JwtSecurityTokenHandler();
             var token = handler.ReadJwtToken(tokenRefreshRequest.JWT);
             var userId = token.Claims.First(claim => claim.Type == "id").Value;
             var user = _context.User.Include(r => r.Role).Include(t => t.RefreshToken).FirstOrDefault(u => u.Id == int.Parse(userId));
-            
-            if(tokenRefreshRequest.RefreshToken != user.RefreshToken.Token || user.RefreshToken.ExpiresAt < DateTime.UtcNow)
-            {
+
+            if (tokenRefreshRequest.RefreshToken != user.RefreshToken.Token || user.RefreshToken.ExpiresAt < DateTime.UtcNow) {
                 throw new Exception("Invalid refresh token.");
             }
 
             string jwt = GenerateJwtToken(user);
             RefreshToken refreshToken = await GenerateRefreshToken(user);
 
-            LoginResponse loginResponse = new LoginResponse
-            {
+            LoginResponse loginResponse = new LoginResponse {
                 JWT = jwt,
                 RefreshToken = refreshToken.Token,
                 RefreshTokenExpiresAt = refreshToken.ExpiresAt
             };
 
             return loginResponse;
+        }
+
+        public async Task UpdateResetPasswordToken(User user, string userToken) {
+
+            var _user = await _context.User.FirstOrDefaultAsync(u => u == user);
+
+            if (_user == null) {
+                throw new Exception("User not found");
+            } else {
+                _user.PasswordResetToken = userToken;
+                _context.User.Update(_user);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task UpdateUserPassword(string userToken, string password) {
+
+            var user = await _context.User.FirstOrDefaultAsync(u => u.PasswordResetToken == userToken);
+
+            if (user == null) {
+                throw new Exception("User not found");
+            } else {
+                user.Password = password;
+                user = HashPassword(user);
+                user.PasswordResetToken = "";
+                _context.User.Update(user);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<User> GetUserAsync(string email) {
+
+            var user = await _context.User.FirstOrDefaultAsync(u => u.Email == email);
+
+            return user;
         }
     }
 }

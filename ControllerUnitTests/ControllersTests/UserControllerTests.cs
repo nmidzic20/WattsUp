@@ -63,7 +63,7 @@ namespace ControllerUnitTests.ControllersTests
                 var cardService = new CardService(dbContext);
 
                 // Act
-                var controller = new UsersController(dbContext, userService, cardService);
+                var controller = new UsersController(dbContext, userService, cardService, emailService: null);
                 var result = await controller.PostUser(user);
 
                 // Assert
@@ -89,7 +89,7 @@ namespace ControllerUnitTests.ControllersTests
                 var cardService = new CardService(dbContext);
 
                 // Act
-                var controller = new UsersController(dbContext, userService, cardService);
+                var controller = new UsersController(dbContext, userService, cardService, emailService: null);
                 var result = await controller.PostUser(user);
 
                 // Assert
@@ -122,7 +122,7 @@ namespace ControllerUnitTests.ControllersTests
                 var cardService = new CardService(dbContext);
 
                 // Act
-                var controller = new UsersController(dbContext, userService, cardService);
+                var controller = new UsersController(dbContext, userService, cardService, emailService: null);
                 var result = await controller.PostUser(user);
 
                 // Assert
@@ -153,7 +153,7 @@ namespace ControllerUnitTests.ControllersTests
                 var cardService = new CardService(dbContext);
 
                 // Act
-                var controller = new UsersController(dbContext, userService, cardService);
+                var controller = new UsersController(dbContext, userService, cardService, emailService: null);
                 var result = await controller.PostUser(user);
 
                 // Assert
@@ -202,7 +202,7 @@ namespace ControllerUnitTests.ControllersTests
                 };
 
                 // Act
-                var controller = new UsersController(dbContext, userService, cardService: null);
+                var controller = new UsersController(dbContext, userService, cardService: null, emailService: null);
                 var result = await controller.Login(userLoginRequest);
 
                 // Assert
@@ -248,7 +248,7 @@ namespace ControllerUnitTests.ControllersTests
                 };
 
                 // Act
-                var controller = new UsersController(dbContext, userService, cardService: null);
+                var controller = new UsersController(dbContext, userService, cardService: null, emailService: null);
                 var result = await controller.Login(userLoginRequest);
 
                 // Assert
@@ -271,7 +271,7 @@ namespace ControllerUnitTests.ControllersTests
                 var userService = new UserService(dbContext, _configuration);
 
                 // Act
-                var controller = new UsersController(dbContext, userService, cardService: null);
+                var controller = new UsersController(dbContext, userService, cardService: null, emailService: null);
                 var result = await controller.Login(userRequest);
 
                 // Assert
@@ -318,7 +318,7 @@ namespace ControllerUnitTests.ControllersTests
                 };
 
                 // Act
-                var controller = new UsersController(dbContext, userService, cardService: null);
+                var controller = new UsersController(dbContext, userService, cardService: null, emailService: null);
                 var result = await controller.TokenRefresh(tokenRefreshRequest);
 
                 // Assert
@@ -365,7 +365,7 @@ namespace ControllerUnitTests.ControllersTests
                 };
 
                 // Act
-                var controller = new UsersController(dbContext, userService, cardService: null);
+                var controller = new UsersController(dbContext, userService, cardService: null, emailService: null);
                 var result = await controller.TokenRefresh(tokenRefreshRequest);
 
                 // Assert
