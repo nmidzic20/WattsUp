@@ -4,6 +4,7 @@ import { UserManagerService } from '../services/user-manager.service';
 import { Station, StationResponse } from '../interfaces/Station';
 import { environment } from 'src/environments/environment';
 import { SSEService } from '../services/sse.service';
+import { format } from 'date-fns';
 
 @Component({
   selector: 'app-station-management',
@@ -91,21 +92,9 @@ export class StationManagementComponent implements OnInit {
       name: stationResponse.name,
       latitude: stationResponse.latitude,
       longitude: stationResponse.longitude,
-      dateAddedFormated: new Date(stationResponse.createdAt).toLocaleDateString('hr', {
-        year: 'numeric',
-        month: 'numeric',
-        day: 'numeric',
-        minute: 'numeric',
-        hour: 'numeric',
-      }),
+      dateAddedFormated: format(stationResponse.createdAt, 'dd.MM.yyyy. HH:mm'),
       addedBy: stationResponse.createdBy,
-      lastSyncFormated: new Date(stationResponse.lastSyncAt).toLocaleDateString('hr', {
-        year: 'numeric',
-        month: 'numeric',
-        day: 'numeric',
-        minute: 'numeric',
-        hour: 'numeric',
-      }),
+      lastSyncFormated: format(stationResponse.createdAt, 'dd.MM.yyyy. HH:mm'),
       status: this.statusConfig(stationResponse),
     };
   }
