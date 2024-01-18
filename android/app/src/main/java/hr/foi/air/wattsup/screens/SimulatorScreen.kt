@@ -51,7 +51,7 @@ fun SimulatorScreen(viewModel: ChargerViewModel, onArrowBackClick: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("EV Simulator") },
+                title = { Text("Choose Initial Charge") },
                 navigationIcon = {
                     IconButton(onClick = { onArrowBackClick() }) {
                         Icon(Icons.Filled.ArrowBack, null, tint = Color.White)
