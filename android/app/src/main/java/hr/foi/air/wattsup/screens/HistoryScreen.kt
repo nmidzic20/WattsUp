@@ -49,43 +49,17 @@ import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun HistoryScreen(
-    /*onArrowBackClick: () -> Unit,
-    onLogOutClick: () -> Unit,*/
     viewModel: HistoryViewModel,
     modifier: Modifier = Modifier,
 ) {
-    /*val showLogoutDialog = remember { mutableStateOf(false) }
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.history)) },
-                navigationIcon = {
-                    IconButton(onClick = { onArrowBackClick() }) {
-                        Icon(Icons.Filled.ArrowBack, null, tint = Color.White)
-                    }
-                },
-                actionIcon = {
-                    IconButton(onClick = { showLogoutDialog.value = true }) {
-                        Icon(Icons.Filled.ExitToApp, null, tint = Color.White)
-                    }
-                },
-            )
-        },
-    ) {*/
     HistoryView(viewModel, modifier)
-    // }
 }
 
 @Composable
 fun HistoryView(
-    /*topPadding: Dp,
-    showLogoutDialog: MutableState<Boolean>,
-    onLogOutClick: () -> Unit,*/
     viewModel: HistoryViewModel,
     modifier: Modifier = Modifier,
     context: Context = LocalContext.current,
@@ -104,12 +78,9 @@ fun HistoryView(
         }
     }
 
-    // LogoutDialog(showLogoutDialog, onLogOutClick)
-
     LazyColumn(
         modifier = modifier
             .fillMaxSize(),
-        // .padding(top = topPadding + 15.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
