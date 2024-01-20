@@ -97,4 +97,8 @@ dependencies {
     testImplementation("androidx.arch.core:core-testing:2.2.0")
 
     implementation("androidx.compose.material:material-icons-extended:1.5.4")
+
+    implementation("io.insert-koin:koin-android:3.5.3")
+    implementation("io.insert-koin:koin-androidx-compose:3.5.3")
+    implementation("io.insert-koin:koin-androidx-navigation:3.5.3")
 }

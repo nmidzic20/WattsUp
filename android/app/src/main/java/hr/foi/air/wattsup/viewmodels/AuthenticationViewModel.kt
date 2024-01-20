@@ -11,10 +11,10 @@ import hr.foi.air.wattsup.network.NetworkService
 import hr.foi.air.wattsup.network.models.Card
 import hr.foi.air.wattsup.network.models.LoginBody
 import hr.foi.air.wattsup.network.models.RegistrationBody
-import hr.foi.air.wattsup.repository.WattsUpRepositoryImpl
+import hr.foi.air.wattsup.repository.WattsUpRepository
 import hr.foi.air.wattsup.utils.LastRegisteredCard
 
-class AuthenticationViewModel(private val repository: WattsUpRepositoryImpl) : ViewModel() {
+class AuthenticationViewModel(private val repository: WattsUpRepository) : ViewModel() {
 
     private val authService = NetworkService.authService
 
