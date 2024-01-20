@@ -76,12 +76,11 @@ import hr.foi.air.wattsup.ui.theme.WattsUpTheme
 import hr.foi.air.wattsup.ui.theme.colorDarkGray
 import hr.foi.air.wattsup.utils.LastAddedCard
 import hr.foi.air.wattsup.utils.LastRegisteredCard
-import hr.foi.air.wattsup.viewmodels.AuthenticationViewModel
 import hr.foi.air.wattsup.viewmodels.CardViewModel
 import hr.foi.air.wattsup.viewmodels.ChargerViewModel
 import hr.foi.air.wattsup.viewmodels.HistoryViewModel
-import hr.foi.air.wattsup.viewmodels.ScanViewModel
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : ComponentActivity() {
 
@@ -89,10 +88,6 @@ class MainActivity : ComponentActivity() {
     private lateinit var REQUIRED_PERMISSIONS: List<String>
 
     private val chargerViewModel: ChargerViewModel by viewModels()
-    private val scanViewModel: ScanViewModel by viewModels()
-    private val historyViewModel: HistoryViewModel by viewModels()
-    private val cardViewModel: CardViewModel by viewModels()
-    private val authenticationViewModel: AuthenticationViewModel by viewModels()
 
     private var cardManagers: List<CardManager> = emptyList()
     private var receivers: MutableList<BroadcastReceiver> =
@@ -123,6 +118,9 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background,
                 ) {
+                    val cardViewModel: CardViewModel = koinViewModel()
+                    val historyViewModel: HistoryViewModel = koinViewModel()
+
                     val navigationState = rememberDrawerState(initialValue = DrawerValue.Closed)
                     val scope = rememberCoroutineScope()
                     var selectedItemIndex by rememberSaveable {
@@ -299,7 +297,7 @@ class MainActivity : ComponentActivity() {
                                     null,
                                     { navigate(R.string.landing_route) },
                                     onScan,
-                                    scanViewModel,
+                                    koinViewModel(),
                                     cardManagers,
                                 )
                             }
@@ -313,7 +311,7 @@ class MainActivity : ComponentActivity() {
                                     LastRegisteredCard,
                                     { navigate(R.string.registration_route) },
                                     onScan,
-                                    scanViewModel,
+                                    koinViewModel(),
                                     cardManagers,
                                 )
                             }
@@ -327,7 +325,7 @@ class MainActivity : ComponentActivity() {
                                     LastAddedCard,
                                     { navigate(R.string.user_mode_route) },
                                     onScan,
-                                    scanViewModel,
+                                    koinViewModel(),
                                     cardManagers,
                                 )
                             }
@@ -349,7 +347,7 @@ class MainActivity : ComponentActivity() {
                                     onArrowBackClick,
                                     onLogInClick,
                                     onAddCard,
-                                    authenticationViewModel,
+                                    viewModel = koinViewModel(),
                                 )
                             }
                             composable(getString(R.string.login_route)) {
@@ -363,7 +361,7 @@ class MainActivity : ComponentActivity() {
                                     onRegisterClick,
                                     onLogin,
                                     { navigate(R.string.landing_route) },
-                                    authenticationViewModel,
+                                    viewModel = koinViewModel(),
                                 )
                             }
                             composable(getString(R.string.user_mode_route)) {

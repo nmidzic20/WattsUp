@@ -13,13 +13,14 @@ import androidx.test.rule.GrantPermissionRule
 import androidx.test.rule.GrantPermissionRule.grant
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
-import org.junit.Assert.*
+import org.junit.Assert.* // ktlint-disable no-wildcard-imports
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class UITests {
+
     @get:Rule
     val composeTestRule = createAndroidComposeRule<MainActivity>()
 
@@ -34,6 +35,18 @@ class UITests {
         Manifest.permission.BLUETOOTH_CONNECT,
         Manifest.permission.BLUETOOTH_SCAN,
     )
+
+    /*@After
+    fun tearDownKoin() {
+        try {
+            stopKoin()
+            startKoin {
+                modules(dataModule, viewModelsModule)
+            }
+        } catch (ex: Exception) {
+            Log.e("UI_TEST", ex.toString())
+        }
+    }*/
 
     @Test
     fun wrongLoginTest() {

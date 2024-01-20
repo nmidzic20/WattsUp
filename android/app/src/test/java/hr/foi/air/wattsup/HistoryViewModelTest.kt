@@ -3,6 +3,7 @@ package hr.foi.air.wattsup
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import hr.foi.air.wattsup.network.models.Event
+import hr.foi.air.wattsup.repository.TestRepositoryImpl
 import hr.foi.air.wattsup.viewmodels.HistoryViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.resetMain
@@ -29,7 +30,7 @@ class HistoryViewModelTest {
     fun setup() {
         MockitoAnnotations.openMocks(this)
         Dispatchers.setMain(Dispatchers.Unconfined)
-        viewModel = HistoryViewModel()
+        viewModel = HistoryViewModel(TestRepositoryImpl())
     }
 
     @After

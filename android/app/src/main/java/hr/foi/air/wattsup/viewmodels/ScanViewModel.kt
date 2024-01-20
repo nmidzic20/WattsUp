@@ -7,9 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hr.foi.air.wattsup.core.CardManager
 import hr.foi.air.wattsup.core.CardScanCallback
-import hr.foi.air.wattsup.network.CardService
-import hr.foi.air.wattsup.network.NetworkService
 import hr.foi.air.wattsup.network.models.Card
+import hr.foi.air.wattsup.repository.WattsUpRepository
 import hr.foi.air.wattsup.utils.HexUtils
 import hr.foi.air.wattsup.utils.LastNewCard
 import hr.foi.air.wattsup.utils.UserCard
@@ -17,13 +16,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
-class ScanViewModel : ViewModel() {
+class ScanViewModel(private val repository: WattsUpRepository) : ViewModel() {
 
-    private val cardService: CardService = NetworkService.cardService
     private var scanTimeoutJob: Job? = null
     private val _scanning = MutableLiveData(false)
     val scanning: LiveData<Boolean> get() = _scanning
@@ -225,24 +220,8 @@ class ScanViewModel : ViewModel() {
             )
         }
 
-        cardService.authenticateCard(deviceAddress).enqueue(object : Callback<Card?> {
-            override fun onResponse(call: Call<Card?>, response: Response<Card?>) {
-                checkedCardAddresses.add(deviceAddress)
+        val onResponse: () -> Unit = { checkedCardAddresses.add(deviceAddress) }
 
-                if (response.isSuccessful && response.body() != null) {
-                    Log.i("CARD_RES", "Success")
-                    onCardAuthenticated(response.body()!!)
-                    // put onCardInvalid() instead of onCardAuthenticated to test scanning with invalid card
-                } else {
-                    Log.i("CARD_RES", "Fail")
-                    onCardInvalid()
-                }
-            }
-
-            override fun onFailure(call: Call<Card?>, t: Throwable) {
-                Log.i("CARD_RES", "Network error")
-                onCardInvalid()
-            }
-        })
+        repository.authenticateCard(deviceAddress, onResponse, onCardAuthenticated, onCardInvalid)
     }
 }

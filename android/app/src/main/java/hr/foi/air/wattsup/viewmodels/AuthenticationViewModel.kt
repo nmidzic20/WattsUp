@@ -13,19 +13,21 @@ import hr.foi.air.wattsup.network.models.Card
 import hr.foi.air.wattsup.network.models.LoginBody
 import hr.foi.air.wattsup.network.models.LoginResponseBody
 import hr.foi.air.wattsup.network.models.RegistrationBody
-import hr.foi.air.wattsup.network.models.RegistrationResponseBody
-import hr.foi.air.wattsup.network.models.TokenManager
+import hr.foi.air.wattsup.repository.WattsUpRepository
 import hr.foi.air.wattsup.utils.LastRegisteredCard
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class AuthenticationViewModel : ViewModel() {
+class AuthenticationViewModel(private val repository: WattsUpRepository) : ViewModel() {
 
     private val authService = NetworkService.authService
 
     private val _showLoading = MutableLiveData<Boolean>(false)
     val showLoading: LiveData<Boolean> = _showLoading
+
+    private val _toastMessage = MutableLiveData<String>("")
+    val toastMessage: LiveData<String> = _toastMessage
 
     private val _interactionSource =
         MutableLiveData<MutableInteractionSource>(MutableInteractionSource())
@@ -105,30 +107,17 @@ class AuthenticationViewModel : ViewModel() {
     fun loginUser(email: String, password: String, context: Context, onLogin: () -> Unit) {
         _showLoading.value = true
 
-        authService.loginUser(LoginBody(email, password)).enqueue(
-            object : Callback<LoginResponseBody> {
-                override fun onResponse(
-                    call: Call<LoginResponseBody>?,
-                    response: Response<LoginResponseBody>?,
-                ) {
-                    _showLoading.value = false
-
-                    if (response?.isSuccessful == true) {
-                        val responseBody = response.body()
-                        val tokenManager = TokenManager.getInstance(context)
-                        tokenManager.setRefreshToken(responseBody!!.refreshToken)
-                        tokenManager.setRefreshTokenExpiresAt(responseBody.refreshToken)
-                        tokenManager.setJWTToken(responseBody.jwt)
-                        onLogin()
-                    } else {
-                        showToast(context, "Invalid credentials")
-                    }
-                }
-
-                override fun onFailure(call: Call<LoginResponseBody>?, t: Throwable?) {
-                    _showLoading.value = false
-                    showToast(context, "Failed to login user")
-                }
+        repository.loginUser(
+            context,
+            LoginBody(email, password),
+            onLogin = {
+                _showLoading.value = false
+                showToast(context, "Successfully logged in")
+                onLogin()
+            },
+            onError = { errorMessage ->
+                _showLoading.value = false
+                _toastMessage.value = errorMessage
             },
         )
     }
@@ -144,39 +133,17 @@ class AuthenticationViewModel : ViewModel() {
     ) {
         _showLoading.value = true
 
-        authService.registerUser(
+        repository.registerUser(
             RegistrationBody(firstName, lastName, email, password, card),
-        ).enqueue(
-            object : Callback<RegistrationResponseBody> {
-                override fun onResponse(
-                    call: Call<RegistrationResponseBody>?,
-                    response: Response<RegistrationResponseBody>?,
-                ) {
-                    Log.i("RES", response.toString())
-                    _showLoading.value = false
-
-                    if (response?.isSuccessful == true) {
-                        val responseBody = response.body()
-                        val message =
-                            "Registered new user under ID ${responseBody?.id}, first name: ${responseBody?.firstName}, last name: ${responseBody?.lastName}, email: ${responseBody?.email}"
-                        Log.i("Response", message)
-                        showToast(context, "Successfully registered user")
-                        onLogInClick()
-                    } else {
-                        val responseBody = response?.body()
-                        Log.i("Response", (responseBody ?: response).toString())
-                        showToast(context, "Failed to register user")
-                        onLogInClick()
-                    }
-                }
-
-                override fun onFailure(
-                    call: Call<RegistrationResponseBody>?,
-                    t: Throwable?,
-                ) {
-                    Log.i("Response", t.toString())
-                    showToast(context, "Failed to register user")
-                }
+            onSuccess = {
+                _showLoading.value = false
+                showToast(context, "Successfully registered user")
+                onLogInClick()
+            },
+            onError = { errorMessage ->
+                _showLoading.value = false
+                showToast(context, errorMessage)
+                onLogInClick()
             },
         )
     }

@@ -37,7 +37,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.ui.component.LoadingSpinner
@@ -175,10 +174,4 @@ fun LoginView(
             }
         }
     }
-}
-
-@Preview(showBackground = false)
-@Composable
-fun LoginPreview() {
-    LoginScreen({}, {}, {}, AuthenticationViewModel())
 }

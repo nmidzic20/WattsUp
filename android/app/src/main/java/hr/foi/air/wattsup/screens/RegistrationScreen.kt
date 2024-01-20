@@ -41,7 +41,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import hr.foi.air.wattsup.R
 import hr.foi.air.wattsup.network.models.Card
@@ -284,10 +283,4 @@ fun CentralView(
             )
         }
     }
-}
-
-@Preview(showBackground = false)
-@Composable
-fun RegistrationPreview() {
-    RegistrationScreen({}, {}, {}, AuthenticationViewModel())
 }
