@@ -1,6 +1,7 @@
 package hr.foi.air.wattsup.viewmodels
 
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.lifecycle.LiveData
@@ -10,9 +11,13 @@ import androidx.lifecycle.ViewModel
 import hr.foi.air.wattsup.network.NetworkService
 import hr.foi.air.wattsup.network.models.Card
 import hr.foi.air.wattsup.network.models.LoginBody
+import hr.foi.air.wattsup.network.models.LoginResponseBody
 import hr.foi.air.wattsup.network.models.RegistrationBody
 import hr.foi.air.wattsup.repository.WattsUpRepository
 import hr.foi.air.wattsup.utils.LastRegisteredCard
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class AuthenticationViewModel(private val repository: WattsUpRepository) : ViewModel() {
 

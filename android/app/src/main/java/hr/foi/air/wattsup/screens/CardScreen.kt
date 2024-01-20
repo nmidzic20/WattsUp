@@ -176,7 +176,11 @@ fun CardView(
 }
 
 @Composable
-fun CardCard(item: Card, userId: Int?, onExpiredToken: () -> Unit, viewModel: CardViewModel) {
+fun CardCard(
+    item: Card,
+    userId: Int?,
+    onExpiredToken: () -> Unit,
+    viewModel: CardViewModel) {
     val width = LocalConfiguration.current.screenWidthDp.dp * 0.92f
     val showRemoveDialog = remember { mutableStateOf(false) }
     val selectedCardId = remember { mutableIntStateOf(-1) }
