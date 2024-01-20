@@ -95,8 +95,6 @@ class MainActivity : ComponentActivity() {
     private val chargerViewModel: ChargerViewModel by viewModels()
     private val scanViewModel: ScanViewModel by viewModels()
     private val historyViewModel: HistoryViewModel by viewModels()
-    private val cardViewModel: CardViewModel by viewModels()
-    // private val authenticationViewModel: AuthenticationViewModel by viewModels()
 
     private var cardManagers: List<CardManager> = emptyList()
     private var receivers: MutableList<BroadcastReceiver> =
@@ -132,6 +130,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background,
                 ) {
+                    val cardViewModel: CardViewModel = koinViewModel()
+
                     val navigationState = rememberDrawerState(initialValue = DrawerValue.Closed)
                     val scope = rememberCoroutineScope()
                     var selectedItemIndex by rememberSaveable {
@@ -359,7 +359,6 @@ class MainActivity : ComponentActivity() {
                                     onLogInClick,
                                     onAddCard,
                                     viewModel = koinViewModel(),
-                                    // authenticationViewModel,
                                 )
                             }
                             composable(getString(R.string.login_route)) {
@@ -374,7 +373,6 @@ class MainActivity : ComponentActivity() {
                                     onLogin,
                                     { navigate(R.string.landing_route) },
                                     viewModel = koinViewModel(),
-                                    // authenticationViewModel,
                                 )
                             }
                             composable(getString(R.string.user_mode_route)) {
