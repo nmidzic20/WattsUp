@@ -27,9 +27,6 @@ class AuthenticationViewModel : ViewModel() {
     private val _showLoading = MutableLiveData<Boolean>(false)
     val showLoading: LiveData<Boolean> = _showLoading
 
-    private val _toastMessage = MutableLiveData<String>("")
-    val toastMessage: LiveData<String> = _toastMessage
-
     private val _interactionSource =
         MutableLiveData<MutableInteractionSource>(MutableInteractionSource())
     val interactionSource: LiveData<MutableInteractionSource> = _interactionSource
@@ -124,13 +121,13 @@ class AuthenticationViewModel : ViewModel() {
                         tokenManager.setJWTToken(responseBody.jwt)
                         onLogin()
                     } else {
-                        _toastMessage.value = "Invalid e-mail or password"
+                        showToast(context, "Invalid credentials")
                     }
                 }
 
                 override fun onFailure(call: Call<LoginResponseBody>?, t: Throwable?) {
                     _showLoading.value = false
-                    _toastMessage.value = "Failed to login user"
+                    showToast(context, "Failed to login user")
                 }
             },
         )
