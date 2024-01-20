@@ -2,6 +2,7 @@ package hr.foi.air.wattsup.repository
 
 import android.content.Context
 import hr.foi.air.wattsup.network.models.Card
+import hr.foi.air.wattsup.network.models.Event
 import hr.foi.air.wattsup.network.models.LoginBody
 import hr.foi.air.wattsup.network.models.LoginResponseBody
 import hr.foi.air.wattsup.network.models.RegistrationBody
@@ -44,4 +45,12 @@ interface WattsUpRepository {
         onSuccess: () -> Unit,
         onFailure: (message: String) -> Unit,
     )
+
+    suspend fun getChargerName(context: Context, chargerId: Int): String?
+    suspend fun getCards(context: Context, userId: Int): List<Card?>
+    suspend fun getEvents(
+        context: Context,
+        cardId: Int,
+        onResponse: (String) -> Unit,
+    ): List<Event?>
 }

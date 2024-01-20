@@ -94,7 +94,6 @@ class MainActivity : ComponentActivity() {
 
     private val chargerViewModel: ChargerViewModel by viewModels()
     private val scanViewModel: ScanViewModel by viewModels()
-    private val historyViewModel: HistoryViewModel by viewModels()
 
     private var cardManagers: List<CardManager> = emptyList()
     private var receivers: MutableList<BroadcastReceiver> =
@@ -131,6 +130,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background,
                 ) {
                     val cardViewModel: CardViewModel = koinViewModel()
+                    val historyViewModel: HistoryViewModel = koinViewModel()
 
                     val navigationState = rememberDrawerState(initialValue = DrawerValue.Closed)
                     val scope = rememberCoroutineScope()
