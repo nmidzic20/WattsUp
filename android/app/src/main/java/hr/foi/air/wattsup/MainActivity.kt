@@ -81,7 +81,6 @@ import hr.foi.air.wattsup.utils.LastRegisteredCard
 import hr.foi.air.wattsup.viewmodels.CardViewModel
 import hr.foi.air.wattsup.viewmodels.ChargerViewModel
 import hr.foi.air.wattsup.viewmodels.HistoryViewModel
-import hr.foi.air.wattsup.viewmodels.ScanViewModel
 import kotlinx.coroutines.launch
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
@@ -93,7 +92,6 @@ class MainActivity : ComponentActivity() {
     private lateinit var REQUIRED_PERMISSIONS: List<String>
 
     private val chargerViewModel: ChargerViewModel by viewModels()
-    private val scanViewModel: ScanViewModel by viewModels()
 
     private var cardManagers: List<CardManager> = emptyList()
     private var receivers: MutableList<BroadcastReceiver> =
@@ -308,7 +306,7 @@ class MainActivity : ComponentActivity() {
                                     null,
                                     { navigate(R.string.landing_route) },
                                     onScan,
-                                    scanViewModel,
+                                    koinViewModel(),
                                     cardManagers,
                                 )
                             }
@@ -322,7 +320,7 @@ class MainActivity : ComponentActivity() {
                                     LastRegisteredCard,
                                     { navigate(R.string.registration_route) },
                                     onScan,
-                                    scanViewModel,
+                                    koinViewModel(),
                                     cardManagers,
                                 )
                             }
@@ -336,7 +334,7 @@ class MainActivity : ComponentActivity() {
                                     LastAddedCard,
                                     { navigate(R.string.user_mode_route) },
                                     onScan,
-                                    scanViewModel,
+                                    koinViewModel(),
                                     cardManagers,
                                 )
                             }

@@ -53,4 +53,11 @@ interface WattsUpRepository {
         cardId: Int,
         onResponse: (String) -> Unit,
     ): List<Event?>
+
+    fun authenticateCard(
+        deviceAddress: String,
+        onResponse: () -> Unit,
+        onCardAuthenticated: (card: Card) -> Unit,
+        onCardInvalid: () -> Unit,
+    )
 }

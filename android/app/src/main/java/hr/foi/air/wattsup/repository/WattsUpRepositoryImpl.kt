@@ -250,4 +250,28 @@ class WattsUpRepositoryImpl : WattsUpRepository {
             })
         }
     }
+
+    override fun authenticateCard(
+        deviceAddress: String,
+        onResponse: () -> Unit,
+        onCardAuthenticated: (card: Card) -> Unit,
+        onCardInvalid: () -> Unit,
+    ) {
+        cardService.authenticateCard(deviceAddress).enqueue(object : Callback<Card?> {
+            override fun onResponse(call: Call<Card?>, response: Response<Card?>) {
+                onResponse()
+
+                if (response.isSuccessful && response.body() != null) {
+                    onCardAuthenticated(response.body()!!)
+                    // put onCardInvalid() instead of onCardAuthenticated to test scanning with invalid card
+                } else {
+                    onCardInvalid()
+                }
+            }
+
+            override fun onFailure(call: Call<Card?>, t: Throwable) {
+                onCardInvalid()
+            }
+        })
+    }
 }
