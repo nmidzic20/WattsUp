@@ -61,8 +61,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import hr.foi.air.wattsup.ble.BLEManager
 import hr.foi.air.wattsup.core.CardManager
-import hr.foi.air.wattsup.di.dataModule
-import hr.foi.air.wattsup.di.viewModelsModule
 import hr.foi.air.wattsup.navigation.CustomNavDrawerItem
 import hr.foi.air.wattsup.network.models.TokenManager
 import hr.foi.air.wattsup.rfid.RFIDManager
@@ -82,9 +80,7 @@ import hr.foi.air.wattsup.viewmodels.CardViewModel
 import hr.foi.air.wattsup.viewmodels.ChargerViewModel
 import hr.foi.air.wattsup.viewmodels.HistoryViewModel
 import kotlinx.coroutines.launch
-import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
-import org.koin.core.context.startKoin
 
 class MainActivity : ComponentActivity() {
 
@@ -100,11 +96,6 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        startKoin {
-            androidContext(this@MainActivity)
-            modules(dataModule, viewModelsModule)
-        }
 
         cardManagers = listOf(
             BLEManager(this),

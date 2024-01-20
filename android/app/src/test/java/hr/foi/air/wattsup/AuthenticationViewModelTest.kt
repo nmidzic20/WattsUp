@@ -3,6 +3,7 @@ package hr.foi.air.wattsup
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import hr.foi.air.wattsup.network.models.Card
+import hr.foi.air.wattsup.repository.TestRepositoryImpl
 import hr.foi.air.wattsup.viewmodels.AuthenticationViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.resetMain
@@ -35,7 +36,8 @@ class AuthenticationViewModelTest {
     fun setup() {
         MockitoAnnotations.openMocks(this)
         Dispatchers.setMain(Dispatchers.Unconfined)
-        viewModel = AuthenticationViewModel()
+
+        viewModel = AuthenticationViewModel(TestRepositoryImpl())
     }
 
     @After
