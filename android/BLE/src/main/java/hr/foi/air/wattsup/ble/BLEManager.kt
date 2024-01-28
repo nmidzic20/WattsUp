@@ -3,7 +3,6 @@ package hr.foi.air.wattsup.ble
 import android.Manifest
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothGatt
 import android.bluetooth.le.BluetoothLeScanner
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanFilter
@@ -26,8 +25,6 @@ class BLEManager(
 
     private var bluetoothAdapter: BluetoothAdapter? = null
     private var bluetoothLeScanner: BluetoothLeScanner? = null
-    private var bluetoothGatt: BluetoothGatt? = null
-
     private var scanCallback: ScanCallback? = null
     private var onScanStop: () -> Unit = {}
 
@@ -36,8 +33,6 @@ class BLEManager(
     }
 
     companion object {
-        private const val REQUEST_PERMISSIONS = 1
-        private const val REQUEST_PERMISSIONS_CONNECT = 2
         private const val REQUEST_PERMISSIONS_SCAN = 3
         private const val REQUEST_ENABLE_BLUETOOTH = 4
     }

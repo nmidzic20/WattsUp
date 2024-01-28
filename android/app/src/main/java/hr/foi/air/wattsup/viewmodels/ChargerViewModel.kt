@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hr.foi.air.wattsup.network.NetworkService
+import hr.foi.air.wattsup.network.models.Charger
 import hr.foi.air.wattsup.network.models.EventPOSTBody
 import hr.foi.air.wattsup.network.models.EventPOSTResponseBody
 import hr.foi.air.wattsup.network.models.EventPUTBody
@@ -23,6 +24,7 @@ class ChargerViewModel : ViewModel() {
 
     private val maxChargePercentage = 1f
     private val selectedChargerId = MutableLiveData(1)
+    private val _lastSelectedInitialChargeValue = MutableLiveData(0)
 
     private val _charging = MutableLiveData(false)
     private val _startTime = MutableLiveData(0L)
@@ -38,8 +40,11 @@ class ChargerViewModel : ViewModel() {
     private val _currentChargeVolume = MutableLiveData(0f)
     private val _eventService = NetworkService.eventService
     private val _openFullChargeAlertDialog = MutableLiveData(false)
-    private val _toastMessage = MutableLiveData<String>()
+    private val _toastMessage = MutableLiveData<String?>()
     private val currentChargeVolume: LiveData<Float> get() = _currentChargeVolume
+    private val _lastSelectedCharger = MutableLiveData<Charger?>(null)
+
+    private val _chargerList = MutableLiveData<List<Charger?>>(emptyList())
 
     val charging: LiveData<Boolean> get() = _charging
     val timeElapsed: LiveData<Long> get() = _timeElapsed
@@ -48,8 +53,13 @@ class ChargerViewModel : ViewModel() {
 
     // Variable used to track the amount of charge in kWh for current charging session
     val currentChargeAmount: LiveData<Float> get() = _currentChargeAmount
+    val lastSelectedInitialChargeValue: LiveData<Int> get() = _lastSelectedInitialChargeValue
+    val lastSelectedCharger: LiveData<Charger?> get() = _lastSelectedCharger
+
+    val chargerList: LiveData<List<Charger?>> = _chargerList
+
     val openFullChargeAlertDialog: LiveData<Boolean> = _openFullChargeAlertDialog
-    val toastMessage: LiveData<String> get() = _toastMessage
+    val toastMessage: MutableLiveData<String?> get() = _toastMessage
     fun setOpenFullChargeAlertDialog(value: Boolean) {
         _openFullChargeAlertDialog.value = value
     }
@@ -58,10 +68,14 @@ class ChargerViewModel : ViewModel() {
         _initialChargeAmount.value = positionValue
         _amountNecessaryForFullCharge.value = maxChargePercentage - _initialChargeAmount.value!!
         _currentChargeAmount.value = _initialChargeAmount.value
+
+        _lastSelectedInitialChargeValue.value =
+            (positionValue * 100).toInt()
     }
 
-    fun updateSelectedCharger(chargerId: Int) {
-        selectedChargerId.value = chargerId
+    fun updateSelectedCharger(charger: Charger) {
+        selectedChargerId.value = charger.id
+        _lastSelectedCharger.value = charger
     }
 
     fun toggleCharging(onFullyCharged: () -> Unit) {
@@ -86,10 +100,12 @@ class ChargerViewModel : ViewModel() {
         _currentChargeVolume.value = 0f
         viewModelScope.launch {
             launch {
-                val eventPOSTBody =
-                    EventPOSTBody(selectedChargerId.value!!, UserCard.userCard.value!!.id)
-                // chargerID is sent as 1 since charger selection is yet to be implemented
-                startEvent(eventPOSTBody)
+                if (selectedChargerId.value != null && UserCard.userCard.value != null) {
+                    val eventPOSTBody =
+                        EventPOSTBody(selectedChargerId.value!!, UserCard.userCard.value!!.id)
+
+                    startEvent(eventPOSTBody)
+                }
             }
             while (_charging.value == true) {
                 if (_percentageChargedUntilFull.value!! < _amountNecessaryForFullCharge.value!!) {
@@ -128,12 +144,16 @@ class ChargerViewModel : ViewModel() {
         _amountNecessaryForFullCharge.value =
             (maxChargePercentage - currentChargeAmount.value!!).coerceIn(0f, 1f)
 
-        val eventPUTBody = EventPUTBody(
-            CurrentEvent.currentEvent.value!!.id,
-            currentChargeVolume.value!!,
-        )
+        _lastSelectedInitialChargeValue.value = (_currentChargeAmount.value!! * 100).toInt()
+
         viewModelScope.launch {
-            stopEvent(eventPUTBody)
+            if (CurrentEvent.currentEvent.value != null && currentChargeVolume.value != null) {
+                val eventPUTBody = EventPUTBody(
+                    CurrentEvent.currentEvent.value!!.id,
+                    currentChargeVolume.value!!,
+                )
+                stopEvent(eventPUTBody)
+            }
         }
     }
 
@@ -181,6 +201,29 @@ class ChargerViewModel : ViewModel() {
                 override fun onFailure(call: Call<EventPUTResponseBody>, t: Throwable) {
                     Log.i("Response", t.toString())
                     _toastMessage.value = "Error saving event"
+                }
+            },
+        )
+    }
+
+    fun getChargers() {
+        val chargerService = NetworkService.chargerService
+
+        chargerService.getChargers().enqueue(
+            object : retrofit2.Callback<List<Charger?>> {
+                override fun onResponse(
+                    call: Call<List<Charger?>?>,
+                    response: Response<List<Charger?>?>,
+                ) {
+                    Log.i("CHARGER_RES", "${response.body()} $response")
+
+                    _chargerList.value = response.body() as List<Charger?>
+                    Log.i("CHARGER_RES", _chargerList.value.toString())
+                }
+
+                override fun onFailure(call: Call<List<Charger?>>, t: Throwable) {
+                    Log.i("Error ", t.toString())
+                    _toastMessage.value = t.toString()
                 }
             },
         )

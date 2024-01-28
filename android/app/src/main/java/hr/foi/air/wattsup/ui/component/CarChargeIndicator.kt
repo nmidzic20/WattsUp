@@ -7,14 +7,24 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
-import androidx.compose.runtime.* // ktlint-disable no-wildcard-imports
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.* // ktlint-disable no-wildcard-imports
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -38,6 +48,7 @@ fun CarChargeIndicator(
     maxValue: Int = 100,
     circleRadius: Float,
     onPositionChange: (Int) -> Unit,
+    onDrag: (Int) -> Unit,
 ) {
     var circleCenter by remember {
         mutableStateOf(Offset.Zero)
@@ -89,6 +100,8 @@ fun CarChargeIndicator(
                                 positionValue =
                                     (oldPositionValue + (changeAngle / (360f / (maxValue - minValue)))).roundToInt()
                             }
+
+                            onDrag(positionValue)
                         },
                         onDragEnd = {
                             oldPositionValue = positionValue
@@ -208,5 +221,6 @@ fun Preview() {
         circleRadius = 230f,
         onPositionChange = {
         },
+        onDrag = {},
     )
 }

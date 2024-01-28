@@ -2,7 +2,6 @@ package hr.foi.air.wattsup.screens
 
 import android.content.res.Configuration
 import android.widget.Toast
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,6 +19,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -277,12 +277,12 @@ fun ChargingIndicators(
 @Composable
 fun SimulatorButton(onClick: () -> Unit) {
     Button(
+        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
         onClick = onClick,
         modifier = Modifier
             .height(70.dp)
             .padding(10.dp)
             .clip(RoundedCornerShape(28.dp))
-            .background(MaterialTheme.colorScheme.secondary)
             .shadow(4.dp, shape = RoundedCornerShape(28.dp)),
     ) {
         Row(
@@ -293,9 +293,10 @@ fun SimulatorButton(onClick: () -> Unit) {
                 imageVector = Icons.Default.Settings,
                 contentDescription = null,
                 modifier = Modifier.size(24.dp),
+                tint = Color.White,
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text(text = "Simulator")
+            Text(text = "Simulator", color = Color.White)
         }
     }
 }

@@ -64,12 +64,15 @@ dependencies {
     implementation(project(mapOf("path" to ":RFID")))
     implementation(project(mapOf("path" to ":core")))
     implementation(platform("androidx.compose:compose-bom:2023.03.00"))
+    implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
+    implementation("androidx.test:rules:1.5.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
+    androidTestImplementation("androidx.test.uiautomator:uiautomator:2.3.0-beta01")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
@@ -94,4 +97,10 @@ dependencies {
     androidTestImplementation("org.mockito:mockito-android:5.7.0")
 
     testImplementation("androidx.arch.core:core-testing:2.2.0")
+
+    implementation("androidx.compose.material:material-icons-extended:1.5.4")
+
+    implementation("io.insert-koin:koin-android:3.5.3")
+    implementation("io.insert-koin:koin-androidx-compose:3.5.3")
+    implementation("io.insert-koin:koin-androidx-navigation:3.5.3")
 }

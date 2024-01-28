@@ -7,22 +7,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import hr.foi.air.wattsup.core.CardManager
 import hr.foi.air.wattsup.core.CardScanCallback
-import hr.foi.air.wattsup.network.CardService
-import hr.foi.air.wattsup.network.NetworkService
 import hr.foi.air.wattsup.network.models.Card
+import hr.foi.air.wattsup.repository.WattsUpRepository
 import hr.foi.air.wattsup.utils.HexUtils
+import hr.foi.air.wattsup.utils.LastNewCard
 import hr.foi.air.wattsup.utils.UserCard
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
-class ScanViewModel : ViewModel() {
+class ScanViewModel(private val repository: WattsUpRepository) : ViewModel() {
 
-    private val cardService: CardService = NetworkService.cardService
     private var scanTimeoutJob: Job? = null
     private val _scanning = MutableLiveData(false)
     val scanning: LiveData<Boolean> get() = _scanning
@@ -31,21 +27,30 @@ class ScanViewModel : ViewModel() {
     private val _userMessage = MutableLiveData("")
     val userMessage: LiveData<String> get() = _userMessage
 
-    fun getStatusMessage(scanning: Boolean, cardManager: CardManager): String =
+    fun getStatusMessage(
+        scanning: Boolean,
+        lastNewCard: LastNewCard?,
+        cardManager: CardManager,
+    ): String =
         if (!cardManager.isCardSupportAvailableOnDevice()) {
             "${cardManager.getName()} is not supported on this device"
         } else if (!cardManager.isCardSupportEnabledOnDevice()) {
             "${cardManager.getName()} is not enabled on this device"
         } else {
-            if (scanning) "No registered ${cardManager.getName()} card found" else "${cardManager.getName()} is supported and enabled on this device"
+            if (scanning) "No ${if (lastNewCard == null) "registered " else ""}${cardManager.getName()} card found" else "${cardManager.getName()} is supported and enabled on this device"
         }
 
-    fun startScanning(cardManager: CardManager, onScan: () -> Unit) {
+    fun startScanning(cardManager: CardManager, onScan: () -> Unit, lastNewCard: LastNewCard?) {
         if (!cardManager.isCardSupportEnabledOnDevice()) {
             cardManager.stopScanningForCard()
             _scanning.value = false
             _scanSuccess.value = false
             _userMessage.value = "${cardManager.getName()} is not enabled on this device"
+            viewModelScope.launch {
+                // Clear the user message after 5 seconds, so that it does not stay if the user in meantime enables that card support
+                delay(5000)
+                _userMessage.value = ""
+            }
             return
         }
 
@@ -54,13 +59,13 @@ class ScanViewModel : ViewModel() {
         cardManager.startScanningForCard(
             object : CardScanCallback {
                 override fun onScanResult(cardAddress: Any) {
-                    handleScanResult(cardAddress, onScan, cardManager)
+                    handleScanResult(cardAddress, onScan, cardManager, lastNewCard)
                 }
 
                 override fun onScanFailed(error: String) {
                     _scanning.value = false
                     _scanSuccess.value = false
-                    _userMessage.value = getStatusMessage(true, cardManager)
+                    _userMessage.value = getStatusMessage(true, lastNewCard, cardManager)
                     Log.i("SCAN", "Scanning failed, error message: $error")
                 }
 
@@ -72,7 +77,7 @@ class ScanViewModel : ViewModel() {
                             cardManager.stopScanningForCard()
                             _scanning.value = false
                             _scanSuccess.value = false
-                            _userMessage.value = getStatusMessage(true, cardManager)
+                            _userMessage.value = getStatusMessage(true, lastNewCard, cardManager)
                         }
                     }
                 }
@@ -84,15 +89,65 @@ class ScanViewModel : ViewModel() {
         )
     }
 
-    private fun handleScanResult(result: Any, onScan: () -> Unit, cardManager: CardManager) {
+    private fun handleScanResult(
+        result: Any,
+        onScan: () -> Unit,
+        cardManager: CardManager,
+        lastNewCard: LastNewCard?,
+    ) {
         if (cardManager.scanResultRequiresAsyncHandling()) {
             viewModelScope.launch(Dispatchers.Main) {
-                checkedCardAddresses.clear()
-                handleScan(result, onScan, cardManager) { cardManager.stopScanningForCard() }
+                if (lastNewCard != null) {
+                    saveCardToLastAddedCard(
+                        lastNewCard,
+                        result,
+                        onScan,
+                    ) { cardManager.stopScanningForCard() }
+                } else {
+                    checkedCardAddresses.clear()
+                    handleScan(result, onScan, cardManager) { cardManager.stopScanningForCard() }
+                }
             }
         } else {
-            handleScan(result, onScan, cardManager) { cardManager.stopScanningForCard() }
+            if (lastNewCard != null) {
+                saveCardToLastAddedCard(
+                    lastNewCard,
+                    result,
+                    onScan,
+                ) { cardManager.stopScanningForCard() }
+            } else {
+                handleScan(result, onScan, cardManager) { cardManager.stopScanningForCard() }
+            }
         }
+    }
+
+    private fun formatDeviceAddress(result: Any): String = when (result) {
+        is ByteArray -> HexUtils.formatHexToPrefix(HexUtils.bytesToHexString(result))
+        is String -> HexUtils.formatHexToPrefix(result)
+        else -> throw IllegalArgumentException("Unsupported result type")
+    }
+
+    private fun saveCardToLastAddedCard(
+        lastNewCard: LastNewCard,
+        result: Any,
+        onScan: () -> Unit,
+        onCardFound: () -> Unit,
+    ) {
+        var deviceAddress: String = formatDeviceAddress(result)
+
+        lastNewCard.setLastNewCard(Card(id = 0, value = deviceAddress, active = true))
+
+        onCardFound()
+        scanTimeoutJob?.cancel()
+
+        _scanSuccess.value = true
+        _scanning.value = false
+        _userMessage.value = "Scan successful"
+
+        onScan()
+
+        _scanSuccess.value = false
+        _userMessage.value = ""
     }
 
     private val checkedCardAddresses = mutableSetOf<String>()
@@ -103,12 +158,7 @@ class ScanViewModel : ViewModel() {
         cardManager: CardManager,
         onCardFound: () -> Unit,
     ) {
-        var deviceAddress: String = ""
-        if (result is ByteArray) {
-            deviceAddress = HexUtils.formatHexToPrefix(HexUtils.bytesToHexString(result))
-        } else if (result is String) {
-            deviceAddress = HexUtils.formatHexToPrefix(result)
-        }
+        var deviceAddress: String = formatDeviceAddress(result)
 
         Log.i("SCAN", "Scanned: $deviceAddress")
 
@@ -144,9 +194,8 @@ class ScanViewModel : ViewModel() {
             }
         }
 
-        val cardAddress = "0" +
-            deviceAddress.substring(1, 2).lowercase() + deviceAddress.uppercase()
-                .substring(2)
+        val cardAddress = HexUtils.formatToDatabase(deviceAddress)
+
         Log.i(
             "CARD_BEFORE_RES",
             cardAddress,
@@ -171,24 +220,8 @@ class ScanViewModel : ViewModel() {
             )
         }
 
-        cardService.authenticateCard(deviceAddress).enqueue(object : Callback<Card?> {
-            override fun onResponse(call: Call<Card?>, response: Response<Card?>) {
-                checkedCardAddresses.add(deviceAddress)
+        val onResponse: () -> Unit = { checkedCardAddresses.add(deviceAddress) }
 
-                if (response.isSuccessful && response.body() != null) {
-                    Log.i("CARD_RES", "Success")
-                    onCardAuthenticated(response.body()!!)
-                    // put onCardInvalid() instead of onCardAuthenticated to test scanning with invalid card
-                } else {
-                    Log.i("CARD_RES", "Fail")
-                    onCardInvalid()
-                }
-            }
-
-            override fun onFailure(call: Call<Card?>, t: Throwable) {
-                Log.i("CARD_RES", "Network error")
-                onCardInvalid()
-            }
-        })
+        repository.authenticateCard(deviceAddress, onResponse, onCardAuthenticated, onCardInvalid)
     }
 }

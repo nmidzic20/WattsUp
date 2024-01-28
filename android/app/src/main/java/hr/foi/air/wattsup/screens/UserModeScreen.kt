@@ -2,146 +2,147 @@
 
 package hr.foi.air.wattsup.screens
 
-import android.annotation.SuppressLint
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ExitToApp
-import androidx.compose.material3.Card
-import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import hr.foi.air.wattsup.R
+import hr.foi.air.wattsup.navigation.bottomAppBarItems
+import hr.foi.air.wattsup.ui.component.LogoutDialog
 import hr.foi.air.wattsup.ui.component.TopAppBar
+import hr.foi.air.wattsup.ui.theme.colorDarkGray
+import hr.foi.air.wattsup.ui.theme.colorGray
+import hr.foi.air.wattsup.viewmodels.CardViewModel
+import hr.foi.air.wattsup.viewmodels.HistoryViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun UserModeScreen(onHistoryClick: () -> Unit, onArrowBackClick: () -> Unit) {
+fun UserModeScreen(
+    historyViewModel: HistoryViewModel,
+    cardsViewModel: CardViewModel,
+    onArrowBackClick: () -> Unit,
+    onLogOut: () -> Unit,
+    onAddCard: () -> Unit,
+    resetUserScreenData: () -> Unit,
+) {
     val showLogoutDialog = remember { mutableStateOf(false) }
+    val selectedRoute = remember { mutableIntStateOf(R.string.cards) }
+
+    val onLogOutFromUserMode = {
+        onLogOut()
+
+        resetUserScreenData()
+    }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("User Mode") },
                 navigationIcon = {
+                    IconButton(onClick = {
+                        onArrowBackClick()
+                        resetUserScreenData()
+                    }) {
+                        Icon(Icons.Filled.ArrowBack, null, tint = Color.White)
+                    }
+                },
+                actionIcon = {
                     IconButton(onClick = { showLogoutDialog.value = true }) {
                         Icon(Icons.Filled.ExitToApp, null, tint = Color.White)
                     }
                 },
             )
         },
-    ) {
-        UserModeView(onHistoryClick, onArrowBackClick, showLogoutDialog)
-    }
-}
+        bottomBar = {
+            BottomAppBar(
+                containerColor = if (isSystemInDarkTheme()) Color.White else colorGray,
+                contentColor = if (isSystemInDarkTheme()) colorDarkGray else Color.White,
+                content = {
+                    bottomAppBarItems.forEach { item ->
+                        NavigationBarItem(
+                            colors = NavigationBarItemDefaults
+                                .colors(
+                                    indicatorColor = MaterialTheme.colorScheme.primary,
+                                    selectedTextColor = if (isSystemInDarkTheme()) colorDarkGray else Color.White,
+                                    unselectedIconColor = if (isSystemInDarkTheme()) colorDarkGray else Color.White,
+                                    unselectedTextColor = if (isSystemInDarkTheme()) colorDarkGray else Color.White,
+                                ),
+                            icon = {
+                                Icon(
+                                    imageVector = item.icon,
+                                    contentDescription = stringResource(id = item.labelResId),
 
-@Composable
-fun UserModeView(onHistoryClick: () -> Unit, onArrowBackClick: () -> Unit, showLogoutDialog: MutableState<Boolean>) {
-    LogoutDialog(showLogoutDialog, onArrowBackClick)
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
-            .padding(0.dp, 15.dp)
-            .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        ElevatedButton(
-            onClick = onHistoryClick
-        ) {
-            Text(
-                text = stringResource(R.string.history),
-                style = MaterialTheme.typography.bodyLarge,
-                color = Color.White,
-            )
-        }
-    }
-}
-
-@Composable
-private fun LogoutDialog(openAlertDialog: MutableState<Boolean>, onArrowBackClick: () -> Unit) {
-    when {
-        openAlertDialog.value -> {
-            Dialog(onDismissRequest = { openAlertDialog.value = false }) {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(150.dp)
-                        .padding(16.dp),
-                    shape = RoundedCornerShape(16.dp),
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Text(
-                            fontSize = 20.sp,
-                            text = "Would you like to log out?",
-                            modifier = Modifier.padding(16.dp),
+                                )
+                            },
+                            label = { Text(text = stringResource(item.labelResId)) },
+                            onClick = { selectedRoute.value = item.labelResId },
+                            selected = selectedRoute.value == item.labelResId,
                         )
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceEvenly,
-                        ) {
-                            TextButton(
-                                onClick = { openAlertDialog.value = false },
-                                modifier = Modifier.padding(8.dp),
-                            ) {
-                                Text(
-                                    text = "Cancel",
-                                    fontSize = 16.sp
-                                )
-                            }
-                            TextButton(
-                                onClick = { openAlertDialog.value = false; onArrowBackClick() },
-                                modifier = Modifier.padding(8.dp),
-                            ) {
-                                Text(
-                                    text = "Yes",
-                                    fontSize = 16.sp
-                                )
-                            }
-                        }
                     }
-                }
-            }
-        }
+                },
+            )
+        },
+    ) {
+        val modifier = Modifier.padding(it)
+
+        UserModeView(
+            selectedRoute,
+            onLogOutFromUserMode,
+            showLogoutDialog,
+            historyViewModel,
+            cardsViewModel,
+            onAddCard,
+            modifier,
+        )
     }
 }
 
-/*@Preview(showBackground = false)
 @Composable
-fun UserModePreview() {
-    UserModeScreen {}
-}*/
+fun UserModeView(
+    selectedRoute: MutableIntState,
+    onLogOut: () -> Unit,
+    showLogoutDialog: MutableState<Boolean>,
+    historyViewModel: HistoryViewModel,
+    cardsViewModel: CardViewModel,
+    onAddCard: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    LogoutDialog(
+        showLogoutDialog,
+        onLogOut,
+    )
+
+    when (selectedRoute.value) {
+        R.string.history ->
+            HistoryScreen(
+                viewModel = historyViewModel,
+                modifier = modifier,
+            )
+
+        R.string.cards -> CardScreen(
+            onAddCard = onAddCard,
+            viewModel = cardsViewModel,
+            onLogOut = onLogOut,
+            modifier = modifier,
+        )
+    }
+}

@@ -9,7 +9,7 @@ object HexUtils {
             // Convert each part to a two-character lowercase hex string
             String.format("%02x", part.toInt(16))
         }
-        return "0x$formattedHex"
+        return "0x${formattedHex.uppercase()}"
     }
 
     fun compareHexStrings(hexString1: String, hexString2: String): Boolean {
@@ -28,4 +28,8 @@ object HexUtils {
         }
         return stringBuilder.toString()
     }
+
+    fun formatToDatabase(deviceAddress: String) = "0" +
+        deviceAddress.substring(1, 2).lowercase() + deviceAddress.uppercase()
+            .substring(2)
 }

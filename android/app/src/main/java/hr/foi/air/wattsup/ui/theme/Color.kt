@@ -5,16 +5,17 @@ import androidx.compose.ui.graphics.Color
 val colorPrimary = Color(0xff11CB54) // green
 
 // val colorSecondary = Color(0xffffe43d) // yellow
-val colorSecondary = Color(0xffFFCD39) // dark yellow
+val colorSecondary = Color(0xfff0b402) // dark yellow
 val colorIterativeView = Color(0xff26D465) // lighter green
 
-val colorBackground = Color(0xfff0f8ff) // alice blue
+val colorBackground = Color.White // white
 
 val colorBackgroundDark = Color(0xff303030) // almost black
 val colorPrimaryDark = colorPrimary
 
 val colorBtnRed = Color(0xffFF6262)
 val colorSilver = Color(0xffC0C0C0)
+var colorDarkSilver = Color(0xffa19f9f)
 
 val colorDarkGray = Color(0xFF1a1717)
 val colorOrange = Color(0xFFdb660d)
