@@ -2,14 +2,11 @@ name: Build and test
 
 on:
   push:
-    branches: [ "dev_backend**", "dev-backend" ]
+    branches: ["dev-backend"]
   pull_request:
-    branches: [ "dev_backend**", "dev-backend" ]
+    branches: ["dev-backend"]
   workflow_dispatch:
-    inputs:
-      branch:
-        description: 'Branch name'
-        required: true
+
 jobs:
   build:
     runs-on: windows-latest
@@ -22,13 +19,17 @@ jobs:
 
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1.3.1
-      
+
       - name: Navigate to Workspace
         run: cd $GITHUB_WORKSPACE
 
       - name: List Directories
         run: dir
-        
+
+      - name: Replace secret placeholder in appsettings.json
+        run: |
+          sed -i "s/#{DB_CONNECTION_STRING}/${{ secrets.DB_CONNECTION_STRING }}/g" backend/appsettings.json
+
       - name: Restore NuGet packages for backend
         run: nuget restore backend/backend.sln
 
@@ -40,6 +41,3 @@ jobs:
 
       - name: Run Unit Tests
         run: dotnet test ControllerUnitTests/ControllerUnitTests.csproj --configuration Release
-
-      - name: Build Docker image
-        run: docker build -t Dockerfile -f backend/ .
