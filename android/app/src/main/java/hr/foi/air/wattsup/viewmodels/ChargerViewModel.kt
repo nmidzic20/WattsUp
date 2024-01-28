@@ -40,7 +40,7 @@ class ChargerViewModel : ViewModel() {
     private val _currentChargeVolume = MutableLiveData(0f)
     private val _eventService = NetworkService.eventService
     private val _openFullChargeAlertDialog = MutableLiveData(false)
-    private val _toastMessage = MutableLiveData<String>()
+    private val _toastMessage = MutableLiveData<String?>()
     private val currentChargeVolume: LiveData<Float> get() = _currentChargeVolume
     private val _lastSelectedCharger = MutableLiveData<Charger?>(null)
 
@@ -59,7 +59,7 @@ class ChargerViewModel : ViewModel() {
     val chargerList: LiveData<List<Charger?>> = _chargerList
 
     val openFullChargeAlertDialog: LiveData<Boolean> = _openFullChargeAlertDialog
-    val toastMessage: LiveData<String> get() = _toastMessage
+    val toastMessage: MutableLiveData<String?> get() = _toastMessage
     fun setOpenFullChargeAlertDialog(value: Boolean) {
         _openFullChargeAlertDialog.value = value
     }
