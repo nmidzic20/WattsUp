@@ -25,7 +25,7 @@ jobs:
 
       - name: List Directories
         run: dir
-
+        
       - name: Replace secret placeholder in appsettings.json
         run: |
           sed -i "s/#{DB_CONNECTION_STRING}/${{ secrets.DB_CONNECTION_STRING }}/g" backend/appsettings.json
@@ -42,8 +42,5 @@ jobs:
       - name: Run Unit Tests
         run: dotnet test ControllerUnitTests/ControllerUnitTests.csproj --configuration Release
 
-      - name: Login to Docker Hub
-        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-
       - name: Build Docker image
-        run: docker build -t wattsup-backend -f backend/Dockerfile ./backend
+        run: docker build -t Dockerfile -f backend/ .
