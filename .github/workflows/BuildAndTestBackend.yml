@@ -25,7 +25,7 @@ jobs:
 
       - name: List Directories
         run: dir
-        
+
       - name: Replace secret placeholder in appsettings.json
         run: |
           sed -i "s/#{DB_CONNECTION_STRING}/${{ secrets.DB_CONNECTION_STRING }}/g" backend/appsettings.json
@@ -41,6 +41,3 @@ jobs:
 
       - name: Run Unit Tests
         run: dotnet test ControllerUnitTests/ControllerUnitTests.csproj --configuration Release
-
-      - name: Build Docker image
-        run: docker build -t Dockerfile -f backend/ .
