@@ -1,0 +1,59 @@
+$defaultFont: 'Arial', 'Helvetica', 'sans-serif';
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+* {
+    margin: 0;
+}
+body {
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    background-color: #F5FFF6;
+    font-family: $defaultFont;
+}
+img, picture, video, canvas, svg {
+    display: block;
+    max-width: 100%;
+}
+input, button, textarea, select {
+font: inherit;
+}
+p, h1, h2, h3, h4, h5, h6 {
+    overflow-wrap: break-word;
+}
+#root, #__next {
+    isolation: isolate;
+}
+
+canvas{
+    transform: matrix(1, 0, 0, 1, 0, 0) !important;
+}
+
+.spinner {
+    width: 48px;
+    height: 48px;
+    border: 5px solid #f5fff6;
+    border-bottom-color: #11cb54;
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+0% {
+    transform: rotate(0deg);
+}
+100% {
+    transform: rotate(360deg);
+}
+} 
+
+.center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 85vh;
+    width: 100%;
+}

@@ -1,0 +1,41 @@
+<div *ngIf="isVisible" class="dialogue-container">
+    <div class="dialogue-content">
+        <h2 *ngIf="!isUpdateMode">ADD NEW CHARGING STATION</h2>
+        <h2 *ngIf="isUpdateMode">UPDATE CHARGING STATION</h2>
+        <div *ngIf="dialogueInputContainerIsVisible" class="dialogue-input-container">
+            <div class="dialogue-input">
+                <label for="name">Station name:</label>
+                <input *ngIf="!isUpdateMode" type="text" name="name" id="stationName">
+                <input *ngIf="isUpdateMode" type="text" name="name" id="stationName" value={{isUpdateMode.name}}>
+            </div>
+            <div class="longitude-latitude-container">
+                <div>
+                    <div class="dialogue-input">
+                        <label for="longitude">Longitude:</label>
+                        <input *ngIf="!isUpdateMode" type="text" name="longitude" id="longitude">
+                        <input *ngIf="isUpdateMode" type="text" name="longitude" id="longitude" value={{isUpdateMode.longitude}}>
+                    </div>
+                    <div class="dialogue-input">
+                        <label for="latitude">Latitude:</label>
+                        <input *ngIf="!isUpdateMode" type="text" name="latitude" id="latitude">
+                        <input *ngIf="isUpdateMode" type="text" name="latitude" id="latitude" value={{isUpdateMode.latitude}}>
+                    </div>
+                </div>
+                <button id="map-button" (click)="openMap()"><img src="../../assets/map_location_icon.png" alt="Map Location"></button>
+            </div>
+
+            <div class="dialogue-buttons">
+                <button id="close-button" (click)="close()">Close</button>
+                <button *ngIf="!isUpdateMode" (click)="addStation()">Add</button>
+                <button *ngIf="isUpdateMode" (click)="updateStation()">Update</button>
+            </div>
+        </div>
+        <div *ngIf="dialogueMapIsVisible" class="dialogue-map-container">
+            <div id="map" class="map"></div>
+            <div class="map-buttons">
+                <button id="close-button" (click)="closeMap()">Cancel</button>
+                <button (click)="loadMarkerCoordinatesToInputFields()">Pick</button>
+            </div>
+        </div>
+    </div>
+</div>

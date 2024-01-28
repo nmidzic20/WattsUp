@@ -1,0 +1,14 @@
+<nav>
+  <a id="logo" routerLink="/">WattsUp</a>
+
+  <a *ngIf="isAdmin" routerLink="/station-management">STATION MANAGEMENT</a>
+  <a *ngIf="isUser || isAdmin" routerLink="/map">MAP</a>
+  <a *ngIf="isUser || isAdmin" routerLink="/statistics">STATISTICS</a>
+  <a *ngIf="isUser || isAdmin" (click)="logOut()">
+    <img src="../assets/logout.png" alt="LogOut">
+  </a>
+</nav>
+
+<main>
+  <router-outlet></router-outlet>
+</main>

@@ -1,0 +1,13 @@
+.map {
+    width: 100%;
+    height: calc(100vh - 90px);
+    display: flex;
+    justify-self: center;
+    padding: 0;
+  }
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+}

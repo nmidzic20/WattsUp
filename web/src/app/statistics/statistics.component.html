@@ -1,0 +1,50 @@
+<div class="statistics" *ngIf="!loading">
+        <div class="data">
+                <div class="graph">
+                        <div class="graph-title">Weekly charging</div>
+                        <div class="canvas">
+                                <canvas baseChart
+                                        [data]="chartData"
+                                        [options]="chartOptions"
+                                        [legend]="false"
+                                        [type]="'bar'">
+                                </canvas>
+                        </div>
+                        <div class="date">
+                                <button class="arrow" (click)="prevWeek()"><</button>
+                                <div class="date-value">{{ weekStartDate | date:'dd.MM.yyyy' }} &ndash; {{ weekEndDate | date:'dd.MM.yyyy' }}</div>
+                                <button class="arrow" (click)="nextWeek()">></button>
+                        </div>
+                </div>
+                <div class="cards">
+                        <div class="card">
+                                <div class="car-title">Total amount charged</div>
+                                <div class="card-value">{{amountCharged}} kWh</div>
+                        </div>
+                        <div class="card">
+                                <div class="car-title">Time spent charging</div>
+                                <div class="card-value">{{timeCharged}}</div>
+                        </div>
+                </div>
+        </div>
+        <table>
+                <thead>
+                        <tr>
+                            <th>Started at</th>
+                            <th>Ended at</th>
+                            <th>Log</th>
+                        </tr>
+                    </thead>
+                <tbody>
+                    <tr *ngFor="let event of events">
+                        <td>{{ event.startedAt | date: 'dd.MM.yyyy  HH:mm:ss' }}</td>
+                        <td>{{ event.endedAt | date: 'dd.MM.yyyy  HH:mm:ss' }}</td>
+                        <td>Charged {{ roundVolumeKwh(event.volumeKwh) }}kWh in {{ calculateDuration(event) }}</td>
+                    </tr>
+                </tbody>
+            </table>
+</div>
+
+<div class="center" *ngIf="loading">
+    <div class="spinner"></div>
+</div>
