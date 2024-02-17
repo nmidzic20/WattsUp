@@ -12,8 +12,17 @@ This is a Work-Based Learning (WBL) project developed in collaboration with Mobi
 
 ## Test data for login
 
-Administrator - Username: **admin** Password: **123456**
-Ordinary user - Username: **user** Password: **123456**
+### Administrator
+
+Username: **admin** 
+
+Password: **123456**
+
+### Ordinary user
+
+Username: **user** 
+
+Password: **123456**
 
 Certain web pages are available only with admin account, so it's suggested to use admin credentials to test full functionality of the app.
 
