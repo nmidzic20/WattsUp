@@ -1,6 +1,6 @@
 # AiR WBL Mobilisis - WattsUp
 
-This is a Work-Based Learning (WBL) project developed in collaboration with Mobilisis for the course Program Analysis and Development (Analiza i razvoj programa). 'WattsUp' is an Android mobile application designed for managing the charging of personal electric cars and providing an overview of charging statistics. Additionally, an Angular web application is created that enables users to access their charging statistics, locations, and other information about available chargers in a specific area. The web application also allows administrators to perform CRUD (Create, Read, Update, Delete) operations on charger data and user data. The backend is implemented in .NET Framework and PostgreSQL. 
+This is a Work-Based Learning (WBL) project developed in collaboration with Mobilisis for the course Program Analysis and Development (Analiza i razvoj programa). 'WattsUp' is an Android mobile application designed for managing the charging of personal electric cars, providing an overview of charging statistics and user managements of RFID/BLE cards used to login into one's account. Additionally, an Angular web application is created that enables users to access their charging statistics, locations, and other information about available chargers in a specific area. The web application also allows administrators to perform CRUD (Create, Read, Update, Delete) operations on charger data and user data. The backend is implemented in .NET Framework and PostgreSQL. 
 
 ## Technologies
 
