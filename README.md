@@ -75,4 +75,10 @@ This will create Docker container with Postgres database. Now you can run .NET p
 
 Before migration to always-on server, connecting to API was done on local machines, with Docker database and ASP.NET project running locally. Angular project uses IP address localhost, so no need to adjust it. As for Android project, since localhost or 10.0.0.2 do not work there for API connection, before running the mobile application, in BASE_URL inside NetworkService class it is necessary to change the address to the local IP address of the current machine (the port used for the backend remains the same, 32770).
 
-Update 20/12/2023: backend has been hosted on render.com.
+Update 20/12/2023: backend has been hosted on `render.com`.
+
+# Git workflow
+
+Three `develop` branches are used for each project, `dev-android` for Android project, `dev-web` for Angular project and `dev-backend` for ASP.NET project. All feature branches are prefixed with the name of the appropriate `dev` branch and referenced with the corresponding Jira issue identificatior (`ANP-[Jira issue ID]`). When the feature branch is finished, PR is created and after two reviewers have approved it, merged into the corresponding `dev` branch.  Hotfixes are commited directly into `dev` branches whenever necessary. At the end of the production, all three `dev` branches were merged into `main` branch.
+
+CD/CI includes GitHub Actions for building and running unit tests for backend, Jenkins for deployment of Android application, SonarCloud for static code analysis.
