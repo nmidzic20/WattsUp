@@ -36,7 +36,7 @@ Backend is currently hosted online so no need to run Docker first. If you still 
 
 ### Angular project
 
-Web project can be tested on: https://wattsup.onrender.com/
+Web project can be tested on: https://wattsup.onrender.com/. Since backend is hosted on free version of Render, it spins down with inactivity, so logging in for the first time or after a period of inactivity can take up to a minute.
 
 Alternatively, if you want to run it locally, you have an option to run locally with running local backend first, or running locally with hosted backend, using the commands below.
 
