@@ -30,7 +30,7 @@ Certain web pages are available only with admin account, so it's suggested to us
 
 ### Android project
 
-Open the project inside android directory from `dev-android` branch in Android Studio. If testing without running Docker, i.e. with hosted backend, logging in for the first time or after a period of inactivity can take up to a minute.
+Open the project inside `android` directory from `dev-android` branch in Android Studio. If testing without running Docker, i.e. with hosted backend, logging in for the first time or after a period of inactivity can take up to a minute.
 
 Backend is currently hosted online so no need to run Docker first. If you still want to use Docker, before running the Android app, in code it is necessary to change the BASE_URL address to the local IP address of the current machine, since `localhost` won't work (see the end of README).
 
