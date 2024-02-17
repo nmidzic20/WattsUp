@@ -2,18 +2,28 @@
 
 This is a Work-Based Learning (WBL) project developed in collaboration with Mobilisis for the course Program Analysis and Development (Analiza i razvoj programa). 'WattsUp' is an Android mobile application designed for managing the charging of personal electric cars and providing an overview of charging statistics. Additionally, an Angular web application is created that enables users to access their charging statistics, locations, and other information about available chargers in a specific area. The web application also allows administrators to perform CRUD (Create, Read, Update, Delete) operations on charger data and user data. The backend is implemented in .NET Framework and PostgreSQL. 
 
-## Technologies not covered throughout laboratory exercises:
+## Technologies
 
 - Docker Desktop (installation link and instructions: https://www.docker.com/products/docker-desktop/)
 - Visual Studio Code, if using as IDE for Angular project (installation link and instructions: https://code.visualstudio.com/download)
 - Visual Studio 2022, IDE for ASP.NET project (installation link and instructions: https://visualstudio.microsoft.com/vs/community/)
+- Android Studio (Giraffe, installation link: https://developer.android.com/studio/install)
 - PostgreSQL (installation link and instructions: https://www.postgresql.org/download/)
+
+## Test data for login
+
+Administrator - Username: **admin** Password: **123456**
+Ordinary user - Username: **user** Password: **123456**
+
+Certain web pages are available only with admin account, so it's suggested to use admin credentials to test full functionality of the app.
 
 ## Instructions for starting the projects
 
 ### Android project
 
-Open the project inside android directory from dev-android branch in Android Studio.
+Open the project inside android directory from `dev-android` branch in Android Studio. 
+
+Backend is currently hosted online so no need to run Docker first. If you still want to use Docker, before running the Android app, in code it is necessary to change the BASE_URL address to the local IP address of the current machine, since `localhost` won't work (see the end of README).
 
 ### Angular project
 
@@ -63,6 +73,6 @@ This will create Docker container with Postgres database. Now you can run .NET p
 
 ### Connecting to API
 
-Until we migrate backend to always-on server, connecting to API is done on local machines, with Docker database and ASP.NET project running locally. Angular project uses IP address localhost, so no need to adjust it. As for Android project, since localhost or 10.0.0.2 do not work there for API connection, before running the mobile application, in BASE_URL inside NetworkService class it is necessary to change the address to the local IP address of the current machine (the port used for the backend remains the same, 32770).
+Before migration to always-on server, connecting to API was done on local machines, with Docker database and ASP.NET project running locally. Angular project uses IP address localhost, so no need to adjust it. As for Android project, since localhost or 10.0.0.2 do not work there for API connection, before running the mobile application, in BASE_URL inside NetworkService class it is necessary to change the address to the local IP address of the current machine (the port used for the backend remains the same, 32770).
 
 Update 20/12/2023: backend has been hosted on render.com.
